@@ -73,10 +73,10 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 
 /* Fill-in */
 .fi-wrap{display:flex;gap:10px;margin-bottom:8px}
-.fi-input{flex:1;background:var(–surface2);border:1px solid var(–border);border-radius:12px;padding:13px 16px;font-size:15px;font-family:‘DM Mono’,monospace;color:var(–text);outline:none;transition:border-color .2s}
-.fi-input:focus{border-color:var(–accent)}
-.fi-input.correct{border-color:var(–accent3);background:rgba(107,255,184,.08)}
-.fi-input.wrong{border-color:var(–accent2);background:rgba(255,107,107,.08)}
+.fi-input{flex:1;background:transparent;border:none;border-bottom:2px solid var(–border);border-radius:0;padding:10px 4px;font-size:18px;font-family:‘DM Mono’,monospace;color:var(–text);outline:none;transition:border-color .2s;letter-spacing:.05em}
+.fi-input:focus{border-color:var(–accent);border-bottom-width:3px}
+.fi-input.correct{border-color:var(–accent3);background:transparent}
+.fi-input.wrong{border-color:var(–accent2);background:transparent}
 .submit-btn{background:var(–accent);color:#ffffff;border:none;border-radius:12px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘DM Sans’,sans-serif;transition:opacity .2s}
 .submit-btn:hover{opacity:.85}
 .submit-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -211,10 +211,10 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .review-qcard{background:var(–surface2);border:1px solid var(–border);border-radius:16px;padding:24px;margin-bottom:14px}
 .review-sentence{font-size:15px;line-height:1.7;color:var(–text2);margin-bottom:16px}
 .review-fi-wrap{display:flex;gap:8px;margin-bottom:8px}
-.review-fi-input{flex:1;background:var(–bg);border:1px solid var(–border);border-radius:10px;padding:11px 14px;font-size:14px;font-family:‘DM Mono’,monospace;color:var(–text);outline:none;transition:border-color .2s}
-.review-fi-input:focus{border-color:var(–accent3)}
-.review-fi-input.correct{border-color:var(–accent3);background:rgba(107,255,184,.06)}
-.review-fi-input.wrong{border-color:var(–accent2);background:rgba(255,107,107,.06)}
+.review-fi-input{flex:1;background:transparent;border:none;border-bottom:2px solid var(–border);border-radius:0;padding:8px 4px;font-size:16px;font-family:‘DM Mono’,monospace;color:var(–text);outline:none;transition:border-color .2s;letter-spacing:.05em}
+.review-fi-input:focus{border-color:var(–accent3);border-bottom-width:3px}
+.review-fi-input.correct{border-color:var(–accent3);background:transparent}
+.review-fi-input.wrong{border-color:var(–accent2);background:transparent}
 .review-submit{background:var(–accent3);color:#ffffff;border:none;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:‘DM Sans’,sans-serif}
 .review-hint-row{display:flex;gap:8px;margin-top:8px}
 .review-hint-btn,.review-skip-btn{flex:1;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:‘DM Sans’,sans-serif;border:1px solid var(–border);background:var(–surface)}
@@ -229,6 +229,25 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .review-next.show{display:block}
 .review-done{text-align:center;padding:40px 20px;color:var(–text2)}
 .review-done h3{font-family:‘Playfair Display’,serif;font-size:22px;color:var(–accent3);margin-bottom:8px}
+
+/* 例句單字提示 tooltip */
+.word-tip{cursor:pointer;border-bottom:1px dashed var(–accent);color:var(–text);position:relative;white-space:nowrap}
+.word-tip:hover{color:var(–accent)}
+.tip-popup{display:none;position:fixed;z-index:500;background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:12px 16px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:13px;line-height:1.6;color:var(–text)}
+.tip-popup.show{display:block}
+.tip-popup .tip-word{font-weight:700;color:var(–accent);font-size:14px;margin-bottom:4px}
+.tip-popup .tip-close{float:right;cursor:pointer;color:var(–text3);font-size:16px;line-height:1;margin-left:8px}
+
+/* 心理學優化：連勝火焰動畫 + milestone 彈窗 */
+@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.streak-flame{display:inline-block;animation:flamePulse 1s ease-in-out infinite}
+.milestone-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:600;background:var(–surface);border:2px solid var(–accent);border-radius:24px;padding:32px 40px;text-align:center;opacity:0;transition:all .35s ease;pointer-events:none}
+.milestone-pop.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+.milestone-pop h2{font-family:‘Playfair Display’,serif;font-size:28px;margin-bottom:8px;color:var(–accent)}
+.milestone-pop p{font-size:14px;color:var(–text2);margin-bottom:20px}
+.milestone-pop button{background:var(–accent);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:‘DM Sans’,sans-serif}
+.milestone-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:599}
+.milestone-overlay.show{display:block}
 </style>
 
 </head>
@@ -252,10 +271,17 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
   <!-- QUIZ PAGE -->
   <div class="page on" id="page-quiz">
     <div class="stats-section">
-      <div class="stats-grid">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-box"><div class="n" id="statScore">0</div><div class="l">總積分</div></div>
         <div class="stat-box"><div class="n streak-n" id="statStreak">0</div><div class="l">🔥 連勝</div></div>
-        <div class="stat-box stat-mastered" onclick="openReview()" style="cursor:pointer;border-color:rgba(107,255,184,.3)" title="點擊複習"><div class="n" id="statMastered" style="color:var(--accent3)">0</div><div class="l" style="color:var(--accent3)">✅ 已背 <span style='font-size:10px'>(點擊複習)</span></div></div>
+        <div class="stat-box" style="border-color:rgba(255,149,0,.3)"><div class="n" style="color:#ff9500" id="statDayStreak">1</div><div class="l" style="color:#ff9500">📅 連續天數</div></div>
+        <div class="stat-box stat-mastered" onclick="openReview()" style="cursor:pointer;border-color:rgba(42,171,111,.3)" title="點擊複習"><div class="n" id="statMastered" style="color:var(--accent3)">0</div><div class="l" style="color:var(--accent3)">✅ 已背</div></div>
+      </div>
+      <div style="margin-top:14px;margin-bottom:4px;display:flex;justify-content:space-between;font-size:12px;color:var(--text3)">
+        <span>今日練習</span><span id="todayCountLabel">0 題</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:4px;margin-bottom:20px;overflow:hidden">
+        <div id="todayBar" style="height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent));border-radius:4px;transition:width .4s ease;width:0%"></div>
       </div>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
@@ -497,6 +523,7 @@ function init() {
     }
   });
   if (dirty) save();
+  checkDailyStreak();
   updateStats(); renderFilters(); renderCards(); buildQuiz();
 }
 
@@ -511,8 +538,19 @@ function updateStats() {
   document.getElementById('hStreak').textContent = streak;
   document.getElementById('statScore').textContent = score;
   document.getElementById('statStreak').textContent = streak;
-  const masteredCount = words.filter(w => w.fi_correct >= 3).length;
+  const masteredCount = words.filter(w => (w.fi_correct||0) >= 3).length;
   document.getElementById('statMastered').textContent = masteredCount;
+  // Daily streak
+  const ds = getDailyStreak();
+  const dsel = document.getElementById('statDayStreak');
+  if (dsel) dsel.textContent = ds;
+  // Today count bar (goal: 20 題)
+  const DAILY_GOAL = 20;
+  const todayN = getTodayCount();
+  const todayLabel = document.getElementById('todayCountLabel');
+  const todayBar = document.getElementById('todayBar');
+  if (todayLabel) todayLabel.textContent = `${todayN} / ${DAILY_GOAL} 題`;
+  if (todayBar) todayBar.style.width = Math.min(100, todayN/DAILY_GOAL*100) + '%';
 }
 
 function switchPage(p) {
@@ -566,13 +604,25 @@ function buildQuiz() {
   const badgeClass = isMC ? 'mc' : (isReview ? 'rev' : 'fi');
   const badgeText  = isMC ? '選擇題' : (isReview ? '⚠ 複習填空' : '填空');
 
-  // 例句（含挖空）
+  // 例句（含挖空 + 難字標注）
   let sentHTML = '';
   if (w.example) {
     const masked = isMC
       ? w.example.replace(new RegExp(escRegex(w.word),'gi'), '<span class="blank"></span>')
       : w.example.replace(new RegExp(escRegex(w.word),'gi'), '______');
-    sentHTML = `<div class="sentence" id="sentenceEl">${masked}</div>`;
+    // 標注難字（排除被挖空的目標單字）
+    const annotated = masked.replace(/<span[^>]*>.*?<\/span>|______/g,
+      m => m).replace(/(?<![<>"])\b([A-Za-z][a-z-]{3,})\b(?![^<]*>)/g, tok => {
+      const clean = tok.toLowerCase();
+      const entry = typeof HARD_WORDS !== 'undefined' && (HARD_WORDS[clean] || HARD_WORDS[clean.replace(/-/g,'')]);
+      if (entry && tok.toLowerCase() !== w.word.toLowerCase().split(' ')[0]) {
+        const pos = entry[0].replace(/'/g,"\'");
+        const def = entry[1].replace(/'/g,"\'");
+        return `<span class="word-tip" onclick="showTip(event,'${tok}','${pos}','${def}')">${tok}</span>`;
+      }
+      return tok;
+    });
+    sentHTML = `<div class="sentence" id="sentenceEl">${annotated}</div>`;
   } else {
     sentHTML = `<div class="loading" id="loadingEl"><div class="spinner"></div>正在生成例句…</div>
                 <div class="sentence" id="sentenceEl" style="display:none"></div>`;
@@ -631,13 +681,16 @@ function checkMC(btn, chosen, correct) {
   if (isOk) {
     btn.classList.add('correct');
     onCorrect();
-    speak(correct);  // 答對後才念
+    playSound('correct');
+    speak(correct, 700);  // 音效後再念
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.opt').forEach(b => {
       if (norm(b.textContent) === norm(correct)) b.classList.add('correct');
     });
     onWrong();
+    playSound('wrong');
+    speak(correct, 600);  // 答錯也念正確答案
   }
   // 答題後在每個選項下方顯示中文字義
   document.querySelectorAll('.opt').forEach(b => {
@@ -673,7 +726,8 @@ function checkFI(skipToAnswer) {
   if (isOk) {
     input.classList.add('correct');
     onCorrect();
-    speak(currentQ.word);  // 答對後才念
+    playSound('correct');
+    speak(currentQ.word, 700);  // 音效後再念
     showFeedback(true);
     // Track fill-in correct streak for "mastered"
     currentQ.fi_correct = (currentQ.fi_correct || 0) + 1;
@@ -691,6 +745,8 @@ function checkFI(skipToAnswer) {
     fb.className = 'feedback bad';
     fb.innerHTML = `${wrongDisplay}<b style="color:var(--accent2)">${escQ(currentQ.word)}</b>`;
     onWrong();
+    playSound('wrong');
+    speak(currentQ.word, 700);  // 答錯也念正確答案
     // Reset fi_correct on wrong
     currentQ.fi_correct = 0;
   }
@@ -712,10 +768,14 @@ function showHint() {
 function onCorrect() {
   score += 10 + streak; streak++;
   showScorePop(`+${10+Math.max(0,streak-1)} ⚡`);
+  incTodayCount();
   save(); updateStats();
+  checkMilestone(streak);
 }
 function onWrong() {
-  streak = 0; save(); updateStats();
+  streak = 0;
+  incTodayCount();
+  save(); updateStats();
 }
 
 function showScorePop(txt) {
@@ -798,12 +858,53 @@ async function fetchExample(w) {
 }
 
 // ── SPEECH ────────────────────────────────────────────
-function speak(word) {
+// Web Audio sound effects
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (type === 'correct') {
+      // 叮～ 上揚音
+      const freqs = [523, 659, 784];
+      freqs.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = f;
+        osc.type = 'sine';
+        const t = ctx.currentTime + i * 0.12;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        osc.start(t); osc.stop(t + 0.36);
+      });
+    } else {
+      // ㄉㄟˉㄉㄟˉ 下降音
+      const beeps = [320, 240];
+      beeps.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = f;
+        osc.type = 'square';
+        const t = ctx.currentTime + i * 0.22;
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        osc.start(t); osc.stop(t + 0.19);
+      });
+    }
+  } catch(e) {}
+}
+
+function speak(word, delay) {
   if (!window.speechSynthesis) return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(word);
-  u.lang = 'en-US'; u.rate = 0.85;
-  speechSynthesis.speak(u);
+  const doSpeak = () => {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US'; u.rate = 0.85;
+    speechSynthesis.speak(u);
+  };
+  if (delay) setTimeout(doSpeak, delay);
+  else doSpeak();
 }
 
 // ── 抽考模式（單字卡分頁新增） ────────────────────────
@@ -1077,7 +1178,8 @@ function checkReview(skipToAnswer) {
     input.classList.add('correct');
     fb.className = 'review-feedback ok';
     fb.textContent = ['答對了！🎉', '完美！✨', '記得很清楚！'][Math.floor(Math.random() * 3)];
-    speak(w.word);  // 答對後念
+    playSound('correct');
+    speak(w.word, 700);
   } else {
     input.classList.add('wrong');
     fb.className = 'review-feedback bad';
@@ -1085,6 +1187,8 @@ function checkReview(skipToAnswer) {
       ? `<span style="color:var(--accent2);text-decoration:line-through">${escQ(val)}</span> → `
       : '';
     fb.innerHTML = `${wrongPart}<b style="color:var(--accent2)">${escQ(w.word)}</b>`;
+    playSound('wrong');
+    speak(w.word, 700);
   }
 
   document.getElementById('reviewNext').classList.add('show');
@@ -1105,9 +1209,254 @@ function nextReview() {
   renderReview();
 }
 
+
+// ── 單字提示系統 ─────────────────────────────────────────
+// 雅思 5.5 程度可能不熟悉的詞彙，點了彈出解釋
+const HARD_WORDS = {
+  "well-drained":["adj.","排水良好的（土壤不積水）"],
+  "drained":["adj.","排乾的；精疲力竭的"],
+  "compost":["n.","堆肥"],
+  "fertilizer":["n.","肥料"],
+  "indigenous":["adj.","原生的；本土的"],
+  "perennial":["adj.","多年生的；長期的"],
+  "biodegradable":["adj.","可生物降解的"],
+  "photosynthesis":["n.","光合作用"],
+  "chlorophyll":["n.","葉綠素"],
+  "connoisseur":["n.","鑑賞家；行家"],
+  "ephemeral":["adj.","短暫的；朝生暮死的"],
+  "nocturnal":["adj.","夜行性的"],
+  "equinox":["n.","晝夜平分點"],
+  "solstice":["n.","至日（夏至/冬至）"],
+  "temperate":["adj.","溫和的；溫帶的"],
+  "pristine":["adj.","原始的；純潔的"],
+  "verdant":["adj.","翠綠的"],
+  "dormant":["adj.","休眠的"],
+  "propagate":["v.","繁殖；傳播"],
+  "germinate":["v.","發芽"],
+  "albeit":["conj.","雖然；儘管"],
+  "consequently":["adv.","因此；結果"],
+  "nevertheless":["adv.","然而；儘管如此"],
+  "subsequently":["adv.","隨後；後來"],
+  "simultaneously":["adv.","同時地"],
+  "predominantly":["adv.","主要地；主導地"],
+  "intrinsically":["adv.","本質上；固有地"],
+  "empirically":["adv.","憑經驗地"],
+  "tangible":["adj.","有形的；實際的"],
+  "intangible":["adj.","無形的；難以捉摸的"],
+  "impeccable":["adj.","無瑕的；完美的"],
+  "meticulous":["adj.","一絲不苟的；仔細的"],
+  "eloquent":["adj.","雄辯的；有說服力的"],
+  "resilient":["adj.","有彈性的；快速恢復的"],
+  "inevitable":["adj.","不可避免的"],
+  "unprecedented":["adj.","前所未有的"],
+  "catastrophic":["adj.","災難性的"],
+  "detrimental":["adj.","有害的"],
+  "paramount":["adj.","最重要的；首要的"],
+  "plausible":["adj.","看似合理的；可信的"],
+  "ambiguous":["adj.","模糊的；有歧義的"],
+  "concise":["adj.","簡潔的"],
+  "coherent":["adj.","條理清晰的；連貫的"],
+  "legitimate":["adj.","合法的；正當的"],
+  "arbitrary":["adj.","任意的；武斷的"],
+  "monotonous":["adj.","單調的；無變化的"],
+  "strenuous":["adj.","費力的；艱苦的"],
+  "vigorous":["adj.","精力充沛的；強健的"],
+  "sporadic":["adj.","零星的；偶爾發生的"],
+  "chronic":["adj.","慢性的；長期的"],
+  "acute":["adj.","急性的；敏銳的"],
+  "diminish":["v.","減少；縮小"],
+  "alleviate":["v.","減輕；緩和"],
+  "exacerbate":["v.","使惡化；加重"],
+  "mitigate":["v.","緩解；減輕"],
+  "facilitate":["v.","促進；使便利"],
+  "inhibit":["v.","抑制；阻礙"],
+  "stimulate":["v.","刺激；激勵"],
+  "depict":["v.","描繪；描述"],
+  "portray":["v.","描繪；扮演"],
+  "contemplate":["v.","沉思；考慮"],
+  "perceive":["v.","察覺；感知"],
+  "acknowledge":["v.","承認；認可"],
+  "demonstrate":["v.","證明；示範"],
+  "incorporate":["v.","納入；合併"],
+  "implement":["v.","實施；執行"],
+  "advocate":["v./n.","提倡；支持者"],
+  "scrutinize":["v.","仔細審查；細看"],
+  "articulate":["v./adj.","清楚表達；口齒清晰的"],
+  "elaborate":["v./adj.","詳述；精心製作的"],
+  "spontaneous":["adj.","自發的；自然的"],
+  "deliberate":["adj./v.","故意的；深思熟慮"],
+  "momentum":["n.","動力；勢頭"],
+  "paradigm":["n.","範例；模式"],
+  "phenomenon":["n.","現象"],
+  "hypothesis":["n.","假設；假說"],
+  "ideology":["n.","意識形態"],
+  "consensus":["n.","共識"],
+  "hierarchy":["n.","等級制度；層次"],
+  "rhetoric":["n.","修辭；花言巧語"],
+  "analogy":["n.","類比；比喻"],
+  "nuance":["n.","細微差別；微妙之處"],
+  "dilemma":["n.","兩難困境"],
+  "cynical":["adj.","憤世嫉俗的；懷疑的"],
+  "pragmatic":["adj.","務實的；實際的"],
+  "naive":["adj.","天真的；幼稚的"],
+  "skeptical":["adj.","懷疑的"],
+  "versatile":["adj.","多才多藝的；多功能的"],
+  "ambivalent":["adj.","矛盾的；左右為難的"],
+  "compel":["v.","強迫；迫使"],
+  "deter":["v.","阻止；使打消念頭"],
+  "persist":["v.","堅持；持續"],
+  "fluctuate":["v.","波動；起伏"],
+  "accumulate":["v.","積累；積聚"],
+  "compensate":["v.","補償；彌補"],
+  "substitute":["v./n.","替代；替代品"],
+  "complement":["v./n.","補充；互補"],
+  "contradict":["v.","矛盾；反駁"],
+  "elaborate":["v.","詳細說明"],
+  "tedious":["adj.","枯燥乏味的"],
+  "frugal":["adj.","節儉的"],
+  "obscure":["adj./v.","模糊的；使模糊"],
+  "profound":["adj.","深刻的；深遠的"],
+  "substantial":["adj.","大量的；重要的"],
+  "comprehensive":["adj.","全面的；綜合的"],
+  "transparent":["adj.","透明的；坦率的"],
+  "prominent":["adj.","突出的；顯著的"],
+  "controversial":["adj.","有爭議的"],
+  "bureaucratic":["adj.","官僚的"],
+  "diplomatic":["adj.","外交的；圓滑的"],
+  "devastating":["adj.","毀滅性的"],
+  "overwhelming":["adj.","壓倒性的；令人不知所措的"],
+  "counterproductive":["adj.","適得其反的"],
+  "indispensable":["adj.","不可或缺的"],
+  "superficial":["adj.","膚淺的；表面的"],
+  "rigorous":["adj.","嚴格的；嚴謹的"],
+  "tedious":["adj.","冗長乏味的"],
+  "aesthetic":["adj./n.","美學的；美感"],
+  "indigenous":["adj.","本土的；固有的"],
+  "coherence":["n.","連貫性"],
+  "validity":["n.","有效性；正確性"],
+  "integrity":["n.","誠信；完整性"],
+  "sustainability":["n.","可持續性"],
+  "accountability":["n.","責任；問責制"],
+};
+
+function annotateSentence(sentence) {
+  // Tokenize and wrap potentially unknown words with .word-tip
+  // Split keeping punctuation
+  const tokens = sentence.split(/(\s+|[,.\'!?;:()\[\]])/);
+  return tokens.map(tok => {
+    const clean = tok.replace(/[^a-zA-Z-]/g, '').toLowerCase();
+    const entry = HARD_WORDS[clean] || HARD_WORDS[clean.replace(/-/g,'')];
+    if (entry && clean.length > 3) {
+      const escaped = tok.replace(/'/g, "\'");
+      const pos = entry[0].replace(/'/g,"\'");
+      const def = entry[1].replace(/'/g,"\'");
+      return `<span class="word-tip" onclick="showTip(event,'${escaped}','${pos}','${def}')">${tok}</span>`;
+    }
+    return tok;
+  }).join('');
+}
+
+function showTip(e, word, pos, def) {
+  e.stopPropagation();
+  const popup = document.getElementById('tipPopup');
+  document.getElementById('tipWord').textContent = word + ' ' + pos;
+  document.getElementById('tipBody').textContent = def;
+  // Position near tap
+  const x = Math.min(e.clientX, window.innerWidth - 280);
+  const y = e.clientY + 12;
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  popup.classList.add('show');
+}
+
+function closeTip() {
+  document.getElementById('tipPopup').classList.remove('show');
+}
+document.addEventListener('click', () => closeTip());
+
+
+// ── 心理學優化：里程碑 + 連勝動畫 ───────────────────────
+const MILESTONES = {
+  5:  ['🔥','連勝 5！','你的大腦正在預熱，繼續！'],
+  10: ['⚡','連勝 10！','記憶迴路全速運轉中！'],
+  20: ['🚀','連勝 20！','你已經進入心流狀態！'],
+  50: ['🏆','連勝 50！','你是單字記憶大師！'],
+};
+
+function checkMilestone(newStreak) {
+  const m = MILESTONES[newStreak];
+  if (!m) return;
+  const [emoji, title, msg] = m;
+  document.getElementById('milestoneEmoji').textContent = emoji;
+  document.getElementById('milestoneTitle').textContent = title;
+  document.getElementById('milestoneMsg').textContent = msg;
+  document.getElementById('milestoneOverlay').classList.add('show');
+  document.getElementById('milestonePop').classList.add('show');
+  playSound('correct');
+}
+
+function closeMilestone() {
+  document.getElementById('milestoneOverlay').classList.remove('show');
+  document.getElementById('milestonePop').classList.remove('show');
+}
+
+
+// ── 每日連續登入 streak ──────────────────────────────────
+function checkDailyStreak() {
+  const today = new Date().toDateString();
+  const lastDate = localStorage.getItem('wf_lastDate') || '';
+  let dayStreak = parseInt(localStorage.getItem('wf_dayStreak') || '1');
+
+  if (lastDate === today) return dayStreak; // 已簽到
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (lastDate === yesterday) {
+    dayStreak++;
+  } else if (lastDate !== '') {
+    dayStreak = 1; // 斷了
+  }
+  localStorage.setItem('wf_lastDate', today);
+  localStorage.setItem('wf_dayStreak', dayStreak);
+  return dayStreak;
+}
+
+function getDailyStreak() {
+  return parseInt(localStorage.getItem('wf_dayStreak') || '1');
+}
+
+// 今日答題數
+function getTodayCount() {
+  const today = new Date().toDateString();
+  const key = 'wf_today_' + today;
+  return parseInt(localStorage.getItem(key) || '0');
+}
+function incTodayCount() {
+  const today = new Date().toDateString();
+  const key = 'wf_today_' + today;
+  const n = getTodayCount() + 1;
+  localStorage.setItem(key, n);
+  return n;
+}
+
 // ── BOOT ──────────────────────────────────────────────
 init();
 </script>
 
+<!-- Milestone popup -->
+
+<div class="milestone-overlay" id="milestoneOverlay" onclick="closeMilestone()"></div>
+<div class="milestone-pop" id="milestonePop">
+  <h2 id="milestoneEmoji">🔥</h2>
+  <h2 id="milestoneTitle">連勝 10！</h2>
+  <p id="milestoneMsg">你的記憶力正在加速！</p>
+  <button onclick="closeMilestone()">繼續練習 →</button>
+</div>
+
+<!-- Tooltip popup -->
+
+<div class="tip-popup" id="tipPopup">
+  <span class="tip-close" onclick="closeTip()">×</span>
+  <div class="tip-word" id="tipWord"></div>
+  <div id="tipBody"></div>
+</div>
 </body>
 </html>
