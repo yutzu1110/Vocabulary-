@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 body::before{content:'';position:fixed;inset:0;opacity:.015;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
 
 /* HEADER */
-header{position:sticky;top:0;z-index:100;background:rgba(245,244,240,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(–border);height:60px;padding:0 20px;display:flex;align-items:center;justify-content:space-between}
+header{position:sticky;top:0;z-index:100;background:rgba(245,244,240,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(–border);min-height:60px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .logo{font-family:‘Playfair Display’,serif;font-size:20px;font-weight:900;letter-spacing:-1px}
 .logo em{color:var(–accent);font-style:normal}
 .hstats{display:flex;gap:10px;align-items:center}
@@ -40,7 +40,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(245,244,240,.92);backdr
 .chip.score b{color:var(–accent)}
 .chip.streak b{color:#ff9500}
 .tabs-wrap{display:flex;gap:4px;background:var(–surface);border:1px solid var(–border);border-radius:100px;padding:3px}
-.tab{background:none;border:none;color:var(–text2);padding:6px 16px;border-radius:100px;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:500;transition:all .2s}
+.tab{background:none;border:none;color:var(–text2);padding:6px 12px;border-radius:100px;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:500;transition:all .2s}
 .tab.on{background:var(–accent);color:#ffffff;font-weight:700}
 
 /* MAIN */
@@ -193,8 +193,9 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 @media(max-width:500px){
 .word-display,.drill-word{font-size:28px}
 .options,.drill-opts{grid-template-columns:1fr}
-.hstats .chip:not(.score){display:none}
+.hstats .chip{display:none}
 .word-grid{grid-template-columns:1fr 1fr}
+.tab{padding:5px 10px;font-size:12px}
 }
 
 /* 提示 & 不知道 按鈕 */
@@ -930,6 +931,10 @@ function init() {
     if (!w.example) {
       const seed = SEED.find(s => s.word === w.word);
       if (seed?.example) { w.example = seed.example; dirty = true; }
+    }
+    if (!w.exampleZh) {
+      const seed = SEED.find(s => s.word === w.word);
+      if (seed?.exampleZh) { w.exampleZh = seed.exampleZh; dirty = true; }
     }
   });
   if (dirty) save();
