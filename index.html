@@ -111,7 +111,6 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .add-btn{background:var(–accent);color:#ffffff;border:none;border-radius:12px;padding:10px 20px;font-weight:700;font-size:13px;cursor:pointer;font-family:‘DM Sans’,sans-serif;transition:opacity .2s}
 .add-btn:hover{opacity:.85}
 
-/* ── 新增：抽考模式按鈕 ── */
 .drill-btn{background:var(–surface);border:1px solid var(–accent3);color:var(–accent3);border-radius:12px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:‘DM Sans’,sans-serif;transition:all .2s;white-space:nowrap}
 .drill-btn:hover,.drill-btn.on{background:rgba(42,171,111,.12)}
 
@@ -167,7 +166,7 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .stat-box .streak-n{color:#ff9500}
 .stat-box .l{font-size:12px;color:var(–text2);margin-top:2px}
 
-/* ── 新增：抽考模式面板 ── */
+/* Drill panel */
 .drill-panel{display:none;margin-bottom:24px;animation:fi .3s ease}
 .drill-panel.show{display:block}
 .drill-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:13px;color:var(–text2)}
@@ -288,7 +287,7 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .photo-scan-btn:disabled{opacity:.4;cursor:not-allowed}
 .photo-cancel-btn{background:var(–surface2);border:1px solid var(–border);border-radius:12px;padding:13px 20px;font-size:14px;color:var(–text2);cursor:pointer;font-family:‘DM Sans’,sans-serif}
 
-/* ── 句子練習分頁 ─────────────────────────────── */
+/* 句子練習分頁 */
 .sent-toolbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;flex-wrap:wrap}
 .sent-title{font-family:‘Playfair Display’,serif;font-size:22px;font-weight:900}
 .sent-subtitle{font-size:13px;color:var(–text2);margin-top:2px}
@@ -312,7 +311,6 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 /* Jigsaw mode */
 .jigsaw-area{margin-bottom:16px}
 
-/* Insert gap for jigsaw */
 .insert-gap{display:inline-flex;align-items:center;justify-content:center;width:20px;height:30px;color:var(–border);font-size:14px;cursor:pointer;border-radius:4px;transition:all .2s;vertical-align:middle;user-select:none;border:1px solid transparent}
 .insert-gap:hover,.insert-gap.active{background:rgba(167,139,250,.2);color:#a78bfa;border:1px solid #a78bfa;transform:scale(1.2)}
 .jigsaw-slots{min-height:52px;border:2px dashed var(–border);border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:12px;background:var(–surface2);transition:border-color .2s;line-height:1.8}
@@ -326,7 +324,6 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .token.wrong-token{background:rgba(255,107,107,.12);border-color:var(–accent2);color:var(–accent2)}
 .slot-token{background:rgba(167,139,250,.12);border:1px solid #a78bfa;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;color:#a78bfa;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
 .slot-token:hover{background:rgba(255,107,107,.12);border-color:var(–accent2);color:var(–accent2)}
-.slot-token:hover{background:rgba(255,107,107,.1);border-color:var(–accent2)}
 
 /* Typing mode */
 .sent-typing-input{width:100%;background:var(–surface2);border:none;border-bottom:2px solid var(–border);border-radius:0;padding:12px 4px;font-size:15px;font-family:‘DM Sans’,sans-serif;color:var(–text);outline:none;resize:none;min-height:80px;transition:border-color .2s;line-height:1.6}
@@ -369,8 +366,8 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 
 .goal-preset{background:var(–surface2);border:1px solid var(–border);border-radius:12px;padding:12px 16px;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:‘DM Sans’,sans-serif;color:var(–text);transition:all .2s}
 .goal-preset:hover{border-color:var(–accent);background:rgba(201,151,58,.06)}
-
 </style>
+
 </head>
 <body>
 
@@ -434,7 +431,6 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
     </div>
 
 ```
-<!-- ── 新增：抽考模式面板（預設隱藏）── -->
 <div class="drill-panel" id="drillPanel">
   <div class="drill-topbar">
     <span>本輪答題：<b id="drillCorrect">0</b> / <b id="drillTotal">0</b> 正確</span>
@@ -466,15 +462,12 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
     </div>
 
 ```
-<!-- Daily progress -->
 <div style="height:5px;background:var(--surface2);border-radius:4px;margin-bottom:20px;overflow:hidden">
   <div id="sentDailyBar" style="height:100%;background:linear-gradient(90deg,#a78bfa,#60a5fa);border-radius:4px;transition:width .4s ease;width:0%"></div>
 </div>
 
-<!-- Practice area -->
 <div id="sentPracticeArea"></div>
 
-<!-- Sentence list -->
 <div class="sent-list-header">
   <span id="sentListCount">0 句</span>
   <div style="display:flex;gap:6px;flex-wrap:wrap" id="sentTagFilter"></div>
@@ -484,19 +477,18 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 
   </div>
 
-<!-- 已背單字複習 Modal -->
+  <!-- 已背單字複習 Modal -->
 
-<div class="review-modal-bg" id="reviewModalBg">
-  <div class="review-modal">
-    <div class="review-modal-header">
-      <h3>🎓 複習已背單字</h3>
-      <button class="review-close" onclick="closeReview()">✕ 關閉</button>
+  <div class="review-modal-bg" id="reviewModalBg">
+    <div class="review-modal">
+      <div class="review-modal-header">
+        <h3>🎓 複習已背單字</h3>
+        <button class="review-close" onclick="closeReview()">✕ 關閉</button>
+      </div>
+      <div class="review-progress" id="reviewProgress"></div>
+      <div id="reviewContent"></div>
     </div>
-    <div class="review-progress" id="reviewProgress"></div>
-    <div id="reviewContent"></div>
   </div>
-</div>
-
 </main>
 
 <!-- ADD WORD MODAL -->
@@ -538,9 +530,117 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
   </div>
 </div>
 
+<!-- Milestone popup -->
+
+<div class="milestone-overlay" id="milestoneOverlay" onclick="closeMilestone()"></div>
+<div class="milestone-pop" id="milestonePop">
+  <h2 id="milestoneEmoji">🔥</h2>
+  <h2 id="milestoneTitle">連勝 10！</h2>
+  <p id="milestoneMsg">你的記憶力正在加速！</p>
+  <button onclick="closeMilestone()">繼續練習 →</button>
+</div>
+
+<!-- Tooltip popup -->
+
+<div class="tip-popup" id="tipPopup">
+  <span class="tip-close" onclick="closeTip()">×</span>
+  <div class="tip-word" id="tipWord"></div>
+  <div id="tipBody"></div>
+</div>
+
+<!-- 拍照匯入 Modal -->
+
+<div class="photo-modal-bg" id="photoModalBg">
+  <div class="photo-modal">
+    <h3>📷 拍照匯入單字</h3>
+    <p class="sub">拍下你的單字筆記，AI 會自動辨識並整理成單字卡（含例句）</p>
+    <div class="photo-drop" id="photoDrop">
+      <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoSelect(this)">
+      <div class="icon">📸</div>
+      <p>點擊拍照或選擇圖片</p>
+      <p class="hint">支援 JPG、PNG，直接對著筆記拍即可</p>
+    </div>
+    <img id="photoPreview" class="photo-preview" alt="預覽">
+    <div class="photo-status" id="photoStatus"></div>
+    <div class="photo-result-list" id="photoResultList"></div>
+    <button class="photo-import-btn" id="photoImportBtn" onclick="importPhotoWords()">✅ 全部匯入單字庫</button>
+    <div class="photo-modal-btns">
+      <button class="photo-scan-btn" id="photoScanBtn" onclick="scanPhoto()" disabled>🔍 AI 辨識</button>
+      <button class="photo-cancel-btn" onclick="closePhotoModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Sentence Modal -->
+
+<div class="modal-bg" id="addSentModalBg">
+  <div class="modal">
+    <h3>新增句子</h3>
+    <div class="form-group">
+      <label>英文句子</label>
+      <textarea id="inSentEn" placeholder="e.g. I'm a firm believer that making plans in advance is essential for achieving goals." style="min-height:80px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>中文意思</label>
+      <textarea id="inSentZh" placeholder="e.g. 我堅信提前做計畫對達成目標至關重要。" style="min-height:60px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>主題標籤</label>
+      <input type="text" id="inSentTag" placeholder="e.g. Plans, Money, Spare Time">
+    </div>
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="closeAddSentModal()">取消</button>
+      <button class="save-btn" onclick="saveNewSent()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sentence Photo Modal -->
+
+<div class="photo-modal-bg" id="sentPhotoModalBg">
+  <div class="photo-modal">
+    <h3>📷 拍照匯入句子</h3>
+    <p class="sub">拍下你的口說筆記，AI 自動辨識長句與中文意思</p>
+    <div class="photo-drop">
+      <input type="file" id="sentPhotoInput" accept="image/*" capture="environment" onchange="handleSentPhotoSelect(this)">
+      <div class="icon">📸</div>
+      <p>點擊拍照或選擇圖片</p>
+      <p class="hint">支援 JPG、PNG</p>
+    </div>
+    <img id="sentPhotoPreview" class="photo-preview" alt="預覽">
+    <div class="photo-status" id="sentPhotoStatus"></div>
+    <div class="photo-result-list" id="sentPhotoResultList"></div>
+    <button class="photo-import-btn" id="sentPhotoImportBtn" onclick="importSentPhotoResults()">✅ 全部匯入句子庫</button>
+    <div class="photo-modal-btns">
+      <button class="photo-scan-btn" id="sentPhotoScanBtn" onclick="scanSentPhoto()" disabled>🔍 AI 辨識</button>
+      <button class="photo-cancel-btn" onclick="closeSentPhotoModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Setting Modal -->
+
+<div class="modal-bg" id="goalModalBg">
+  <div class="modal" style="max-width:360px">
+    <h3>🎯 設定每日目標</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px">根據你的雅思目標，建議每日練習量：</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <button class="goal-preset" onclick="setGoalPreset(10,'輕鬆維持')">10 題／天 &nbsp;<span style="color:var(--text3)">輕鬆維持</span></button>
+      <button class="goal-preset" onclick="setGoalPreset(20,'穩定進步')">20 題／天 &nbsp;<span style="color:var(--text3)">穩定進步</span></button>
+      <button class="goal-preset" onclick="setGoalPreset(30,'雅思衝刺')">30 題／天 &nbsp;<span style="color:var(--text3)">雅思 6.0+ 衝刺</span></button>
+      <button class="goal-preset" onclick="setGoalPreset(50,'密集訓練')">50 題／天 &nbsp;<span style="color:var(--text3)">密集訓練</span></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <span style="font-size:13px;color:var(--text2)">自訂：</span>
+      <input type="number" id="customGoalInput" min="5" max="200" placeholder="題數" style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;color:var(--text);outline:none">
+      <button onclick="setCustomGoal()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">確認</button>
+    </div>
+    <button class="cancel-btn" onclick="closeGoalModal()">關閉</button>
+  </div>
+</div>
+
 <script>
 // ── STATE ──────────────────────────────────────────────
-// Safe localStorage access
 function lsGet(key, def) { try { return localStorage.getItem(key) || def; } catch(e) { return def; } }
 function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
@@ -551,7 +651,6 @@ let currentQ = null;
 let answered = false;
 let filterTag = 'all';
 
-// 抽考模式 state
 let drillOn = false;
 let drillC = 0, drillT = 0;
 let drillCur = null, drillAns = false;
@@ -706,9 +805,6 @@ const SEED = [
   {word:'manage my time effectively',zh:'有效管理時間',type:'phrase',tag:'Schedule',note:'',
    example:'I started using a timer app to help me manage my time effectively during work hours.',
    exampleZh:'我開始使用計時器應用程式，幫助我在工作時間有效管理時間。'},
-  // ── 新增單字（從筆記照片）──────────────────────────────
-
-  // 片語
   {word:'carries a profound meaning',zh:'承載著深遠涵義',type:'phrase',tag:'片語',note:'',
    example:'Every symbol in this painting carries a profound meaning rooted in ancient tradition.',
    exampleZh:'這幅畫中的每個符號都承載著植根於古老傳統的深遠意義。'},
@@ -751,8 +847,6 @@ const SEED = [
   {word:'serves as a form of',zh:'作為一種...的形式',type:'phrase',tag:'片語',note:'',
    example:'Journaling serves as a form of therapy for many people dealing with stress.',
    exampleZh:'對許多承受壓力的人來說，寫日記是一種治療方式。'},
-
-  // 形容詞
   {word:'hospitality',zh:'熱情款待',type:'n',tag:'名詞',note:'',
    example:'The hospitality of the local people made our trip truly unforgettable.',
    exampleZh:'當地人的熱情款待讓我們的旅程真正難以忘懷。'},
@@ -783,8 +877,6 @@ const SEED = [
   {word:'impulsively',zh:'衝動地',type:'adv',tag:'形容詞',note:'',
    example:'He impulsively booked a flight to Tokyo without telling anyone.',
    exampleZh:'他衝動地訂了一張去東京的機票，沒有告訴任何人。'},
-
-  // 動詞／名詞
   {word:'pursuit',zh:'追求；追逐',type:'n',tag:'名詞',note:'',
    example:'The pursuit of happiness looks different for everyone.',
    exampleZh:'對每個人來說，追求幸福的樣子都不同。'},
@@ -830,8 +922,6 @@ const SEED = [
   {word:'fortunately',zh:'幸運地',type:'adv',tag:'副詞',note:'',
    example:'Fortunately, I remembered my umbrella before the rain started.',
    exampleZh:'幸運地，在下雨之前我記起了帶傘。'},
-
-  // Spare Time
   {word:'in my spare time',zh:'在我空閒時間',type:'phrase',tag:'Spare Time',note:'',
    example:'In my spare time, I enjoy sketching and listening to podcasts.',
    exampleZh:'在我的空閒時間，我喜歡素描和聽播客。'},
@@ -853,8 +943,6 @@ const SEED = [
   {word:'solitude',zh:'獨處；孤獨',type:'n',tag:'Spare Time',note:'',
    example:'She craves solitude after a week of back-to-back social events.',
    exampleZh:'在連續一週的社交活動後，她渴望獨處。'},
-
-  // Money
   {word:'a worthwhile investment',zh:'值得投資的事',type:'phrase',tag:'Money',note:'',
    example:'Learning a new language is always a worthwhile investment of your time.',
    exampleZh:'學習一門新語言永遠是值得投資的時間。'},
@@ -891,8 +979,6 @@ const SEED = [
   {word:'drive happiness from',zh:'從...獲得快樂',type:'phrase',tag:'Money',note:'',
    example:'She drives happiness from helping others, not from accumulating things.',
    exampleZh:'她從幫助他人中獲得快樂，而不是從積累物品中。'},
-
-  // Emotions
   {word:'a deep sense of fulfillment',zh:'深層的成就感',type:'phrase',tag:'Emotions',note:'',
    example:'Finishing the marathon gave her a deep sense of fulfillment she had never felt before.',
    exampleZh:'完成馬拉松給了她一種前所未有的深層成就感。'},
@@ -916,11 +1002,10 @@ const SEED = [
    exampleZh:'像一起烹飪這樣的共同體驗真的可以強化社會連結。'},
   {word:'healthy work-life balance',zh:'健康的工作生活平衡',type:'phrase',tag:'Emotions',note:'',
    example:'The company actively promotes a healthy work-life balance for all employees.',
-   exampleZh:'該公司積極為所有員工推廣健康的工作生活平衡。'},
+   exampleZh:'該公司積極為所有員工推廣健康的工作生活平衡。'}
 ];
 
 function init() {
-  // 強制確保有單字資料
   try {
     if (!words || words.length === 0) {
       words = SEED.map((w,i) => ({
@@ -939,24 +1024,22 @@ function init() {
       fi_correct: 0, nextDue: 0
     }));
   }
-  // 相容舊資料：補 nextDue、把內建例句回填給沒例句的舊單字
   let dirty = false;
   words.forEach(w => {
     if (w.nextDue === undefined) { w.nextDue = 0; dirty = true; }
     if (w.fi_correct === undefined) { w.fi_correct = 0; dirty = true; }
     if (!w.example) {
       const seed = SEED.find(s => s.word === w.word);
-      if (seed?.example) { w.example = seed.example; dirty = true; }
+      if (seed && seed.example) { w.example = seed.example; dirty = true; }
     }
     if (!w.exampleZh) {
       const seed = SEED.find(s => s.word === w.word);
-      if (seed?.exampleZh) { w.exampleZh = seed.exampleZh; dirty = true; }
+      if (seed && seed.exampleZh) { w.exampleZh = seed.exampleZh; dirty = true; }
     }
   });
   if (dirty) save();
   try { checkDailyStreak(); } catch(e) {}
   updateStats(); renderFilters(); renderCards(); buildQuiz();
-  // Debug: show word count
   const dbg = document.getElementById('debugInfo');
   if (dbg) dbg.textContent = '單字數: ' + words.length + ' | localStorage: ' + (typeof localStorage !== 'undefined' ? 'OK' : 'blocked');
 }
@@ -974,19 +1057,17 @@ function updateStats() {
   document.getElementById('statStreak').textContent = streak;
   const masteredCount = words.filter(w => (w.fi_correct||0) >= 3).length;
   document.getElementById('statMastered').textContent = masteredCount;
-  // Daily streak
   const ds = getDailyStreak();
   const dsel = document.getElementById('statDayStreak');
   if (dsel) dsel.textContent = ds;
-  // Today count bar (dynamic goal)
-  const DAILY_GOAL = typeof getDailyGoal === 'function' ? getDailyGoal() : 20;
+  const DAILY_GOAL = getDailyGoal();
   const todayN = getTodayCount();
   const todayLabel = document.getElementById('todayCountLabel');
   const todayBar = document.getElementById('todayBar');
   const goalDisplay = document.getElementById('goalDisplay');
-  if (todayLabel) todayLabel.textContent = `${todayN} / ${DAILY_GOAL} 題`;
+  if (todayLabel) todayLabel.textContent = todayN + ' / ' + DAILY_GOAL + ' 題';
   if (todayBar) todayBar.style.width = Math.min(100, todayN/DAILY_GOAL*100) + '%';
-  if (goalDisplay) goalDisplay.textContent = `每日 ${DAILY_GOAL} 題`;
+  if (goalDisplay) goalDisplay.textContent = '每日 ' + DAILY_GOAL + ' 題';
 }
 
 function switchPage(p, el) {
@@ -996,20 +1077,12 @@ function switchPage(p, el) {
   if (el) el.classList.add('on');
 }
 
-// ── QUIZ ───────────────────────────────────────────────
-// 規則（原版保留 + nextDue 間隔）：
-//   seen === 0  →  選擇題（例句挖空，選英文）
-//   seen >= 1   →  填空題（例句挖空，自己拼）
-//   答對 → 設定 nextDue（間隔複習，不馬上再出）
-//   答錯 → nextDue = 1小時後，優先重複
-
+// ── QUIZ ──────────────────────────────────────────────
 function pickWord() {
   if (words.length === 0) return null;
   const now = Date.now();
-  // 優先選「到期」的單字
   let pool = words.filter(w => w.nextDue <= now);
   if (pool.length === 0) {
-    // 全部都還沒到期：等最快到期的那個（或選 seen=0 的，因為未練過的 nextDue=0 永遠到期）
     pool = [...words].sort((a,b) => a.nextDue - b.nextDue);
     pool = pool.slice(0, Math.max(1, Math.ceil(pool.length * 0.2)));
   }
@@ -1023,7 +1096,7 @@ function pickWord() {
 
 function buildQuiz() {
   if (words.length === 0) {
-    document.getElementById('quizArea').innerHTML = `<div class="empty"><h2>還沒有單字</h2><p>先到「單字卡」頁面新增單字<br>就可以開始練習了！</p></div>`;
+    document.getElementById('quizArea').innerHTML = '<div class="empty"><h2>還沒有單字</h2><p>先到「單字卡」頁面新增單字<br>就可以開始練習了！</p></div>';
     return;
   }
   const w = pickWord();
@@ -1035,71 +1108,40 @@ function buildQuiz() {
   const mastered = words.filter(x => x.mastery >= 2).length;
   document.getElementById('progressFill').style.width = (mastered/total*100)+'%';
 
-  // seen === 0 → 選擇題；seen >= 1 → 填空
   const isMC = (w.seen === 0);
   const isReview = w.wrong > 0;
   const badgeClass = isMC ? 'mc' : (isReview ? 'rev' : 'fi');
   const badgeText  = isMC ? '選擇題' : (isReview ? '⚠ 複習填空' : '填空');
 
-  // 例句（含挖空 + 難字標注）
   let sentHTML = '';
   if (w.example) {
     const masked = isMC
       ? w.example.replace(new RegExp(escRegex(w.word),'gi'), '<span class="blank"></span>')
       : w.example.replace(new RegExp(escRegex(w.word),'gi'), '______');
-    // 標注難字（排除被挖空的目標單字）
-    const annotated = masked.replace(/<span[^>]*>.*?<\/span>|______/g,
-      m => m).replace(/(?<![<>"])\b([A-Za-z][a-z-]{3,})\b(?![^<]*>)/g, tok => {
-      const clean = tok.toLowerCase();
-      const entry = typeof HARD_WORDS !== 'undefined' && (HARD_WORDS[clean] || HARD_WORDS[clean.replace(/-/g,'')]);
-      if (entry && tok.toLowerCase() !== w.word.toLowerCase().split(' ')[0]) {
-        const pos = entry[0].replace(/'/g,"\'");
-        const def = entry[1].replace(/'/g,"\'");
-        return `<span class="word-tip" onclick="showTip(event,'${tok}','${pos}','${def}')">${tok}</span>`;
-      }
-      return tok;
-    });
-    sentHTML = `<div class="sentence" id="sentenceEl">${annotated}</div>`;
+    sentHTML = '<div class="sentence" id="sentenceEl">' + masked + '</div>';
   } else {
-    sentHTML = `<div class="loading" id="loadingEl"><div class="spinner"></div>正在生成例句…</div>
-                <div class="sentence" id="sentenceEl" style="display:none"></div>`;
+    sentHTML = '<div class="loading" id="loadingEl"><div class="spinner"></div>正在生成例句…</div><div class="sentence" id="sentenceEl" style="display:none"></div>';
   }
 
-  let html = `<div class="qcard">
-    <div class="qmeta">
-      <span class="badge ${badgeClass}">${badgeText}</span>
-      <button class="speak-btn" onclick="speak('${escQ(w.word)}')">🔊 發音</button>
-    </div>
-    <div class="word-hint">${w.type} · ${w.tag||''}${w.note?' · '+escQ(w.note):''}</div>
-    ${sentHTML}`;
+  let html = '<div class="qcard"><div class="qmeta"><span class="badge ' + badgeClass + '">' + badgeText + '</span><button class="speak-btn" onclick="speak(\'' + escQ(w.word) + '\')">🔊 發音</button></div><div class="word-hint">' + w.type + ' · ' + (w.tag||'') + (w.note?' · '+escQ(w.note):'') + '</div>' + sentHTML;
 
   if (isMC) {
     const opts = getMCOptions(w);
-    html += `<div class="options" id="optionsEl">`;
+    html += '<div class="options" id="optionsEl">';
     opts.forEach(o => {
-      html += `<button class="opt" data-zh="${escQ(o.zh)}" onclick="checkMC(this,'${escQ(o.word)}','${escQ(w.word)}')">${escQ(o.word)}</button>`;
+      html += '<button class="opt" data-zh="' + escQ(o.zh) + '" onclick="checkMC(this,\'' + escQ(o.word) + '\',\'' + escQ(w.word) + '\')">' + escQ(o.word) + '</button>';
     });
-    html += `</div>`;
+    html += '</div>';
   } else {
-    html += `<div class="fi-wrap">
-      <input class="fi-input" id="fiInput" placeholder="拼出答案…" onkeydown="if(event.key==='Enter')checkFI()">
-      <button class="submit-btn" id="submitBtn" onclick="checkFI()">確認</button>
-    </div>
-    <div class="hint-row" id="hintRow">
-      <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 提示</button>
-      <button class="skip-btn" onclick="checkFI(true)">❌ 不知道</button>
-    </div>`;
+    html += '<div class="fi-wrap"><input class="fi-input" id="fiInput" placeholder="拼出答案…" onkeydown="if(event.key===\'Enter\')checkFI()"><button class="submit-btn" id="submitBtn" onclick="checkFI()">確認</button></div><div class="hint-row" id="hintRow"><button class="hint-btn" id="hintBtn" onclick="showHint()">💡 提示</button><button class="skip-btn" onclick="checkFI(true)">❌ 不知道</button></div>';
   }
 
-  html += `<div class="feedback" id="feedbackEl"></div>
-    <button class="next-btn" id="nextBtn" onclick="buildQuiz()">下一題 →</button>
-  </div>`;
+  html += '<div class="feedback" id="feedbackEl"></div><button class="next-btn" id="nextBtn" onclick="buildQuiz()">下一題 →</button></div>';
 
   document.getElementById('quizArea').innerHTML = html;
 
-  if (!isMC) setTimeout(() => document.getElementById('fiInput')?.focus(), 100);
+  if (!isMC) setTimeout(function(){ var el = document.getElementById('fiInput'); if(el) el.focus(); }, 100);
   if (!w.example) fetchExample(w);
-  // 不自動念，答對後才念
 }
 
 function getMCOptions(w) {
@@ -1112,14 +1154,14 @@ function getMCOptions(w) {
 function checkMC(btn, chosen, correct) {
   if (answered) return;
   answered = true;
-  const norm = s => s.toLowerCase().trim();
+  const norm = function(s){ return s.toLowerCase().trim(); };
   const isOk = norm(chosen) === norm(correct);
   document.querySelectorAll('.opt').forEach(b => b.disabled = true);
   if (isOk) {
     btn.classList.add('correct');
     onCorrect();
     playSound('correct');
-    speak(correct, 700);  // 音效後再念
+    speak(correct, 700);
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.opt').forEach(b => {
@@ -1127,9 +1169,8 @@ function checkMC(btn, chosen, correct) {
     });
     onWrong();
     playSound('wrong');
-    speak(correct, 600);  // 答錯也念正確答案
+    speak(correct, 600);
   }
-  // 答題後在每個選項下方顯示中文字義
   document.querySelectorAll('.opt').forEach(b => {
     const zh = b.dataset.zh;
     if (zh) {
@@ -1140,7 +1181,6 @@ function checkMC(btn, chosen, correct) {
     }
   });
   showFeedback(isOk);
-  // 例句揭示：填回完整例句 + 下方顯示例句中文翻譯
   if (currentQ && currentQ.example) {
     const sentEl = document.getElementById('sentenceEl');
     if (sentEl) {
@@ -1148,7 +1188,6 @@ function checkMC(btn, chosen, correct) {
       if (currentQ.exampleZh) {
         sentEl.innerHTML += '<div style="margin-top:8px;font-size:13px;color:var(--text2);padding-top:8px;border-top:1px solid var(--border)">' + escH(currentQ.exampleZh) + '</div>';
       } else {
-        // 沒有預存翻譯，用 AI 即時翻
         sentEl.innerHTML += '<div id="exZhLoading" style="margin-top:8px;font-size:12px;color:var(--text3);padding-top:8px;border-top:1px solid var(--border)">翻譯載入中…</div>';
         fetchExampleZh(currentQ);
       }
@@ -1165,12 +1204,11 @@ function checkFI(skipToAnswer) {
   const val = skipToAnswer ? '' : input.value.trim();
   if (!skipToAnswer && !val) return;
   answered = true;
-  const norm = s => s.toLowerCase().replace(/[^a-z0-9\s']/g,'').trim();
+  const norm = function(s){ return s.toLowerCase().replace(/[^a-z0-9\s']/g,'').trim(); };
   const isOk = !skipToAnswer && norm(val) === norm(currentQ.word);
   input.disabled = true;
   document.getElementById('submitBtn').disabled = true;
 
-  // Hide hint/skip buttons
   const hintRow = document.getElementById('hintRow');
   if (hintRow) hintRow.style.display = 'none';
 
@@ -1178,30 +1216,26 @@ function checkFI(skipToAnswer) {
     input.classList.add('correct');
     onCorrect();
     playSound('correct');
-    speak(currentQ.word, 700);  // 音效後再念
+    speak(currentQ.word, 700);
     showFeedback(true);
-    // Track fill-in correct streak for "mastered"
     currentQ.fi_correct = (currentQ.fi_correct || 0) + 1;
     if (currentQ.fi_correct === 3) {
-      setTimeout(() => {
+      setTimeout(function(){
         const fb = document.getElementById('feedbackEl');
         if (fb) fb.innerHTML += '<br><span style="color:var(--accent3);font-weight:700">🎓 已背起來！加入已背單字</span>';
       }, 100);
     }
   } else {
     input.classList.add('wrong');
-    // Show user's wrong attempt in red, then correct answer
-    const wrongDisplay = skipToAnswer ? '' : `<span style="color:var(--accent2);text-decoration:line-through">${escQ(val)}</span> → `;
+    const wrongDisplay = skipToAnswer ? '' : '<span style="color:var(--accent2);text-decoration:line-through">' + escQ(val) + '</span> → ';
     const fb = document.getElementById('feedbackEl');
     fb.className = 'feedback bad';
-    fb.innerHTML = `${wrongDisplay}<b style="color:var(--accent2)">${escQ(currentQ.word)}</b>`;
+    fb.innerHTML = wrongDisplay + '<b style="color:var(--accent2)">' + escQ(currentQ.word) + '</b>';
     onWrong();
     playSound('wrong');
-    speak(currentQ.word, 700);  // 答錯也念正確答案
-    // Reset fi_correct on wrong
+    speak(currentQ.word, 700);
     currentQ.fi_correct = 0;
   }
-  // 例句揭示：填空答完後顯示完整例句 + 例句中文翻譯
   if (currentQ && currentQ.example) {
     const sentEl = document.getElementById('sentenceEl');
     if (sentEl) {
@@ -1218,7 +1252,6 @@ function checkFI(skipToAnswer) {
   updateWord(currentQ.id, isOk);
 }
 
-// hint state
 let hintRevealCount = 0;
 
 function showHint() {
@@ -1230,12 +1263,10 @@ function showHint() {
   const word = currentQ.word;
   const maxHints = 5;
 
-  // Reveal letters one by one up to hintRevealCount
   const revealed = word.slice(0, hintRevealCount);
   const hidden = '_ '.repeat(word.length - hintRevealCount).trim();
   const hintText = revealed + (hintRevealCount < word.length ? ' ' + hidden : '');
 
-  // Put hint in input so user can see progress, clear wrong text
   input.value = '';
   input.placeholder = hintText + '  ← 繼續拼完整';
   input.focus();
@@ -1244,9 +1275,8 @@ function showHint() {
   const remaining = maxHints - hintRevealCount;
 
   if (hintRevealCount >= maxHints || hintRevealCount >= word.length) {
-    // Out of hints → show answer as wrong
     if (hintBtn) { hintBtn.disabled = true; hintBtn.style.opacity = '0.4'; }
-    setTimeout(() => checkFI(true), 400);
+    setTimeout(function(){ checkFI(true); }, 400);
   } else {
     if (hintBtn) hintBtn.textContent = '💡 提示（剩 ' + remaining + ' 次）';
   }
@@ -1254,7 +1284,7 @@ function showHint() {
 
 function onCorrect() {
   score += 10 + streak; streak++;
-  showScorePop(`+${10+Math.max(0,streak-1)} ⚡`);
+  showScorePop('+' + (10+Math.max(0,streak-1)) + ' ⚡');
   incTodayCount();
   save(); updateStats();
   checkMilestone(streak);
@@ -1268,7 +1298,7 @@ function onWrong() {
 function showScorePop(txt) {
   const el = document.getElementById('scorePop');
   el.textContent = txt; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 1800);
+  setTimeout(function(){ el.classList.remove('show'); }, 1800);
 }
 
 function showFeedback(ok) {
@@ -1287,7 +1317,6 @@ function updateWord(id, ok) {
   if (ok) {
     w.correct++;
     w.mastery = Math.min(2, w.mastery+1);
-    // 填空答對才算 fi_correct（選擇題不算）
     if (currentQ && currentQ.id === id && w.seen > 1) {
       w.fi_correct = (w.fi_correct || 0) + 1;
     }
@@ -1296,7 +1325,6 @@ function updateWord(id, ok) {
   } else {
     w.wrong++;
     w.mastery = Math.max(0, w.mastery-1);
-    // 答錯：fi_correct 歸零，1小時後重考
     w.fi_correct = 0;
     w.nextDue = Date.now() + 3600000;
   }
@@ -1314,12 +1342,12 @@ async function fetchExample(w) {
         max_tokens: 150,
         messages: [{
           role: 'user',
-          content: `Create ONE natural English example sentence using the word/phrase: "${w.word}" (${w.zh}). The sentence should be conversational, 10-20 words, and clearly show the meaning. The word/phrase must appear exactly as written. Return ONLY the sentence, nothing else.`
+          content: 'Create ONE natural English example sentence using the word/phrase: "' + w.word + '" (' + w.zh + '). The sentence should be conversational, 10-20 words, and clearly show the meaning. The word/phrase must appear exactly as written. Return ONLY the sentence, nothing else.'
         }]
       })
     });
     const data = await res.json();
-    const ex = data.content?.[0]?.text?.trim() || '';
+    const ex = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : '';
     if (ex) {
       w.example = ex;
       const idx = words.findIndex(x => x.id === w.id);
@@ -1327,7 +1355,7 @@ async function fetchExample(w) {
       save();
       const loadEl = document.getElementById('loadingEl');
       const sentEl = document.getElementById('sentenceEl');
-      if (loadEl && sentEl && currentQ?.id === w.id) {
+      if (loadEl && sentEl && currentQ && currentQ.id === w.id) {
         loadEl.style.display = 'none';
         const isMC = (w.seen === 0);
         const masked = isMC
@@ -1335,7 +1363,6 @@ async function fetchExample(w) {
           : ex.replace(new RegExp(escRegex(w.word),'gi'), '______');
         sentEl.innerHTML = masked;
         sentEl.style.display = 'block';
-        // 不自動念
       }
     }
   } catch(e) {
@@ -1345,14 +1372,12 @@ async function fetchExample(w) {
 }
 
 // ── SPEECH ────────────────────────────────────────────
-// Web Audio sound effects
 function playSound(type) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     if (type === 'correct') {
-      // 叮～ 上揚音
       const freqs = [523, 659, 784];
-      freqs.forEach((f, i) => {
+      freqs.forEach(function(f, i) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
@@ -1365,9 +1390,8 @@ function playSound(type) {
         osc.start(t); osc.stop(t + 0.36);
       });
     } else {
-      // ㄉㄟˉㄉㄟˉ 下降音
       const beeps = [320, 240];
-      beeps.forEach((f, i) => {
+      beeps.forEach(function(f, i) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
@@ -1384,7 +1408,7 @@ function playSound(type) {
 
 function speak(word, delay) {
   if (!window.speechSynthesis) return;
-  const doSpeak = () => {
+  const doSpeak = function() {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(word);
     u.lang = 'en-US'; u.rate = 0.85;
@@ -1394,8 +1418,6 @@ function speak(word, delay) {
   else doSpeak();
 }
 
-
-// ── 例句中文翻譯（即時 AI 翻譯，結果快取到 word.exampleZh）──
 async function fetchExampleZh(w) {
   if (!w.example) return;
   try {
@@ -1412,16 +1434,14 @@ async function fetchExampleZh(w) {
       })
     });
     const data = await res.json();
-    const zh = data.content?.[0]?.text?.trim() || '';
+    const zh = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : '';
     if (zh) {
-      // 快取翻譯
       w.exampleZh = zh;
       const idx = words.findIndex(x => x.id === w.id);
       if (idx !== -1) words[idx].exampleZh = zh;
       save();
-      // 如果目前還顯示這題，更新 UI
       const loadEl = document.getElementById('exZhLoading');
-      if (loadEl && currentQ?.id === w.id) {
+      if (loadEl && currentQ && currentQ.id === w.id) {
         loadEl.textContent = zh;
         loadEl.style.color = 'var(--text2)';
         loadEl.style.fontSize = '13px';
@@ -1433,10 +1453,7 @@ async function fetchExampleZh(w) {
   }
 }
 
-// ── 抽考模式（單字卡分頁新增） ────────────────────────
-// 規則：看英文單字 → 從4個選項中選中文字義
-// 和練習頁完全分開，不影響 seen/mastery
-
+// ── 抽考模式 ────────────────────────────────────────
 function toggleDrill() {
   drillOn = !drillOn;
   const btn = document.getElementById('drillBtn');
@@ -1456,13 +1473,11 @@ function toggleDrill() {
 
 function buildDrill() {
   if (words.length < 2) {
-    document.getElementById('drillCard').innerHTML = `<div class="empty" style="padding:40px 0"><h2>單字不夠</h2><p>至少需要 2 個單字</p></div>`;
+    document.getElementById('drillCard').innerHTML = '<div class="empty" style="padding:40px 0"><h2>單字不夠</h2><p>至少需要 2 個單字</p></div>';
     return;
   }
   drillAns = false;
-  // 隨機挑一個
   drillCur = words[Math.floor(Math.random()*words.length)];
-  // 3個干擾選項（不同 id）
   const distractors = words
     .filter(w => w.id !== drillCur.id)
     .sort(() => Math.random()-.5)
@@ -1472,25 +1487,13 @@ function buildDrill() {
   document.getElementById('drillCorrect').textContent = drillC;
   document.getElementById('drillTotal').textContent = drillT;
 
-  const html = `<div class="drill-card">
-    <div class="qmeta">
-      <span class="badge mc">字義選擇</span>
-      <button class="speak-btn" onclick="speak('${escQ(drillCur.word)}')">🔊 發音</button>
-    </div>
-    <div class="drill-word">${escQ(drillCur.word)}</div>
-    <div class="drill-sub">${drillCur.type}${drillCur.tag?' · '+escQ(drillCur.tag):''}${drillCur.note?' · '+escQ(drillCur.note):''}</div>
-    <div class="drill-q">這個單字的中文意思是？</div>
-    <div class="drill-opts">
-      ${opts.map(o =>
-        `<button class="drill-opt" data-id="${o.id}" onclick="checkDrill(this)">${escQ(o.zh)}</button>`
-      ).join('')}
-    </div>
-    <div class="drill-fb" id="drillFb"></div>
-    <button class="drill-next" id="drillNext" onclick="buildDrill()">下一題 →</button>
-  </div>`;
+  let html = '<div class="drill-card"><div class="qmeta"><span class="badge mc">字義選擇</span><button class="speak-btn" onclick="speak(\'' + escQ(drillCur.word) + '\')">🔊 發音</button></div><div class="drill-word">' + escQ(drillCur.word) + '</div><div class="drill-sub">' + drillCur.type + (drillCur.tag?' · '+escQ(drillCur.tag):'') + (drillCur.note?' · '+escQ(drillCur.note):'') + '</div><div class="drill-q">這個單字的中文意思是？</div><div class="drill-opts">';
+  opts.forEach(function(o){
+    html += '<button class="drill-opt" data-id="' + o.id + '" onclick="checkDrill(this)">' + escQ(o.zh) + '</button>';
+  });
+  html += '</div><div class="drill-fb" id="drillFb"></div><button class="drill-next" id="drillNext" onclick="buildDrill()">下一題 →</button></div>';
 
   document.getElementById('drillCard').innerHTML = html;
-  // 不自動念
 }
 
 function checkDrill(btn) {
@@ -1506,7 +1509,6 @@ function checkDrill(btn) {
     drillC++;
   } else {
     btn.classList.add('wrong');
-    // 標出正確選項
     document.querySelectorAll('.drill-opt').forEach(b => {
       if (parseInt(b.dataset.id) === drillCur.id) b.classList.add('correct');
     });
@@ -1520,7 +1522,7 @@ function checkDrill(btn) {
   if (isOk) {
     fb.textContent = ['答對了！🎉','正確！✨','太棒了！'][Math.floor(Math.random()*3)];
   } else {
-    fb.innerHTML = `不對喔！<b style="color:var(--accent)">${escQ(drillCur.word)}</b> = <b style="color:var(--accent3)">${escQ(drillCur.zh)}</b>`;
+    fb.innerHTML = '不對喔！<b style="color:var(--accent)">' + escQ(drillCur.word) + '</b> = <b style="color:var(--accent3)">' + escQ(drillCur.zh) + '</b>';
   }
   document.getElementById('drillNext').classList.add('show');
 }
@@ -1529,9 +1531,9 @@ function checkDrill(btn) {
 function renderFilters() {
   const tags = [...new Set(words.map(w => w.tag).filter(Boolean))];
   const bar = document.getElementById('filterBar');
-  bar.innerHTML = `<div class="filter-chip ${filterTag==='all'?'on':''}" onclick="setFilter('all',this)">全部</div>`;
-  tags.forEach(t => {
-    bar.innerHTML += `<div class="filter-chip ${filterTag===t?'on':''}" onclick="setFilter('${escQ(t)}',this)">${escQ(t)}</div>`;
+  bar.innerHTML = '<div class="filter-chip ' + (filterTag==='all'?'on':'') + '" onclick="setFilter(\'all\',this)">全部</div>';
+  tags.forEach(function(t) {
+    bar.innerHTML += '<div class="filter-chip ' + (filterTag===t?'on':'') + '" onclick="setFilter(\'' + escQ(t) + '\',this)">' + escQ(t) + '</div>';
   });
 }
 
@@ -1546,38 +1548,16 @@ function renderCards() {
   const grid = document.getElementById('wordGrid');
   const list = filterTag === 'all' ? words : words.filter(w => w.tag === filterTag);
   if (list.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:40px">這個分類還沒有單字</div>`;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:40px">這個分類還沒有單字</div>';
     return;
   }
-  grid.innerHTML = list.map(w => {
+  grid.innerHTML = list.map(function(w) {
     const mc = ['mastery-0','mastery-1','mastery-2'][w.mastery||0];
-    return `<div class="wcard" id="wcard-${w.id}">
-      <div class="wcard-mastery ${mc}"></div>
-      <div class="wcard-front">
-        <div class="wcard-word">${escQ(w.word)}</div>
-        <div class="wcard-type">${w.type}${w.tag?' · '+escQ(w.tag):''}</div>
-        <div class="wcard-zh">${escQ(w.zh)}</div>
-        ${w.note?`<div style="font-size:11px;color:var(--text3);margin-top:4px">${escQ(w.note)}</div>`:''}
-        <div class="wcard-actions">
-          <button class="wcard-act speak" onclick="event.stopPropagation();speak('${escQ(w.word)}')">🔊</button>
-          <button class="wcard-act" onclick="event.stopPropagation();flipCard(${w.id})">例句</button>
-          <button class="wcard-act" onclick="event.stopPropagation();deleteWord(${w.id})">🗑</button>
-        </div>
-      </div>
-      <div class="wcard-back">
-        <div class="wcard-word" style="font-size:14px">${escQ(w.word)}</div>
-        <div class="wcard-def">${escQ(w.zh)}</div>
-        <div class="wcard-ex">${w.example || '（尚未生成例句）'}</div>
-        <div class="wcard-actions">
-          <button class="wcard-act" onclick="event.stopPropagation();flipCard(${w.id})">返回</button>
-          ${!w.example?`<button class="wcard-act" onclick="event.stopPropagation();genExample(${w.id})">生成例句</button>`:''}
-        </div>
-      </div>
-    </div>`;
+    return '<div class="wcard" id="wcard-' + w.id + '"><div class="wcard-mastery ' + mc + '"></div><div class="wcard-front"><div class="wcard-word">' + escQ(w.word) + '</div><div class="wcard-type">' + w.type + (w.tag?' · '+escQ(w.tag):'') + '</div><div class="wcard-zh">' + escQ(w.zh) + '</div>' + (w.note?'<div style="font-size:11px;color:var(--text3);margin-top:4px">'+escQ(w.note)+'</div>':'') + '<div class="wcard-actions"><button class="wcard-act speak" onclick="event.stopPropagation();speak(\''+escQ(w.word)+'\')">🔊</button><button class="wcard-act" onclick="event.stopPropagation();flipCard('+w.id+')">例句</button><button class="wcard-act" onclick="event.stopPropagation();deleteWord('+w.id+')">🗑</button></div></div><div class="wcard-back"><div class="wcard-word" style="font-size:14px">'+escQ(w.word)+'</div><div class="wcard-def">'+escQ(w.zh)+'</div><div class="wcard-ex">'+(w.example||'（尚未生成例句）')+'</div><div class="wcard-actions"><button class="wcard-act" onclick="event.stopPropagation();flipCard('+w.id+')">返回</button>'+((!w.example)?'<button class="wcard-act" onclick="event.stopPropagation();genExample('+w.id+')">生成例句</button>':'')+'</div></div></div>';
   }).join('');
 }
 
-function flipCard(id) { document.getElementById('wcard-'+id)?.classList.toggle('flipped'); }
+function flipCard(id) { var el = document.getElementById('wcard-'+id); if(el) el.classList.toggle('flipped'); }
 
 async function genExample(id) {
   const w = words.find(x => x.id === id);
@@ -1596,7 +1576,7 @@ function deleteWord(id) {
 function openModal() { document.getElementById('modalBg').classList.add('open'); document.getElementById('inWord').focus(); }
 function closeModal() {
   document.getElementById('modalBg').classList.remove('open');
-  ['inWord','inZh','inTag','inNote'].forEach(id => document.getElementById(id).value = '');
+  ['inWord','inZh','inTag','inNote'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
 }
 
 async function saveWord() {
@@ -1607,17 +1587,16 @@ async function saveWord() {
   const tag = document.getElementById('inTag').value.trim();
   const note = document.getElementById('inNote').value.trim();
   const newId = Date.now();
-  const newWord = {id:newId, word, zh, type, tag, note, example:'', seen:0, correct:0, wrong:0, mastery:0, nextDue:0};
+  const newWord = {id:newId, word, zh, type, tag, note, example:'', seen:0, correct:0, wrong:0, mastery:0, nextDue:0, fi_correct:0};
   words.push(newWord);
   save(); closeModal(); renderFilters(); renderCards(); updateStats();
-  fetchExample(newWord).then(() => renderCards());
+  fetchExample(newWord).then(function(){ renderCards(); });
 }
 
 // ── UTILS ──────────────────────────────────────────────
-function escQ(s) { return String(s).replace(/'/g,"\\'").replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escQ(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
 function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-
 
 // ── 已背單字複習 Modal ─────────────────────────────────
 let reviewWords = [];
@@ -1625,7 +1604,6 @@ let reviewIdx = 0;
 let reviewAnswered = false;
 
 function openReview() {
-  // 已背 = fi_correct >= 3
   reviewWords = words.filter(w => (w.fi_correct || 0) >= 3).sort(() => Math.random() - .5);
   if (reviewWords.length === 0) {
     alert('還沒有已背單字！填空拼對 3 次後就會加入這裡。');
@@ -1643,15 +1621,10 @@ function closeReview() {
 function renderReview() {
   const w = reviewWords[reviewIdx];
   reviewAnswered = false;
-  document.getElementById('reviewProgress').textContent =
-    `第 ${reviewIdx + 1} / ${reviewWords.length} 個`;
+  document.getElementById('reviewProgress').textContent = '第 ' + (reviewIdx + 1) + ' / ' + reviewWords.length + ' 個';
 
   if (!w) {
-    document.getElementById('reviewContent').innerHTML = `
-      <div class="review-done">
-        <h3>複習完成！🎉</h3>
-        <p>你複習了全部 ${reviewWords.length} 個已背單字</p>
-      </div>`;
+    document.getElementById('reviewContent').innerHTML = '<div class="review-done"><h3>複習完成！🎉</h3><p>你複習了全部 ' + reviewWords.length + ' 個已背單字</p></div>';
     return;
   }
 
@@ -1659,29 +1632,9 @@ function renderReview() {
     ? w.example.replace(new RegExp(escRegex(w.word), 'gi'), '______')
     : '（尚無例句）';
 
-  document.getElementById('reviewContent').innerHTML = `
-    <div class="review-qcard">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase">${w.type} · ${w.tag || ''}</span>
-        <button style="background:none;border:1px solid var(--border);border-radius:100px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer" onclick="speak('${escQ(w.word)}')">🔊</button>
-      </div>
-      <div class="review-sentence">${masked}</div>
-      <div class="review-fi-wrap">
-        <input class="review-fi-input" id="reviewInput" placeholder="拼出被挖空的單字…" onkeydown="if(event.key==='Enter')checkReview()">
-        <button class="review-submit" onclick="checkReview()">確認</button>
-      </div>
-      <div class="review-hint-row">
-        <button class="review-hint-btn" id="reviewHintBtn" onclick="showReviewHint()">💡 提示</button>
-        <button class="review-skip-btn" onclick="checkReview(true)">❌ 不知道</button>
-      </div>
-      <div class="review-feedback" id="reviewFeedback"></div>
-      <button class="review-next" id="reviewNext" onclick="nextReview()">
-        ${reviewIdx + 1 < reviewWords.length ? '下一個 →' : '完成複習 ✓'}
-      </button>
-    </div>`;
+  document.getElementById('reviewContent').innerHTML = '<div class="review-qcard"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase">' + w.type + ' · ' + (w.tag || '') + '</span><button style="background:none;border:1px solid var(--border);border-radius:100px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer" onclick="speak(\'' + escQ(w.word) + '\')">🔊</button></div><div class="review-sentence">' + masked + '</div><div class="review-fi-wrap"><input class="review-fi-input" id="reviewInput" placeholder="拼出被挖空的單字…" onkeydown="if(event.key===\'Enter\')checkReview()"><button class="review-submit" onclick="checkReview()">確認</button></div><div class="review-hint-row"><button class="review-hint-btn" id="reviewHintBtn" onclick="showReviewHint()">💡 提示</button><button class="review-skip-btn" onclick="checkReview(true)">❌ 不知道</button></div><div class="review-feedback" id="reviewFeedback"></div><button class="review-next" id="reviewNext" onclick="nextReview()">' + (reviewIdx + 1 < reviewWords.length ? '下一個 →' : '完成複習 ✓') + '</button></div>';
 
-  setTimeout(() => document.getElementById('reviewInput')?.focus(), 100);
-  // 不自動念
+  setTimeout(function(){ var el=document.getElementById('reviewInput'); if(el) el.focus(); }, 100);
 }
 
 function checkReview(skipToAnswer) {
@@ -1693,12 +1646,12 @@ function checkReview(skipToAnswer) {
   reviewAnswered = true;
 
   const w = reviewWords[reviewIdx];
-  const norm = s => s.toLowerCase().replace(/[^a-z0-9\s']/g, '').trim();
+  const norm = function(s){ return s.toLowerCase().replace(/[^a-z0-9\s']/g, '').trim(); };
   const isOk = !skipToAnswer && norm(val) === norm(w.word);
 
   input.disabled = true;
-  document.getElementById('reviewHintBtn').disabled = true;
-  const hintRow = input.parentElement?.nextElementSibling;
+  var hintBtn = document.getElementById('reviewHintBtn');
+  if(hintBtn) hintBtn.disabled = true;
 
   const fb = document.getElementById('reviewFeedback');
   if (isOk) {
@@ -1711,21 +1664,22 @@ function checkReview(skipToAnswer) {
     input.classList.add('wrong');
     fb.className = 'review-feedback bad';
     const wrongPart = (!skipToAnswer && val)
-      ? `<span style="color:var(--accent2);text-decoration:line-through">${escQ(val)}</span> → `
+      ? '<span style="color:var(--accent2);text-decoration:line-through">' + escQ(val) + '</span> → '
       : '';
-    fb.innerHTML = `${wrongPart}<b style="color:var(--accent2)">${escQ(w.word)}</b>`;
+    fb.innerHTML = wrongPart + '<b style="color:var(--accent2)">' + escQ(w.word) + '</b>';
     playSound('wrong');
     speak(w.word, 700);
   }
 
-  document.getElementById('reviewNext').classList.add('show');
+  var nextBtn = document.getElementById('reviewNext');
+  if(nextBtn) nextBtn.classList.add('show');
 }
 
 function showReviewHint() {
   const w = reviewWords[reviewIdx];
   const input = document.getElementById('reviewInput');
   if (!input || reviewAnswered) return;
-  input.placeholder = `${w.word[0].toUpperCase()}… (開頭字母提示)`;
+  input.placeholder = w.word[0].toUpperCase() + '… (開頭字母提示)';
   input.focus();
   const btn = document.getElementById('reviewHintBtn');
   if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; }
@@ -1736,9 +1690,7 @@ function nextReview() {
   renderReview();
 }
 
-
 // ── 單字提示系統 ─────────────────────────────────────────
-// 雅思 5.5 程度可能不熟悉的詞彙，點了彈出解釋
 const HARD_WORDS = {
   "well-drained":["adj.","排水良好的（土壤不積水）"],
   "drained":["adj.","排乾的；精疲力竭的"],
@@ -1747,8 +1699,6 @@ const HARD_WORDS = {
   "indigenous":["adj.","原生的；本土的"],
   "perennial":["adj.","多年生的；長期的"],
   "biodegradable":["adj.","可生物降解的"],
-  "photosynthesis":["n.","光合作用"],
-  "chlorophyll":["n.","葉綠素"],
   "connoisseur":["n.","鑑賞家；行家"],
   "ephemeral":["adj.","短暫的；朝生暮死的"],
   "nocturnal":["adj.","夜行性的"],
@@ -1838,7 +1788,6 @@ const HARD_WORDS = {
   "substitute":["v./n.","替代；替代品"],
   "complement":["v./n.","補充；互補"],
   "contradict":["v.","矛盾；反駁"],
-  "elaborate":["v.","詳細說明"],
   "tedious":["adj.","枯燥乏味的"],
   "frugal":["adj.","節儉的"],
   "obscure":["adj./v.","模糊的；使模糊"],
@@ -1856,39 +1805,19 @@ const HARD_WORDS = {
   "indispensable":["adj.","不可或缺的"],
   "superficial":["adj.","膚淺的；表面的"],
   "rigorous":["adj.","嚴格的；嚴謹的"],
-  "tedious":["adj.","冗長乏味的"],
   "aesthetic":["adj./n.","美學的；美感"],
-  "indigenous":["adj.","本土的；固有的"],
   "coherence":["n.","連貫性"],
   "validity":["n.","有效性；正確性"],
   "integrity":["n.","誠信；完整性"],
   "sustainability":["n.","可持續性"],
-  "accountability":["n.","責任；問責制"],
+  "accountability":["n.","責任；問責制"]
 };
-
-function annotateSentence(sentence) {
-  // Tokenize and wrap potentially unknown words with .word-tip
-  // Split keeping punctuation
-  const tokens = sentence.split(/(\s+|[,.\'!?;:()\[\]])/);
-  return tokens.map(tok => {
-    const clean = tok.replace(/[^a-zA-Z-]/g, '').toLowerCase();
-    const entry = HARD_WORDS[clean] || HARD_WORDS[clean.replace(/-/g,'')];
-    if (entry && clean.length > 3) {
-      const escaped = tok.replace(/'/g, "\'");
-      const pos = entry[0].replace(/'/g,"\'");
-      const def = entry[1].replace(/'/g,"\'");
-      return `<span class="word-tip" onclick="showTip(event,'${escaped}','${pos}','${def}')">${tok}</span>`;
-    }
-    return tok;
-  }).join('');
-}
 
 function showTip(e, word, pos, def) {
   e.stopPropagation();
   const popup = document.getElementById('tipPopup');
   document.getElementById('tipWord').textContent = word + ' ' + pos;
   document.getElementById('tipBody').textContent = def;
-  // Position near tap
   const x = Math.min(e.clientX, window.innerWidth - 280);
   const y = e.clientY + 12;
   popup.style.left = x + 'px';
@@ -1899,10 +1828,9 @@ function showTip(e, word, pos, def) {
 function closeTip() {
   document.getElementById('tipPopup').classList.remove('show');
 }
-document.addEventListener('click', () => closeTip());
+document.addEventListener('click', function(){ closeTip(); });
 
-
-// ── 心理學優化：里程碑 + 連勝動畫 ───────────────────────
+// ── 心理學優化：里程碑 ───────────────────────
 const MILESTONES = {
   5:  ['🔥','連勝 5！','你的大腦正在預熱，繼續！'],
   10: ['⚡','連勝 10！','記憶迴路全速運轉中！'],
@@ -1913,7 +1841,7 @@ const MILESTONES = {
 function checkMilestone(newStreak) {
   const m = MILESTONES[newStreak];
   if (!m) return;
-  const [emoji, title, msg] = m;
+  const emoji = m[0], title = m[1], msg = m[2];
   document.getElementById('milestoneEmoji').textContent = emoji;
   document.getElementById('milestoneTitle').textContent = title;
   document.getElementById('milestoneMsg').textContent = msg;
@@ -1927,19 +1855,18 @@ function closeMilestone() {
   document.getElementById('milestonePop').classList.remove('show');
 }
 
-
 // ── 每日連續登入 streak ──────────────────────────────────
 function checkDailyStreak() {
   const today = new Date().toDateString();
   const lastDate = lsGet('wf_lastDate', '');
   let dayStreak = parseInt(lsGet('wf_dayStreak', '1'));
 
-  if (lastDate === today) return dayStreak; // 已簽到
+  if (lastDate === today) return dayStreak;
   const yesterday = new Date(Date.now() - 86400000).toDateString();
   if (lastDate === yesterday) {
     dayStreak++;
   } else if (lastDate !== '') {
-    dayStreak = 1; // 斷了
+    dayStreak = 1;
   }
   lsSet('wf_lastDate', today);
   lsSet('wf_dayStreak', dayStreak);
@@ -1950,7 +1877,6 @@ function getDailyStreak() {
   return parseInt(lsGet('wf_dayStreak', '1'));
 }
 
-// 今日答題數
 function getTodayCount() {
   const today = new Date().toDateString();
   const key = 'wf_today_' + today;
@@ -1963,7 +1889,6 @@ function incTodayCount() {
   lsSet(key, n);
   return n;
 }
-
 
 // ── 拍照匯入系統 ─────────────────────────────────────────
 let photoBase64 = null;
@@ -1989,13 +1914,11 @@ function handlePhotoSelect(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = function(e) {
     const dataUrl = e.target.result;
-    // Show preview
     const preview = document.getElementById('photoPreview');
     preview.src = dataUrl;
     preview.style.display = 'block';
-    // Store base64 (strip prefix)
     photoBase64 = dataUrl.split(',')[1];
     document.getElementById('photoScanBtn').disabled = false;
     document.getElementById('photoStatus').textContent = '圖片已載入，點擊「AI 辨識」開始掃描';
@@ -2022,40 +1945,15 @@ async function scanPhoto() {
         messages: [{
           role: 'user',
           content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: 'image/jpeg', data: photoBase64 }
-            },
-            {
-              type: 'text',
-              text: `You are a vocabulary extraction assistant. Look at this handwritten English vocabulary note image.
-
-Extract ALL English words and phrases with their Chinese translations.
-For each item, also determine the part of speech and category/topic tag if visible.
-
-Return ONLY a JSON array, no other text, no markdown. Format:
-[
-  {
-    "word": "the English word or phrase exactly as written",
-    "zh": "Chinese meaning",
-    "type": "adj|v|n|phrase|adv|other",
-    "tag": "the topic category if visible, e.g. Flowers, 形容詞, 片語, Plans, Money, Emotions, Spare Time, or best guess"
-  }
-]
-
-Important:
-- Fix obvious spelling errors (e.g. "persuit" → "pursuit", "efficiente" → "efficient")
-- If no Chinese translation is visible, infer a short Chinese meaning
-- Extract every single vocabulary item you can see
-- For phrases without a clear type, use "phrase"`
-            }
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: photoBase64 } },
+            { type: 'text', text: 'You are a vocabulary extraction assistant. Look at this handwritten English vocabulary note image.\n\nExtract ALL English words and phrases with their Chinese translations.\nFor each item, also determine the part of speech and category/topic tag if visible.\n\nReturn ONLY a JSON array, no other text, no markdown. Format:\n[\n  {\n    "word": "the English word or phrase exactly as written",\n    "zh": "Chinese meaning",\n    "type": "adj|v|n|phrase|adv|other",\n    "tag": "the topic category if visible, e.g. Flowers, 形容詞, 片語, Plans, Money, Emotions, Spare Time, or best guess"\n  }\n]\n\nImportant:\n- Fix obvious spelling errors\n- If no Chinese translation is visible, infer a short Chinese meaning\n- Extract every single vocabulary item you can see\n- For phrases without a clear type, use "phrase"' }
           ]
         }]
       })
     });
 
     const data = await res.json();
-    const raw = data.content?.[0]?.text?.trim() || '[]';
+    const raw = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : '[]';
     let parsed;
     try {
       parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -2063,9 +1961,9 @@ Important:
       throw new Error('解析失敗，請再試一次');
     }
 
-    photoResults = parsed.map((item, i) => ({ ...item, _id: i, _include: true }));
+    photoResults = parsed.map(function(item, i){ return Object.assign({}, item, {_id: i, _include: true}); });
     renderPhotoResults();
-    document.getElementById('photoStatus').textContent = `✅ 找到 ${photoResults.length} 個單字，可以刪除不要的再匯入`;
+    document.getElementById('photoStatus').textContent = '✅ 找到 ' + photoResults.length + ' 個單字，可以刪除不要的再匯入';
     document.getElementById('photoImportBtn').classList.add('show');
 
   } catch(err) {
@@ -2078,16 +1976,9 @@ Important:
 
 function renderPhotoResults() {
   const list = document.getElementById('photoResultList');
-  list.innerHTML = photoResults.filter(w => w._include).map(w => `
-    <div class="photo-word-item">
-      <div class="pw-info">
-        <div class="pw-en">${escQ(w.word)}</div>
-        <div class="pw-zh">${escQ(w.zh)}</div>
-        <div class="pw-tag">${w.type} · ${escQ(w.tag || '')}</div>
-      </div>
-      <button class="pw-del" onclick="removePhotoWord(${w._id})" title="移除">×</button>
-    </div>
-  `).join('');
+  list.innerHTML = photoResults.filter(function(w){ return w._include; }).map(function(w){
+    return '<div class="photo-word-item"><div class="pw-info"><div class="pw-en">' + escQ(w.word) + '</div><div class="pw-zh">' + escQ(w.zh) + '</div><div class="pw-tag">' + w.type + ' · ' + escQ(w.tag || '') + '</div></div><button class="pw-del" onclick="removePhotoWord(' + w._id + ')" title="移除">×</button></div>';
+  }).join('');
 }
 
 function removePhotoWord(id) {
@@ -2095,7 +1986,7 @@ function removePhotoWord(id) {
   if (item) item._include = false;
   renderPhotoResults();
   const remaining = photoResults.filter(w => w._include).length;
-  document.getElementById('photoStatus').textContent = `剩餘 ${remaining} 個單字`;
+  document.getElementById('photoStatus').textContent = '剩餘 ' + remaining + ' 個單字';
   if (remaining === 0) document.getElementById('photoImportBtn').classList.remove('show');
 }
 
@@ -2106,11 +1997,10 @@ async function importPhotoWords() {
   const btn = document.getElementById('photoImportBtn');
   btn.disabled = true;
   btn.textContent = '⏳ 匯入中，產生例句…';
-  document.getElementById('photoStatus').textContent = `正在為 ${toImport.length} 個單字生成例句，請稍候…`;
+  document.getElementById('photoStatus').textContent = '正在為 ' + toImport.length + ' 個單字生成例句，請稍候…';
 
   let added = 0;
   for (const item of toImport) {
-    // Skip if already exists
     if (words.find(w => w.word.toLowerCase() === item.word.toLowerCase())) continue;
     const newId = Date.now() + Math.random();
     const newWord = {
@@ -2122,7 +2012,6 @@ async function importPhotoWords() {
     };
     words.push(newWord);
     added++;
-    // Generate example in background
     fetchExample(newWord);
   }
 
@@ -2131,19 +2020,14 @@ async function importPhotoWords() {
   renderCards();
   updateStats();
   closePhotoModal();
-  document.getElementById('photoStatus').textContent = '';
-
-  // Show success
-  showScorePop(`+${added} 個新單字 🎉`);
+  showScorePop('+' + added + ' 個新單字 🎉');
 }
-
 
 // ══════════════════════════════════════════════════════════
 // SENTENCE SYSTEM
 // ══════════════════════════════════════════════════════════
 
 const SENT_SEED = [
-  // Money
   {en:"Money is a tool that adds a touch of quality to my life.",zh:"金錢是一個為我的生活增添品質的工具。",tag:"Money"},
   {en:"Even though I enjoy the instant gratification of spending, I'm a firm believer in budget allocation.",zh:"雖然我享受消費帶來的即時滿足，但我堅信預算配置的重要性。",tag:"Money"},
   {en:"I usually follow the rule where I save 30% of my income, set aside 40% for living expenses, and use the remaining 30% for leisure and entertainment.",zh:"我通常遵循這個規則：儲蓄30%收入，留出40%用於生活開銷，剩下30%用於休閒娛樂。",tag:"Money"},
@@ -2166,7 +2050,6 @@ const SENT_SEED = [
   {en:"When I was younger, I tended to buy things impulsively for instant gratification; however, as I've become more mature, I prefer to save my money for authentic, urgent events.",zh:"當我年輕時，我傾向於衝動購物來獲得即時滿足；然而，隨著我變得更成熟，我更喜歡把錢留給真正重要的事。",tag:"Money"},
   {en:"Although wealthy people may enjoy financial freedom, they still have their own battles that people don't see.",zh:"雖然富有的人可能享有財務自由，但他們仍然有著別人看不見的自己的困境。",tag:"Money"},
   {en:"Experiences such as travelling can give us meaningful memories, compared to buying material possessions which only provide instant gratification.",zh:"旅行等體驗能給我們帶來有意義的回憶，相比之下購買物質財產只能提供即時的滿足感。",tag:"Money"},
-  // Spare Time
   {en:"Back then, I had plenty of time to kill time mindlessly, but nowadays my schedule is much tighter, so I have to manage my time effectively to find any gaps for relaxation.",zh:"那時候我有大把時間漫無目的地打發時間，但如今我的日程緊湊得多，所以我必須有效管理時間，才能找到任何放鬆的空隙。",tag:"Spare Time"},
   {en:"There's a growing trend of young people seeking 'me-time' in quiet places to take a break from work.",zh:"越來越多的年輕人趨向於在安靜的地方尋求「個人時間」，從工作中休息一下。",tag:"Spare Time"},
   {en:"Without enough rest, we can't remain productive in the long run.",zh:"沒有足夠的休息，我們從長遠來看無法保持高效。",tag:"Spare Time"},
@@ -2177,7 +2060,6 @@ const SENT_SEED = [
   {en:"During longer breaks, I unwind by visiting cafes for afternoon tea or watching classic movies.",zh:"在較長的休息時間裡，我通過去咖啡廳喝下午茶或觀看經典電影來放鬆。",tag:"Spare Time"},
   {en:"Most of the time, I prefer to be alone — I'm a person who needs solitude to recharge my batteries.",zh:"大多數時候，我更喜歡獨處——我是一個需要獨處來為自己充電的人。",tag:"Spare Time"},
   {en:"These small moments of relaxation add a touch of quality to my busy life, making me feel that my time is both well-spent and meaningful.",zh:"這些小小的放鬆時刻為我忙碌的生活增添了一絲品質，讓我感到我的時間既有價值又有意義。",tag:"Spare Time"},
-  // Plans
   {en:"I'm a firm believer that making plans in advance is essential for achieving goals.",zh:"我堅信提前制定計畫對於實現目標至關重要。",tag:"Plans"},
   {en:"It helps me prioritize tasks, ensuring that my daily schedule remains manageable and organized.",zh:"這幫助我排列任務優先順序，確保我的日常行程保持可管理且有條理。",tag:"Plans"},
   {en:"Even though I love planning, I often struggle with laziness and procrastination, which prevent me from staying on track.",zh:"儘管我喜歡計畫，但我常常與懶惰和拖延作鬥爭，這讓我難以保持正軌。",tag:"Plans"},
@@ -2186,39 +2068,31 @@ const SENT_SEED = [
   {en:"I believe the solution is to allow myself some downtime by incorporating breaks into my schedule, so I can actually stick to it more effectively.",zh:"我相信解決方案是通過在行程中加入休息時間來給自己一些喘息空間，這樣我才能更有效地堅持執行。",tag:"Plans"},
   {en:"Among all types of plans, I find that my travel itineraries are usually the most successful.",zh:"在所有類型的計畫中，我發現我的旅行行程通常是最成功的。",tag:"Plans"},
   {en:"When everything is executed perfectly as planned, it gives me a great sense of satisfaction and accomplishment.",zh:"當一切都按計畫完美執行時，它給了我巨大的滿足感和成就感。",tag:"Plans"},
-  // Future Plans
   {en:"As a person who firmly believes that planning is essential, I have a clear roadmap for my future.",zh:"作為一個堅定相信計畫重要性的人，我對自己的未來有一個清晰的路線圖。",tag:"Future"},
   {en:"In the short term, my priority is to finish my graduation project and achieve an outstanding IELTS score, which will allow me to graduate and apply for my master's degree.",zh:"短期內，我的優先事項是完成畢業專題並取得優秀的雅思成績，這將讓我順利畢業並申請碩士學位。",tag:"Future"},
   {en:"Following that, I plan to spend the next two years diving into neuroscience and finding internships in relevant labs or companies.",zh:"接下來，我計畫花兩年時間深入研究神經科學，並在相關實驗室或公司尋找實習機會。",tag:"Future"},
   {en:"I'm preparing myself by improving my time management and trying to avoid procrastination.",zh:"我通過改善時間管理和努力避免拖延來為自己做準備。",tag:"Future"},
   {en:"My dream is to work for a multinational company as a digital nomad — I envision myself travelling with my laptop and exploring the world while I work.",zh:"我的夢想是作為數位遊牧者為跨國公司工作——我想像自己帶著筆電旅行，一邊探索世界一邊工作。",tag:"Future"},
   {en:"It's about balancing my career and freedom.",zh:"這是關於平衡我的職業和自由。",tag:"Future"},
-  // Name
   {en:"My name carries a profound meaning rooted in the values of education and kindness.",zh:"我的名字承載著植根於教育和善良價值觀的深遠意義。",tag:"Name"},
   {en:"I strongly believe that a name reflects the profound expectations and aspirations that parents or grandparents have for a child's future.",zh:"我強烈相信名字反映了父母或祖父母對孩子未來的深切期望和抱負。",tag:"Name"},
   {en:"I feel that a unique name often aligns with a person's temperament; in my case, I'm fortunate that my name embodies the essence of kindness and benevolence.",zh:"我覺得獨特的名字往往與一個人的氣質相符；就我而言，我很幸運我的名字體現了善良和仁慈的本質。",tag:"Name"},
   {en:"It serves as a constant reminder for me to remain innocent and true to myself.",zh:"它時刻提醒我保持純真和忠於自我。",tag:"Name"},
   {en:"Some parents consulted a fortune teller before naming their children, as they believed a name could influence their future.",zh:"一些父母在為孩子命名前會諮詢算命師，因為他們相信名字能影響孩子的未來。",tag:"Name"},
   {en:"In our culture, people tend to avoid using names that are identical to those of their relatives.",zh:"在我們的文化中，人們傾向於避免使用與親戚相同的名字。",tag:"Name"},
-  {en:"That experience taught me an important lesson — having a distinctive name makes people stand out.",zh:"那次經歷教會了我一個重要的教訓——擁有獨特的名字讓人與眾不同。",tag:"Name"},
+  {en:"That experience taught me an important lesson — having a distinctive name makes people stand out.",zh:"那次經歷教會了我一個重要的教訓——擁有獨特的名字讓人與眾不同。",tag:"Name"}
 ];
 
-// Sentence state
 let sentences = JSON.parse(lsGet('wf_sentences', '[]') || '[]');
-let sentPracticeIdx = 0;
 let sentAnswered = false;
-let sentJigsawPlaced = []; // indices of tokens placed in order
 let sentPhotoBase64S = null;
 let sentPhotoResultsArr = [];
 
 function initSentences() {
   if (sentences.length === 0) {
-    sentences = SENT_SEED.map((s, i) => ({
-      id: i + 1,
-      en: s.en, zh: s.zh, tag: s.tag || '',
-      seen: 0,   // total practice count
-      mastery: 0 // 0-4; at 4 enters spaced review
-    }));
+    sentences = SENT_SEED.map(function(s, i){
+      return { id: i + 1, en: s.en, zh: s.zh, tag: s.tag || '', seen: 0, mastery: 0 };
+    });
     saveSentences();
   }
   renderSentTagFilter();
@@ -2231,7 +2105,6 @@ function saveSentences() {
   lsSet('wf_sentences', JSON.stringify(sentences));
 }
 
-// Daily sentence count
 function getSentTodayCount() {
   const key = 'wf_sent_today_' + new Date().toDateString();
   return parseInt(lsGet(key, '0'));
@@ -2247,14 +2120,13 @@ function updateSentDailyBar() {
   const n = getSentTodayCount();
   const label = document.getElementById('sentDailyLabel');
   const bar = document.getElementById('sentDailyBar');
-  if (label) label.textContent = `今日：${n} / ${GOAL} 句`;
+  if (label) label.textContent = '今日：' + n + ' / ' + GOAL + ' 句';
   if (bar) bar.style.width = Math.min(100, n / GOAL * 100) + '%';
 }
 
-// Pick next sentence to practice
 function pickSentence() {
   if (sentences.length === 0) return null;
-  const pool = sentences.filter(s => s.mastery < 4).sort((a, b) => {
+  const pool = sentences.filter(s => s.mastery < 4).sort(function(a, b) {
     const wa = (a.seen === 0 ? 100 : 0) + (4 - a.mastery) * 10 + Math.random() * 5;
     const wb = (b.seen === 0 ? 100 : 0) + (4 - b.mastery) * 10 + Math.random() * 5;
     return wb - wa;
@@ -2262,92 +2134,57 @@ function pickSentence() {
   return pool[0] || sentences[Math.floor(Math.random() * sentences.length)];
 }
 
-// Mode: seen 0-1 → jigsaw, seen 2-3 → typing, seen>=4 → spaced typing review
 function getSentMode(s) {
   if (s.seen <= 1) return 'jigsaw';
   return 'typing';
 }
+
+// Jigsaw state
+let slotOrder = [];
+let selectedSlotIdx = null;
+let jigsawHintsLeft = 5;
 
 function buildSentPractice() {
   const area = document.getElementById('sentPracticeArea');
   if (!area) return;
   const s = pickSentence();
   if (!s) {
-    area.innerHTML = `<div class="sent-empty"><h3>🎉 全部練習完了！</h3><p>新增更多句子繼續練習</p></div>`;
+    area.innerHTML = '<div class="sent-empty"><h3>🎉 全部練習完了！</h3><p>新增更多句子繼續練習</p></div>';
     return;
   }
   sentAnswered = false;
-  sentJigsawPlaced = [];
   slotOrder = [];
   selectedSlotIdx = null;
   jigsawHintsLeft = 5;
   const mode = getSentMode(s);
-  const dots = Array.from({length: 4}, (_, i) =>
-    `<div class="sent-dot ${i < s.mastery ? 'done' : (i === s.mastery ? 'active' : '')}"></div>`
-  ).join('');
+  const dots = Array.from({length: 4}, function(_, i){
+    return '<div class="sent-dot ' + (i < s.mastery ? 'done' : (i === s.mastery ? 'active' : '')) + '"></div>';
+  }).join('');
 
   let modeHTML = '';
   if (mode === 'jigsaw') {
-    // Tokenize: split by spaces keeping punctuation attached
     const tokens = s.en.match(/[\w']+[.,;!?]?|[.,;!?]/g) || s.en.split(' ');
-    window._currentSentData = { en: s.en, id: s.id, tokens };
+    window._currentSentData = { en: s.en, id: s.id, tokens: tokens };
     const shuffled = [...tokens].sort(() => Math.random() - .5);
-    const tokensHTML = shuffled.map((t, i) =>
-      `<span class="token" data-token="${t.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-idx="${i}" onclick="jigsawClick(this)">${escH(t)}</span>`
-    ).join('');
-    modeHTML = `
-      <div class="jigsaw-area">
-        <div style="font-size:12px;color:var(--text3);margin-bottom:8px">點擊單詞，按正確順序排列句子：</div>
-        <div class="jigsaw-slots" id="jigsawSlots"></div>
-        <div class="jigsaw-tokens" id="jigsawTokens">${tokensHTML}</div>
-      </div>
-      <div class="sent-hint-row" style="margin-bottom:8px">
-        <button class="sent-hint-btn" id="jigsawHintBtn" onclick="jigsawHint()">💡 提示 (<span id="jigsawHintsCount">5</span>次)</button>
-        <button class="sent-skip-btn" onclick="jigsawShowAnswer()">❌ 不知道</button>
-      </div>
-      <button class="sent-check-btn" id="sentCheckBtn" onclick="checkJigsaw()" disabled>確認順序 ✓</button>
-    `;
+    const tokensHTML = shuffled.map(function(t, i){
+      return '<span class="token" data-token="' + t.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" data-idx="' + i + '" onclick="jigsawClick(this)">' + escH(t) + '</span>';
+    }).join('');
+    modeHTML = '<div class="jigsaw-area"><div style="font-size:12px;color:var(--text3);margin-bottom:8px">點擊單詞，按正確順序排列句子：</div><div class="jigsaw-slots" id="jigsawSlots"></div><div class="jigsaw-tokens" id="jigsawTokens">' + tokensHTML + '</div></div><div class="sent-hint-row" style="margin-bottom:8px"><button class="sent-hint-btn" id="jigsawHintBtn" onclick="jigsawHint()">💡 提示 (<span id="jigsawHintsCount">5</span>次)</button><button class="sent-skip-btn" onclick="jigsawShowAnswer()">❌ 不知道</button></div><button class="sent-check-btn" id="sentCheckBtn" onclick="checkJigsaw()" disabled>確認順序 ✓</button>';
   } else {
-    // Store current sentence for typing mode
     window._currentSentData = { en: s.en, id: s.id };
-    modeHTML = `
-      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">根據中文，用英文寫出完整句子：</div>
-      <textarea class="sent-typing-input" id="sentTypingInput" placeholder="在這裡輸入英文句子…" oninput="sentTypingChange()"></textarea>
-
-```
-  <div class="sent-hint-row">
-    <button class="sent-hint-btn" id="sentHintBtn" onclick="showSentHint()">💡 提示（首字）</button>
-    <button class="sent-skip-btn" onclick="skipSent()">❌ 不知道</button>
-  </div>
-  <button class="sent-check-btn" id="sentCheckBtn" onclick="checkTyping()" disabled>確認 ✓</button>
-`;
-```
+    modeHTML = '<div style="font-size:12px;color:var(--text3);margin-bottom:8px">根據中文，用英文寫出完整句子：</div><textarea class="sent-typing-input" id="sentTypingInput" placeholder="在這裡輸入英文句子…" oninput="sentTypingChange()"></textarea><div class="sent-hint-row"><button class="sent-hint-btn" id="sentHintBtn" onclick="showSentHint()">💡 提示（首字）</button><button class="sent-skip-btn" onclick="skipSent()">❌ 不知道</button></div><button class="sent-check-btn" id="sentCheckBtn" onclick="checkTyping()" disabled>確認 ✓</button>';
 
 }
 
-area.innerHTML = `<div class="sent-card">
-<div class="sent-card-meta">
-<span class="sent-mode-badge ${mode === 'jigsaw' ? 'jigsaw' : 'typing'}">${mode === ‘jigsaw’ ? ‘🧩 排列句子’ : ‘✏️ 自由書寫’}</span>
-<div class="sent-progress-dots">${dots}</div>
-</div>
-<div class="sent-tag">${s.tag || ‘’}</div>
-<div class="sent-zh">${escQ(s.zh)}</div>
-${modeHTML}
-<div class="sent-feedback" id="sentFeedback"></div>
-<div id="sentCorrectAns"></div>
-<div id="sentZhBox" style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6;display:none"></div>
-<button class="sent-next-btn" id="sentNextBtn" onclick="buildSentPractice()">下一句 →</button>
-
-  </div>`;
+area.innerHTML = ‘<div class="sent-card"><div class="sent-card-meta"><span class="sent-mode-badge ' + (mode === 'jigsaw' ? 'jigsaw' : 'typing') + '">’ + (mode === ‘jigsaw’ ? ‘🧩 排列句子’ : ‘✏️ 自由書寫’) + ‘</span><div class="sent-progress-dots">’ + dots + ‘</div></div><div class="sent-tag">’ + (s.tag || ‘’) + ‘</div><div class="sent-zh">’ + escQ(s.zh) + ‘</div>’ + modeHTML + ‘<div class="sent-feedback" id="sentFeedback"></div><div id="sentCorrectAns"></div><div id="sentZhBox" style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6;display:none"></div><button class="sent-next-btn" id="sentNextBtn" onclick="buildSentPractice()">下一句 →</button></div>’;
 }
 
-// ── Jigsaw 提示功能 ──────────────────────────────────────
 function jigsawHint() {
 if (sentAnswered || jigsawHintsLeft <= 0) return;
-const { tokens } = window._currentSentData || {};
+const data = window._currentSentData || {};
+const tokens = data.tokens;
 if (!tokens) return;
 
-// 找第一個錯誤位置：比對 slotOrder 和 tokens，找出哪裡開始不對
 let firstWrongPos = -1;
 for (let i = 0; i < tokens.length; i++) {
 if (i >= slotOrder.length || slotOrder[i].token !== tokens[i]) {
@@ -2355,32 +2192,25 @@ firstWrongPos = i;
 break;
 }
 }
-// 如果全部都對了，從最後繼續接
 if (firstWrongPos === -1) firstWrongPos = slotOrder.length;
 if (firstWrongPos >= tokens.length) return;
 
-// 移除從 firstWrongPos 開始的錯誤 token，還回 pool
 const wrongItems = slotOrder.splice(firstWrongPos);
-wrongItems.forEach(item => {
-const origEl = document.querySelector(`.token[data-idx="${item.tokenIdx}"]`);
+wrongItems.forEach(function(item) {
+const origEl = document.querySelector(’.token[data-idx=”’ + item.tokenIdx + ‘”]’);
 if (origEl) origEl.classList.remove(‘placed’);
 });
 
-// 放入正確的下一個 token
 const correctToken = tokens[firstWrongPos];
 const allTokenEls = Array.from(document.querySelectorAll(’.token’));
-
-// 找未放置且文字相符的 token
-const tokenEl = allTokenEls.find(el =>
-!el.classList.contains(‘placed’) &&
-(el.dataset.token === correctToken || el.textContent.trim() === correctToken)
-);
+const tokenEl = allTokenEls.find(function(el) {
+return !el.classList.contains(‘placed’) && (el.dataset.token === correctToken || el.textContent.trim() === correctToken);
+});
 
 if (tokenEl) {
 tokenEl.classList.add(‘placed’);
-// 閃爍提示
 tokenEl.style.outline = ‘2px solid #a78bfa’;
-setTimeout(() => { tokenEl.style.outline = ‘’; }, 800);
+setTimeout(function(){ tokenEl.style.outline = ‘’; }, 800);
 slotOrder.push({ tokenIdx: tokenEl.dataset.idx, token: correctToken });
 }
 
@@ -2393,7 +2223,7 @@ const hintBtn = document.getElementById(‘jigsawHintBtn’);
 
 if (jigsawHintsLeft <= 0) {
 if (hintBtn) { hintBtn.disabled = true; hintBtn.style.opacity = ‘0.4’; }
-setTimeout(() => jigsawShowAnswer(), 500);
+setTimeout(function(){ jigsawShowAnswer(); }, 500);
 } else {
 if (hintBtn) hintBtn.textContent = ‘💡 提示（剩 ’ + jigsawHintsLeft + ’ 次）’;
 }
@@ -2401,16 +2231,16 @@ if (hintBtn) hintBtn.textContent = ‘💡 提示（剩 ’ + jigsawHintsLeft + 
 
 function jigsawShowAnswer() {
 if (sentAnswered) return;
-const { tokens, id: sentId } = window._currentSentData || {};
+const data = window._currentSentData || {};
+const tokens = data.tokens;
+const sentId = data.id;
 if (!tokens) return;
 
-// Place all tokens in correct order
-slotOrder = tokens.map((tok, i) => ({ tokenIdx: String(i), token: tok }));
-document.querySelectorAll(’.token’).forEach(el => el.classList.add(‘placed’));
+slotOrder = tokens.map(function(tok, i){ return { tokenIdx: String(i), token: tok }; });
+document.querySelectorAll(’.token’).forEach(function(el){ el.classList.add(‘placed’); });
 selectedSlotIdx = null;
 renderSlots();
 
-// Mark as wrong and show answer
 sentAnswered = true;
 document.getElementById(‘sentCheckBtn’).disabled = true;
 const hintBtn = document.getElementById(‘jigsawHintBtn’);
@@ -2418,13 +2248,13 @@ if (hintBtn) { hintBtn.disabled = true; hintBtn.style.opacity = ‘0.4’; }
 
 const slots = document.getElementById(‘jigsawSlots’);
 if (slots) {
-slots.innerHTML = tokens.map(t => `<span class="slot-token correct-token">${escH(t)}</span>`).join(’ ’);
+slots.innerHTML = tokens.map(function(t){ return ‘<span class="slot-token correct-token">’ + escH(t) + ‘</span>’; }).join(’ ’);
 }
 
 const fb = document.getElementById(‘sentFeedback’);
 fb.className = ‘sent-feedback bad’;
-const showAnsS = sentences.find(x => String(x.id) === String(sentId));
 fb.textContent = ‘看看正確句子，記起來再繼續！’;
+const showAnsS = sentences.find(function(x){ return String(x.id) === String(sentId); });
 if (showAnsS) {
 const zhBox = document.getElementById(‘sentZhBox’);
 if (zhBox) { zhBox.innerHTML = escH(showAnsS.zh); zhBox.style.display = ‘block’; }
@@ -2437,26 +2267,18 @@ const nb = document.getElementById(‘sentNextBtn’);
 if (nb) nb.classList.add(‘show’);
 }
 
-// ── Jigsaw logic ──
-// State: slotOrder = array of {tokenIdx, token} in placed order
-let slotOrder = [];
-let selectedSlotIdx = null; // index in slotOrder that is “selected for insert”
-let jigsawHintsLeft = 5; // max 5 hints per jigsaw question
-
 function jigsawClick(tokenEl) {
 if (sentAnswered) return;
 const idx = tokenEl.dataset.idx;
 const token = tokenEl.dataset.token;
 
 if (tokenEl.classList.contains(‘placed’)) {
-// Remove from slotOrder
-slotOrder = slotOrder.filter(s => s.tokenIdx !== idx);
+slotOrder = slotOrder.filter(function(s){ return s.tokenIdx !== idx; });
 tokenEl.classList.remove(‘placed’);
 selectedSlotIdx = null;
 } else {
-// Add to slotOrder (at selectedSlotIdx if set, otherwise end)
 tokenEl.classList.add(‘placed’);
-const item = { tokenIdx: idx, token };
+const item = { tokenIdx: idx, token: token };
 if (selectedSlotIdx !== null && selectedSlotIdx <= slotOrder.length) {
 slotOrder.splice(selectedSlotIdx, 0, item);
 selectedSlotIdx = null;
@@ -2470,15 +2292,13 @@ checkJigsawBtn();
 
 function slotTokenClick(slotIdx) {
 if (sentAnswered) return;
-// If clicking same → deselect and return to pool
 if (selectedSlotIdx === slotIdx) {
 selectedSlotIdx = null;
 renderSlots();
 return;
 }
-// Return this token to pool
 const removed = slotOrder.splice(slotIdx, 1)[0];
-const origEl = document.querySelector(`.token[data-idx="${removed.tokenIdx}"]`);
+const origEl = document.querySelector(’.token[data-idx=”’ + removed.tokenIdx + ‘”]’);
 if (origEl) origEl.classList.remove(‘placed’);
 selectedSlotIdx = null;
 renderSlots();
@@ -2487,7 +2307,6 @@ checkJigsawBtn();
 
 function insertGapClick(afterIdx) {
 if (sentAnswered) return;
-// afterIdx = insert position (0 = before first, n = after last)
 selectedSlotIdx = afterIdx;
 renderSlots();
 }
@@ -2500,18 +2319,15 @@ slots.innerHTML = ‘<span style="color:var(--text3);font-size:13px;padding:4px 
 return;
 }
 let html = ‘’;
-// Insert gap at position 0
 const gap0active = selectedSlotIdx === 0;
-html += `<span class="insert-gap ${gap0active?'active':''}" onclick="insertGapClick(0)">⬩</span>`;
-slotOrder.forEach((item, i) => {
-const isSelected = false; // slot tokens are never “selected” visually
-html += `<span class="slot-token" onclick="slotTokenClick(${i})">${escH(item.token)} <span style="font-size:9px;opacity:.5">✕</span></span>`;
+html += ‘<span class="insert-gap ' + (gap0active?'active':'') + '" onclick="insertGapClick(0)">⬩</span>’;
+slotOrder.forEach(function(item, i) {
+html += ‘<span class="slot-token" onclick="slotTokenClick(' + i + ')">’ + escH(item.token) + ’ <span style="font-size:9px;opacity:.5">✕</span></span>’;
 const gapActive = selectedSlotIdx === (i + 1);
-html += `<span class="insert-gap ${gapActive?'active':''}" onclick="insertGapClick(${i+1})">⬩</span>`;
+html += ‘<span class="insert-gap ' + (gapActive?'active':'') + '" onclick="insertGapClick(' + (i+1) + ')">⬩</span>’;
 });
-// Show hint when a slot is selected
 if (selectedSlotIdx !== null) {
-html += `<span style="font-size:11px;color:#a78bfa;margin-left:4px">← 點下方單詞插入此處</span>`;
+html += ‘<span style="font-size:11px;color:#a78bfa;margin-left:4px">← 點下方單詞插入此處</span>’;
 }
 slots.innerHTML = html;
 }
@@ -2525,30 +2341,30 @@ checkBtn.disabled = slotOrder.length < total;
 
 function checkJigsaw() {
 if (sentAnswered) return;
-const { tokens, id: sentId } = window._currentSentData || {};
+const data = window._currentSentData || {};
+const tokens = data.tokens;
+const sentId = data.id;
 if (!tokens) return;
 sentAnswered = true;
 const correct = tokens;
-const placed = slotOrder.map(s => s.token);
+const placed = slotOrder.map(function(s){ return s.token; });
 const isOk = placed.join(’ ‘) === correct.join(’ ’);
 
 document.getElementById(‘sentCheckBtn’).disabled = true;
 
-// Re-render slots with color feedback
 const slots = document.getElementById(‘jigsawSlots’);
 if (slots) {
 let html = ‘’;
-slotOrder.forEach((item, i) => {
+slotOrder.forEach(function(item, i) {
 const ok = item.token === correct[i];
-html += `<span class="slot-token ${ok ? 'correct-token' : 'wrong-token'}">${escH(item.token)}</span> `;
+html += ‘<span class="slot-token ' + (ok ? 'correct-token' : 'wrong-token') + '">’ + escH(item.token) + ’</span> ’;
 });
 slots.innerHTML = html;
 }
 
 const fb = document.getElementById(‘sentFeedback’);
 const nextBtn = document.getElementById(‘sentNextBtn’);
-const curSent = sentences.find(x => String(x.id) === String(sentId));
-// 答完後在句子中文意思區顯示
+const curSent = sentences.find(function(x){ return String(x.id) === String(sentId); });
 if (curSent) {
 const zhBox = document.getElementById(‘sentZhBox’);
 if (zhBox) { zhBox.innerHTML = escH(curSent.zh); zhBox.style.display = ‘block’; }
@@ -2562,8 +2378,7 @@ updateSentence(sentId, true);
 fb.className = ‘sent-feedback bad’;
 fb.textContent = ‘順序有點不對，正確句子：’;
 playSound(‘wrong’);
-document.getElementById(‘sentCorrectAns’).innerHTML =
-`<div class="sent-correct-ans">${escH(correct.join(' '))}</div>`;
+document.getElementById(‘sentCorrectAns’).innerHTML = ‘<div class="sent-correct-ans">’ + escH(correct.join(’ ’)) + ‘</div>’;
 updateSentence(sentId, false);
 }
 incSentTodayCount();
@@ -2571,18 +2386,18 @@ updateSentDailyBar();
 if (nextBtn) nextBtn.classList.add(‘show’);
 }
 
-// ── Typing logic ──
 function sentTypingChange() {
 const input = document.getElementById(‘sentTypingInput’);
 const btn = document.getElementById(‘sentCheckBtn’);
-if (btn) btn.disabled = !input?.value.trim();
+if (btn) btn.disabled = !(input && input.value.trim());
 }
 
 function showSentHint() {
-const { en } = window._currentSentData || {};
+const data = window._currentSentData || {};
+const en = data.en;
 if (!en) return;
-const words = en.split(’ ‘);
-const hint = words.slice(0, 3).join(’ ’) + ‘…’;
+const ws = en.split(’ ‘);
+const hint = ws.slice(0, 3).join(’ ’) + ‘…’;
 const input = document.getElementById(‘sentTypingInput’);
 if (input) { input.placeholder = hint; input.focus(); }
 const btn = document.getElementById(‘sentHintBtn’);
@@ -2591,7 +2406,9 @@ if (btn) { btn.disabled = true; btn.style.opacity = ‘0.4’; }
 
 function skipSent() {
 if (sentAnswered) return;
-const { en, id: sentId } = window.*currentSentData || {};
+const data = window._currentSentData || {};
+const en = data.en;
+const sentId = data.id;
 if (!en) return;
 sentAnswered = true;
 document.getElementById(‘sentCheckBtn’).disabled = true;
@@ -2600,13 +2417,12 @@ if (input) { input.disabled = true; input.classList.add(‘wrong’); }
 const fb = document.getElementById(‘sentFeedback’);
 fb.className = ‘sent-feedback bad’;
 fb.textContent = ‘沒關係，看看正確答案：’;
-const skipSent* = sentences.find(x => String(x.id) === String(sentId));
-if (skipSent_) {
+const skipSentObj = sentences.find(function(x){ return String(x.id) === String(sentId); });
+if (skipSentObj) {
 const zhBox = document.getElementById(‘sentZhBox’);
-if (zhBox) { zhBox.innerHTML = escH(skipSent_.zh); zhBox.style.display = ‘block’; }
+if (zhBox) { zhBox.innerHTML = escH(skipSentObj.zh); zhBox.style.display = ‘block’; }
 }
-document.getElementById(‘sentCorrectAns’).innerHTML =
-`<div class="sent-correct-ans">${escH(en)}</div>`;
+document.getElementById(‘sentCorrectAns’).innerHTML = ‘<div class="sent-correct-ans">’ + escH(en) + ‘</div>’;
 playSound(‘wrong’);
 updateSentence(sentId, false);
 incSentTodayCount();
@@ -2617,21 +2433,22 @@ if (nb) nb.classList.add(‘show’);
 
 function checkTyping() {
 if (sentAnswered) return;
-const { en, id: sentId } = window._currentSentData || {};
+const data = window._currentSentData || {};
+const en = data.en;
+const sentId = data.id;
 if (!en) return;
 const input = document.getElementById(‘sentTypingInput’);
-const val = input?.value.trim() || ‘’;
+const val = (input && input.value.trim()) ? input.value.trim() : ‘’;
 if (!val) return;
 sentAnswered = true;
 input.disabled = true;
 document.getElementById(‘sentCheckBtn’).disabled = true;
 
-const norm = s => s.toLowerCase().replace(/[^a-z\s]/g, ‘’).replace(/\s+/g, ’ ’).trim();
+const norm = function(s){ return s.toLowerCase().replace(/[^a-z\s]/g, ‘’).replace(/\s+/g, ’ ’).trim(); };
 const isOk = norm(val) === norm(en);
 
 const fb = document.getElementById(‘sentFeedback’);
-const typingSent = sentences.find(x => String(x.id) === String(sentId));
-// 顯示中文
+const typingSent = sentences.find(function(x){ return String(x.id) === String(sentId); });
 if (typingSent) {
 const zhBox = document.getElementById(‘sentZhBox’);
 if (zhBox) { zhBox.innerHTML = escH(typingSent.zh); zhBox.style.display = ‘block’; }
@@ -2645,9 +2462,8 @@ updateSentence(sentId, true);
 } else {
 input.classList.add(‘wrong’);
 fb.className = ‘sent-feedback bad’;
-fb.innerHTML = `<span style="color:var(--accent2);text-decoration:line-through">${escH(val)}</span>`;
-document.getElementById(‘sentCorrectAns’).innerHTML =
-`<div class="sent-correct-ans">${escH(en)}</div>`;
+fb.innerHTML = ‘<span style="color:var(--accent2);text-decoration:line-through">’ + escH(val) + ‘</span>’;
+document.getElementById(‘sentCorrectAns’).innerHTML = ‘<div class="sent-correct-ans">’ + escH(en) + ‘</div>’;
 playSound(‘wrong’);
 updateSentence(sentId, false);
 }
@@ -2658,7 +2474,7 @@ if (nb) nb.classList.add(‘show’);
 }
 
 function updateSentence(id, ok) {
-const s = sentences.find(x => String(x.id) === String(id));
+const s = sentences.find(function(x){ return String(x.id) === String(id); });
 if (!s) return;
 s.seen++;
 if (ok) s.mastery = Math.min(4, s.mastery + 1);
@@ -2667,14 +2483,13 @@ saveSentences();
 renderSentList();
 }
 
-// ── Sentence list ──
 let sentTagFilter2 = ‘all’;
 function renderSentTagFilter() {
 const tags = […new Set(sentences.map(s => s.tag).filter(Boolean))];
 const bar = document.getElementById(‘sentTagFilter’);
 if (!bar) return;
-bar.innerHTML = `<span class="filter-chip ${sentTagFilter2==='all'?'on':''}" onclick="setSentFilter('all',this)">全部</span>` +
-tags.map(t => `<span class="filter-chip ${sentTagFilter2===t?'on':''}" onclick="setSentFilter('${escQ(t)}',this)">${escQ(t)}</span>`).join(’’);
+bar.innerHTML = ‘<span class="filter-chip ' + (sentTagFilter2==='all'?'on':'') + '" onclick="setSentFilter(\'all\',this)">全部</span>’ +
+tags.map(function(t){ return ‘<span class="filter-chip ' + (sentTagFilter2===t?'on':'') + '" onclick="setSentFilter(\'' + escQ(t) + '\',this)">’ + escQ(t) + ‘</span>’; }).join(’’);
 }
 function setSentFilter(tag, el) {
 sentTagFilter2 = tag;
@@ -2689,12 +2504,12 @@ if (!list) return;
 const filtered = sentTagFilter2 === ‘all’ ? sentences : sentences.filter(s => s.tag === sentTagFilter2);
 if (countEl) countEl.textContent = filtered.length + ’ 句’;
 if (filtered.length === 0) {
-list.innerHTML = `<div class="sent-empty"><h3>還沒有句子</h3><p>點擊「＋ 新增」或「📷 掃描」加入句子</p></div>`;
+list.innerHTML = ‘<div class="sent-empty"><h3>還沒有句子</h3><p>點擊「＋ 新增」或「📷 掃描」加入句子</p></div>’;
 return;
 }
-list.innerHTML = filtered.map(s => {
-const dots = Array.from({length:4},(_,i)=>`<div class="slc-seen-dot ${i<s.mastery?'done':(i===s.mastery?'active':'')}"></div>`).join(’’);
-return `<div class="sent-list-card"> <div style="flex:1"> <div class="slc-en">${escQ(s.en)}</div> <div class="slc-zh">${escQ(s.zh)}</div> <div class="slc-meta">${s.tag || ''} · 練習 ${s.seen} 次</div> <div class="slc-seen">${dots}</div> </div> <button class="slc-del" onclick="deleteSent(${s.id})" title="刪除">×</button> </div>`;
+list.innerHTML = filtered.map(function(s) {
+const dots = Array.from({length:4},function(_,i){ return ‘<div class="slc-seen-dot ' + (i<s.mastery?'done':(i===s.mastery?'active':'')) + '"></div>’; }).join(’’);
+return ‘<div class="sent-list-card"><div style="flex:1"><div class="slc-en">’ + escQ(s.en) + ‘</div><div class="slc-zh">’ + escQ(s.zh) + ‘</div><div class="slc-meta">’ + (s.tag || ‘’) + ’ · 練習 ’ + s.seen + ’ 次</div><div class="slc-seen">’ + dots + ‘</div></div><button class="slc-del" onclick="deleteSent(' + s.id + ')" title="刪除">×</button></div>’;
 }).join(’’);
 }
 function deleteSent(id) {
@@ -2703,11 +2518,10 @@ sentences = sentences.filter(s => s.id !== id);
 saveSentences(); renderSentTagFilter(); renderSentList();
 }
 
-// ── Add sentence modal ──
 function openAddSentModal() { document.getElementById(‘addSentModalBg’).classList.add(‘open’); }
 function closeAddSentModal() {
 document.getElementById(‘addSentModalBg’).classList.remove(‘open’);
-[‘inSentEn’,‘inSentZh’,‘inSentTag’].forEach(id => { const el = document.getElementById(id); if(el) el.value=’’; });
+[‘inSentEn’,‘inSentZh’,‘inSentTag’].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=’’; });
 }
 function saveNewSent() {
 const en = document.getElementById(‘inSentEn’).value.trim();
@@ -2715,20 +2529,21 @@ const zh = document.getElementById(‘inSentZh’).value.trim();
 if (!en || !zh) { alert(‘請填入英文句子和中文意思’); return; }
 const tag = document.getElementById(‘inSentTag’).value.trim();
 const newId = Date.now();
-sentences.push({ id:newId, en, zh, tag, seen:0, mastery:0 });
+sentences.push({ id:newId, en:en, zh:zh, tag:tag, seen:0, mastery:0 });
 saveSentences(); closeAddSentModal(); renderSentTagFilter(); renderSentList();
 buildSentPractice();
 }
 
-// ── Photo scan for sentences ──
 function openSentPhotoModal() {
 sentPhotoBase64S = null; sentPhotoResultsArr = [];
-[‘sentPhotoPreview’,‘sentPhotoResultList’,‘sentPhotoImportBtn’,‘sentPhotoStatus’].forEach(id => {
-const el = document.getElementById(id);
-if (el) { el.style && (el.style.display = ‘none’); el.innerHTML && (el.innerHTML = ‘’); el.textContent && (el.textContent = ‘’); }
-});
-document.getElementById(‘sentPhotoPreview’).style.display = ‘none’;
-document.getElementById(‘sentPhotoStatus’).textContent = ‘’;
+var prev = document.getElementById(‘sentPhotoPreview’);
+if(prev) prev.style.display = ‘none’;
+var status = document.getElementById(‘sentPhotoStatus’);
+if(status) status.textContent = ‘’;
+var results = document.getElementById(‘sentPhotoResultList’);
+if(results) results.innerHTML = ‘’;
+var importBtn = document.getElementById(‘sentPhotoImportBtn’);
+if(importBtn) importBtn.classList.remove(‘show’);
 document.getElementById(‘sentPhotoScanBtn’).disabled = true;
 document.getElementById(‘sentPhotoInput’).value = ‘’;
 document.getElementById(‘sentPhotoModalBg’).classList.add(‘open’);
@@ -2738,7 +2553,7 @@ function closeSentPhotoModal() { document.getElementById(‘sentPhotoModalBg’)
 function handleSentPhotoSelect(input) {
 const file = input.files[0]; if (!file) return;
 const reader = new FileReader();
-reader.onload = e => {
+reader.onload = function(e) {
 const dataUrl = e.target.result;
 const preview = document.getElementById(‘sentPhotoPreview’);
 preview.src = dataUrl; preview.style.display = ‘block’;
@@ -2768,40 +2583,21 @@ messages: [{
 role: ‘user’,
 content: [
 { type: ‘image’, source: { type: ‘base64’, media_type: ‘image/jpeg’, data: sentPhotoBase64S } },
-{ type: ‘text’, text: `You are an IELTS speaking practice assistant. Look at this handwritten English speaking note image.
-
-Extract ALL complete English sentences or phrases that appear to be example sentences for speaking practice. These are usually bullet points or numbered items.
-
-For each sentence:
-
-1. Copy the English sentence exactly (fix obvious spelling errors)
-1. Translate it to Traditional Chinese (繁體中文)
-1. Identify the topic tag (e.g. Plans, Money, Spare Time, Future, Name, Emotions, or infer from context)
-
-Return ONLY a JSON array, no other text:
-[
-{
-“en”: “the complete English sentence”,
-“zh”: “繁體中文翻譯”,
-“tag”: “topic tag”
-}
-]
-
-Focus on complete sentences, not individual vocabulary words.` }
+{ type: ‘text’, text: ‘You are an IELTS speaking practice assistant. Look at this handwritten English speaking note image.\n\nExtract ALL complete English sentences or phrases that appear to be example sentences for speaking practice.\n\nFor each sentence:\n1. Copy the English sentence exactly (fix obvious spelling errors)\n2. Translate it to Traditional Chinese (繁體中文)\n3. Identify the topic tag (e.g. Plans, Money, Spare Time, Future, Name, Emotions, or infer from context)\n\nReturn ONLY a JSON array, no other text:\n[\n  {\n    “en”: “the complete English sentence”,\n    “zh”: “繁體中文翻譯”,\n    “tag”: “topic tag”\n  }\n]\n\nFocus on complete sentences, not individual vocabulary words.’ }
 ]
 }]
 })
 });
 const data = await res.json();
-const raw = data.content?.[0]?.text?.trim() || ‘[]’;
+const raw = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : ‘[]’;
 let parsed;
 try { parsed = JSON.parse(raw.replace(/`json|`/g, ‘’).trim()); }
 catch(e) { throw new Error(‘解析失敗’); }
 
 ```
-sentPhotoResultsArr = parsed.map((item, i) => ({ ...item, _id: i, _include: true }));
+sentPhotoResultsArr = parsed.map(function(item, i){ return Object.assign({}, item, {_id: i, _include: true}); });
 renderSentPhotoResults();
-document.getElementById('sentPhotoStatus').textContent = `✅ 找到 ${sentPhotoResultsArr.length} 個句子`;
+document.getElementById('sentPhotoStatus').textContent = '✅ 找到 ' + sentPhotoResultsArr.length + ' 個句子';
 document.getElementById('sentPhotoImportBtn').classList.add('show');
 ```
 
@@ -2815,26 +2611,28 @@ btn.disabled = false; btn.textContent = ‘🔍 重新辨識’;
 function renderSentPhotoResults() {
 const list = document.getElementById(‘sentPhotoResultList’);
 list.style.display = ‘flex’;
-list.innerHTML = sentPhotoResultsArr.filter(s => s._include).map(s => ` <div class="photo-word-item"> <div class="pw-info"> <div class="pw-en" style="font-size:13px;line-height:1.5">${escQ(s.en)}</div> <div class="pw-zh">${escQ(s.zh)}</div> <div class="pw-tag">${escQ(s.tag || '')}</div> </div> <button class="pw-del" onclick="removeSentPhotoItem(${s._id})">×</button> </div>`).join(’’);
+list.innerHTML = sentPhotoResultsArr.filter(function(s){ return s._include; }).map(function(s){
+return ‘<div class="photo-word-item"><div class="pw-info"><div class="pw-en" style="font-size:13px;line-height:1.5">’ + escQ(s.en) + ‘</div><div class="pw-zh">’ + escQ(s.zh) + ‘</div><div class="pw-tag">’ + escQ(s.tag || ‘’) + ‘</div></div><button class="pw-del" onclick="removeSentPhotoItem(' + s._id + ')">×</button></div>’;
+}).join(’’);
 }
 function removeSentPhotoItem(id) {
 const item = sentPhotoResultsArr.find(s => s._id === id);
 if (item) item._include = false;
 renderSentPhotoResults();
 const n = sentPhotoResultsArr.filter(s => s._include).length;
-document.getElementById(‘sentPhotoStatus’).textContent = `剩餘 ${n} 個句子`;
+document.getElementById(‘sentPhotoStatus’).textContent = ‘剩餘 ’ + n + ’ 個句子’;
 if (n === 0) document.getElementById(‘sentPhotoImportBtn’).classList.remove(‘show’);
 }
 function importSentPhotoResults() {
 const toImport = sentPhotoResultsArr.filter(s => s._include);
 let added = 0;
-toImport.forEach(item => {
+toImport.forEach(function(item) {
 if (sentences.find(s => s.en.toLowerCase() === item.en.toLowerCase())) return;
 sentences.push({ id: Date.now() + Math.random(), en: item.en, zh: item.zh, tag: item.tag||’’, seen:0, mastery:0 });
 added++;
 });
 saveSentences(); closeSentPhotoModal(); renderSentTagFilter(); renderSentList(); buildSentPractice();
-showScorePop(`+${added} 個句子 🎉`);
+showScorePop(’+’ + added + ’ 個句子 🎉’);
 }
 
 // ── Daily Goal Setting ──────────────────────────────────
@@ -2860,138 +2658,18 @@ showScorePop(‘目標：’ + n + ’ 題 ✓’);
 
 // ── BOOT ──────────────────────────────────────────────
 init();
-try { initSentences(); } catch(e) { console.log(“sentences init error:”, e); }
+try { initSentences(); } catch(e) { console.log(‘sentences init error:’, e); }
 </script>
-
-<!-- Milestone popup -->
-
-<div class="milestone-overlay" id="milestoneOverlay" onclick="closeMilestone()"></div>
-<div class="milestone-pop" id="milestonePop">
-  <h2 id="milestoneEmoji">🔥</h2>
-  <h2 id="milestoneTitle">連勝 10！</h2>
-  <p id="milestoneMsg">你的記憶力正在加速！</p>
-  <button onclick="closeMilestone()">繼續練習 →</button>
-</div>
-
-<!-- Tooltip popup -->
-
-<div class="tip-popup" id="tipPopup">
-  <span class="tip-close" onclick="closeTip()">×</span>
-  <div class="tip-word" id="tipWord"></div>
-  <div id="tipBody"></div>
-</div>
-
-<!-- 拍照匯入 Modal -->
-
-<div class="photo-modal-bg" id="photoModalBg">
-  <div class="photo-modal">
-    <h3>📷 拍照匯入單字</h3>
-    <p class="sub">拍下你的單字筆記，AI 會自動辨識並整理成單字卡（含例句）</p>
-
-```
-<div class="photo-drop" id="photoDrop">
-  <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoSelect(this)">
-  <div class="icon">📸</div>
-  <p>點擊拍照或選擇圖片</p>
-  <p class="hint">支援 JPG、PNG，直接對著筆記拍即可</p>
-</div>
-
-<img id="photoPreview" class="photo-preview" alt="預覽">
-
-<div class="photo-status" id="photoStatus"></div>
-
-<div class="photo-result-list" id="photoResultList"></div>
-
-<button class="photo-import-btn" id="photoImportBtn" onclick="importPhotoWords()">
-  ✅ 全部匯入單字庫
-</button>
-
-<div class="photo-modal-btns">
-  <button class="photo-scan-btn" id="photoScanBtn" onclick="scanPhoto()" disabled>🔍 AI 辨識</button>
-  <button class="photo-cancel-btn" onclick="closePhotoModal()">關閉</button>
-</div>
-```
-
-  </div>
-</div>
-
-<!-- Add Sentence Modal -->
-
-<div class="modal-bg" id="addSentModalBg">
-  <div class="modal">
-    <h3>新增句子</h3>
-    <div class="form-group">
-      <label>英文句子</label>
-      <textarea id="inSentEn" placeholder="e.g. I'm a firm believer that making plans in advance is essential for achieving goals." style="min-height:80px"></textarea>
-    </div>
-    <div class="form-group">
-      <label>中文意思</label>
-      <textarea id="inSentZh" placeholder="e.g. 我堅信提前做計畫對達成目標至關重要。" style="min-height:60px"></textarea>
-    </div>
-    <div class="form-group">
-      <label>主題標籤</label>
-      <input type="text" id="inSentTag" placeholder="e.g. Plans, Money, Spare Time">
-    </div>
-    <div class="modal-btns">
-      <button class="cancel-btn" onclick="closeAddSentModal()">取消</button>
-      <button class="save-btn" onclick="saveNewSent()">儲存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Sentence Photo Modal -->
-
-<div class="photo-modal-bg" id="sentPhotoModalBg">
-  <div class="photo-modal">
-    <h3>📷 拍照匯入句子</h3>
-    <p class="sub">拍下你的口說筆記，AI 自動辨識長句與中文意思</p>
-    <div class="photo-drop">
-      <input type="file" id="sentPhotoInput" accept="image/*" capture="environment" onchange="handleSentPhotoSelect(this)">
-      <div class="icon">📸</div>
-      <p>點擊拍照或選擇圖片</p>
-      <p class="hint">支援 JPG、PNG</p>
-    </div>
-    <img id="sentPhotoPreview" class="photo-preview" alt="預覽">
-    <div class="photo-status" id="sentPhotoStatus"></div>
-    <div class="photo-result-list" id="sentPhotoResultList"></div>
-    <button class="photo-import-btn" id="sentPhotoImportBtn" onclick="importSentPhotoResults()">✅ 全部匯入句子庫</button>
-    <div class="photo-modal-btns">
-      <button class="photo-scan-btn" id="sentPhotoScanBtn" onclick="scanSentPhoto()" disabled>🔍 AI 辨識</button>
-      <button class="photo-cancel-btn" onclick="closeSentPhotoModal()">關閉</button>
-    </div>
-  </div>
-</div>
 
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', function() {
     navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log('SW registered'))
-      .catch(err => console.log('SW failed:', err));
+      .then(function(reg){ console.log('SW registered'); })
+      .catch(function(err){ console.log('SW failed:', err); });
   });
 }
 </script>
-
-<!-- Goal Setting Modal -->
-
-<div class="modal-bg" id="goalModalBg">
-  <div class="modal" style="max-width:360px">
-    <h3>🎯 設定每日目標</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:20px">根據你的雅思目標，建議每日練習量：</p>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-      <button class="goal-preset" onclick="setGoalPreset(10,'輕鬆維持')">10 題／天 &nbsp;<span style="color:var(--text3)">輕鬆維持</span></button>
-      <button class="goal-preset" onclick="setGoalPreset(20,'穩定進步')">20 題／天 &nbsp;<span style="color:var(--text3)">穩定進步</span></button>
-      <button class="goal-preset" onclick="setGoalPreset(30,'雅思衝刺')">30 題／天 &nbsp;<span style="color:var(--text3)">雅思 6.0+ 衝刺</span></button>
-      <button class="goal-preset" onclick="setGoalPreset(50,'密集訓練')">50 題／天 &nbsp;<span style="color:var(--text3)">密集訓練</span></button>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      <span style="font-size:13px;color:var(--text2)">自訂：</span>
-      <input type="number" id="customGoalInput" min="5" max="200" placeholder="題數" style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;color:var(--text);outline:none">
-      <button onclick="setCustomGoal()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">確認</button>
-    </div>
-    <button class="cancel-btn" onclick="closeGoalModal()">關閉</button>
-  </div>
-</div>
 
 </body>
 </html>
