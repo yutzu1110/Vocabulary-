@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 body::before{content:'';position:fixed;inset:0;opacity:.015;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
 
 /* HEADER */
-header{position:sticky;top:0;z-index:100;background:rgba(245,244,240,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(–border);padding:8px 16px;display:flex;flex-direction:column;align-items:stretch;gap:6px}
+header{position:sticky;top:0;z-index:100;background:rgba(245,244,240,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(–border);height:60px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .logo{font-family:‘Playfair Display’,serif;font-size:20px;font-weight:900;letter-spacing:-1px}
 .logo em{color:var(–accent);font-style:normal}
 .hstats{display:flex;gap:10px;align-items:center}
@@ -194,6 +194,7 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 .word-display,.drill-word{font-size:28px}
 .options,.drill-opts{grid-template-columns:1fr}
 .hstats .chip{display:none}
+.logo{font-size:16px}
 .word-grid{grid-template-columns:1fr 1fr}
 .tab{padding:5px 10px;font-size:12px}
 }
@@ -374,18 +375,14 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 <body>
 
 <header>
-  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px">
-    <div class="logo">Word<em>Forge</em></div>
-    <div class="hstats">
-      <div class="chip score">⚡ <b id="hScore">0</b> pts</div>
-      <div class="chip streak">🔥 <b id="hStreak">0</b></div>
-    </div>
-  </div>
-  <div style="display:flex;justify-content:center;width:100%">
+  <div class="logo">Word<em>Forge</em></div>
+  <div class="hstats">
+    <div class="chip score">⚡ <b id="hScore">0</b> pts</div>
+    <div class="chip streak">🔥 <b id="hStreak">0</b></div>
     <div class="tabs-wrap">
-      <button class="tab on" onclick="switchPage('quiz')">練習</button>
-      <button class="tab" onclick="switchPage('cards')">單字卡</button>
-      <button class="tab" onclick="switchPage('sentences')">句子</button>
+      <button class="tab on" onclick="switchPage('quiz',this)">練習</button>
+      <button class="tab" onclick="switchPage('cards',this)">單字卡</button>
+      <button class="tab" onclick="switchPage('sentences',this)">句子</button>
     </div>
   </div>
 </header>
@@ -542,9 +539,13 @@ main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto
 
 <script>
 // ── STATE ──────────────────────────────────────────────
-let words = JSON.parse(localStorage.getItem('wf_words') || '[]');
-let score = parseInt(localStorage.getItem('wf_score') || '0');
-let streak = parseInt(localStorage.getItem('wf_streak') || '0');
+// Safe localStorage access
+function lsGet(key, def) { try { return localStorage.getItem(key) || def; } catch(e) { return def; } }
+function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+
+let words = JSON.parse(lsGet('wf_words', '[]'));
+let score = parseInt(lsGet('wf_score', '0'));
+let streak = parseInt(lsGet('wf_streak', '0'));
 let currentQ = null;
 let answered = false;
 let filterTag = 'all';
@@ -947,9 +948,9 @@ function init() {
 }
 
 function save() {
-  localStorage.setItem('wf_words', JSON.stringify(words));
-  localStorage.setItem('wf_score', score);
-  localStorage.setItem('wf_streak', streak);
+  lsSet('wf_words', JSON.stringify(words));
+  lsSet('wf_score', score);
+  lsSet('wf_streak', streak);
 }
 
 function updateStats() {
@@ -974,11 +975,11 @@ function updateStats() {
   if (goalDisplay) goalDisplay.textContent = `每日 ${DAILY_GOAL} 題`;
 }
 
-function switchPage(p) {
-  document.querySelectorAll('.page').forEach(el => el.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(el => el.classList.remove('on'));
+function switchPage(p, el) {
+  document.querySelectorAll('.page').forEach(e => e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
   document.getElementById('page-'+p).classList.add('on');
-  event.target.classList.add('on');
+  if (el) el.classList.add('on');
 }
 
 // ── QUIZ ───────────────────────────────────────────────
@@ -1916,8 +1917,8 @@ function closeMilestone() {
 // ── 每日連續登入 streak ──────────────────────────────────
 function checkDailyStreak() {
   const today = new Date().toDateString();
-  const lastDate = localStorage.getItem('wf_lastDate') || '';
-  let dayStreak = parseInt(localStorage.getItem('wf_dayStreak') || '1');
+  const lastDate = lsGet('wf_lastDate') || '';
+  let dayStreak = parseInt(lsGet('wf_dayStreak') || '1');
 
   if (lastDate === today) return dayStreak; // 已簽到
   const yesterday = new Date(Date.now() - 86400000).toDateString();
@@ -1926,26 +1927,26 @@ function checkDailyStreak() {
   } else if (lastDate !== '') {
     dayStreak = 1; // 斷了
   }
-  localStorage.setItem('wf_lastDate', today);
-  localStorage.setItem('wf_dayStreak', dayStreak);
+  lsSet('wf_lastDate', today);
+  lsSet('wf_dayStreak', dayStreak);
   return dayStreak;
 }
 
 function getDailyStreak() {
-  return parseInt(localStorage.getItem('wf_dayStreak') || '1');
+  return parseInt(lsGet('wf_dayStreak') || '1');
 }
 
 // 今日答題數
 function getTodayCount() {
   const today = new Date().toDateString();
   const key = 'wf_today_' + today;
-  return parseInt(localStorage.getItem(key) || '0');
+  return parseInt(lsGet(key, '0'));
 }
 function incTodayCount() {
   const today = new Date().toDateString();
   const key = 'wf_today_' + today;
   const n = getTodayCount() + 1;
-  localStorage.setItem(key, n);
+  lsSet(key, n);
   return n;
 }
 
@@ -2189,7 +2190,7 @@ const SENT_SEED = [
 ];
 
 // Sentence state
-let sentences = JSON.parse(localStorage.getItem('wf_sentences') || '[]');
+let sentences = JSON.parse(lsGet('wf_sentences') || '[]');
 let sentPracticeIdx = 0;
 let sentAnswered = false;
 let sentJigsawPlaced = []; // indices of tokens placed in order
@@ -2213,18 +2214,18 @@ function initSentences() {
 }
 
 function saveSentences() {
-  localStorage.setItem('wf_sentences', JSON.stringify(sentences));
+  lsSet('wf_sentences', JSON.stringify(sentences));
 }
 
 // Daily sentence count
 function getSentTodayCount() {
   const key = 'wf_sent_today_' + new Date().toDateString();
-  return parseInt(localStorage.getItem(key) || '0');
+  return parseInt(lsGet(key, '0'));
 }
 function incSentTodayCount() {
   const key = 'wf_sent_today_' + new Date().toDateString();
   const n = getSentTodayCount() + 1;
-  localStorage.setItem(key, n);
+  lsSet(key, n);
   return n;
 }
 function updateSentDailyBar() {
@@ -2824,12 +2825,12 @@ showScorePop(`+${added} 個句子 🎉`);
 
 // ── Daily Goal Setting ──────────────────────────────────
 function getDailyGoal() {
-return parseInt(localStorage.getItem(‘wf_daily_goal’) || ‘20’);
+return parseInt(lsGet(‘wf_daily_goal’) || ‘20’);
 }
 function openGoalModal() { document.getElementById(‘goalModalBg’).classList.add(‘open’); }
 function closeGoalModal() { document.getElementById(‘goalModalBg’).classList.remove(‘open’); }
 function setGoalPreset(n, label) {
-localStorage.setItem(‘wf_daily_goal’, n);
+lsSet(‘wf_daily_goal’, n);
 closeGoalModal();
 updateStats();
 showScorePop(‘目標：’ + n + ’ 題 ✓’);
@@ -2837,7 +2838,7 @@ showScorePop(‘目標：’ + n + ’ 題 ✓’);
 function setCustomGoal() {
 const n = parseInt(document.getElementById(‘customGoalInput’).value);
 if (!n || n < 1) return;
-localStorage.setItem(‘wf_daily_goal’, n);
+lsSet(‘wf_daily_goal’, n);
 closeGoalModal();
 updateStats();
 showScorePop(‘目標：’ + n + ’ 題 ✓’);
