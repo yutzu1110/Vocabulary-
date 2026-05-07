@@ -919,14 +919,24 @@ const SEED = [
 ];
 
 function init() {
-  if (words.length === 0) {
+  // 強制確保有單字資料
+  try {
+    if (!words || words.length === 0) {
+      words = SEED.map((w,i) => ({
+        id: i+1, word: w.word, zh: w.zh, type: w.type,
+        tag: w.tag||'', note: w.note||'', example: w.example||'', exampleZh: w.exampleZh||'',
+        seen: 0, correct: 0, wrong: 0, mastery: 0,
+        fi_correct: 0, nextDue: 0
+      }));
+      save();
+    }
+  } catch(e) {
     words = SEED.map((w,i) => ({
       id: i+1, word: w.word, zh: w.zh, type: w.type,
       tag: w.tag||'', note: w.note||'', example: w.example||'', exampleZh: w.exampleZh||'',
       seen: 0, correct: 0, wrong: 0, mastery: 0,
       fi_correct: 0, nextDue: 0
     }));
-    save();
   }
   // 相容舊資料：補 nextDue、把內建例句回填給沒例句的舊單字
   let dirty = false;
