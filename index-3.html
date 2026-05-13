@@ -1,0 +1,3003 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="WordForge">
+<meta name="theme-color" content="#f5f4f0">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #eeecea;
+  --border: #dddad5;
+  --accent: #c9973a;
+  --accent2: #e05252;
+  --accent3: #2aab6f;
+  --text: #1a1814;
+  --text2: #6b6760;
+  --text3: #a8a49e;
+  --r: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;opacity:.015;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(245,244,240,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:60px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:-1px}
+.logo em{color:var(--accent);font-style:normal}
+.hstats{display:flex;gap:10px;align-items:center}
+.chip{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:12px;font-weight:500;white-space:nowrap}
+.chip b{font-family:'DM Mono',monospace;font-weight:700}
+.chip.score b{color:var(--accent)}
+.chip.streak b{color:#ff9500}
+.tabs-wrap{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:3px}
+.tab{background:none;border:none;color:var(--text2);padding:6px 12px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all .2s}
+.tab.on{background:var(--accent);color:#ffffff;font-weight:700}
+
+/* MAIN */
+main{position:relative;z-index:1;padding:28px 20px;max-width:720px;margin:0 auto}
+.page{display:none}.page.on{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* QUIZ */
+.progress-bar{height:4px;background:var(--surface2);border-radius:4px;margin-bottom:28px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff9500);border-radius:4px;transition:width .4s ease}
+
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;margin-bottom:20px;position:relative;overflow:hidden}
+.qcard::after{content:'';position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(201,151,58,.04),transparent 70%);pointer-events:none}
+
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.badge{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 11px;border-radius:100px}
+.badge.mc{background:rgba(107,255,184,.12);color:var(--accent3);border:1px solid rgba(107,255,184,.2)}
+.badge.fi{background:rgba(232,197,71,.12);color:var(--accent);border:1px solid rgba(232,197,71,.2)}
+.badge.rev{background:rgba(255,107,107,.12);color:var(--accent2);border:1px solid rgba(255,107,107,.2)}
+.speak-btn{background:none;border:1px solid var(--border);border-radius:100px;color:var(--text2);padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.speak-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+.word-display{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;margin-bottom:8px;letter-spacing:-1px}
+.word-hint{font-size:13px;color:var(--text2);margin-bottom:4px}
+.word-def{font-size:14px;color:var(--text3);font-style:italic;margin-bottom:20px}
+
+.sentence{font-size:16px;line-height:1.7;color:var(--text2);background:var(--surface2);border-radius:12px;padding:16px 20px;margin-bottom:24px;border-left:3px solid var(--border)}
+.blank{display:inline-block;background:var(--border);border-radius:6px;min-width:80px;height:22px;vertical-align:middle;position:relative;top:-2px}
+
+/* MC options */
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.opt{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:13px 16px;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;text-align:left;color:var(--text)}
+.opt:hover{border-color:var(--accent);background:rgba(201,151,58,.08)}
+.opt.correct{border-color:var(--accent3);background:rgba(107,255,184,.1);color:var(--accent3)}
+.opt.wrong{border-color:var(--accent2);background:rgba(255,107,107,.1);color:var(--accent2)}
+
+/* Fill-in */
+.fi-wrap{display:flex;gap:10px;margin-bottom:8px}
+.fi-input{flex:1;background:transparent;border:none;border-bottom:2px solid var(--border);border-radius:0;padding:10px 4px;font-size:18px;font-family:'DM Mono',monospace;color:var(--text);outline:none;transition:border-color .2s;letter-spacing:.05em}
+.fi-input:focus{border-color:var(--accent);border-bottom-width:3px}
+.fi-input.correct{border-color:var(--accent3);background:transparent}
+.fi-input.wrong{border-color:var(--accent2);background:transparent}
+.submit-btn{background:var(--accent);color:#ffffff;border:none;border-radius:12px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.submit-btn:hover{opacity:.85}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.feedback{font-size:13px;margin-top:10px;min-height:20px;font-weight:500}
+.feedback.ok{color:var(--accent3)}
+.feedback.bad{color:var(--accent2)}
+
+.next-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:15px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s;display:none;font-family:'DM Sans',sans-serif}
+.next-btn:hover{border-color:var(--accent);color:var(--accent)}
+.next-btn.show{display:block}
+
+/* Score pop */
+.score-pop{position:fixed;top:80px;right:20px;z-index:200;background:var(--surface);border:1px solid var(--accent);border-radius:14px;padding:12px 20px;font-size:15px;font-weight:700;color:var(--accent);transform:translateX(120%);transition:transform .3s ease;pointer-events:none}
+.score-pop.show{transform:translateX(0)}
+
+/* Empty state */
+.empty{text-align:center;padding:80px 20px;color:var(--text2)}
+.empty h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--text);margin-bottom:10px}
+.empty p{font-size:14px;line-height:1.7}
+
+/* FLASHCARDS */
+.fc-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:10px;flex-wrap:wrap}
+.fc-toolbar h2{font-family:'Playfair Display',serif;font-size:22px}
+.fc-actions{display:flex;gap:8px;align-items:center}
+.add-btn{background:var(--accent);color:#ffffff;border:none;border-radius:12px;padding:10px 20px;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.add-btn:hover{opacity:.85}
+
+/* ── 新增：抽考模式按鈕 ── */
+.drill-btn{background:var(--surface);border:1px solid var(--accent3);color:var(--accent3);border-radius:12px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.drill-btn:hover,.drill-btn.on{background:rgba(42,171,111,.12)}
+
+/* Add word modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px;width:100%;max-width:460px}
+.modal h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group select option{background:var(--surface2)}
+.form-group textarea{resize:vertical;min-height:70px}
+.modal-btns{display:flex;gap:10px;margin-top:20px}
+.cancel-btn{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.save-btn{flex:2;background:var(--accent);color:#ffffff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Filter */
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filter-chip{background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .2s}
+.filter-chip.on{background:var(--accent);color:#0f0e17;border-color:var(--accent);font-weight:700}
+
+/* Word grid */
+.word-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.wcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;position:relative}
+.wcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.wcard.flipped .wcard-front{display:none}
+.wcard.flipped .wcard-back{display:block}
+.wcard-back{display:none}
+.wcard-word{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.wcard-type{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.wcard-zh{font-size:13px;color:var(--text2)}
+.wcard-actions{display:flex;gap:6px;margin-top:10px}
+.wcard-act{background:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--text3);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.wcard-act:hover{border-color:var(--accent2);color:var(--accent2)}
+.wcard-act.speak:hover{border-color:var(--accent3);color:var(--accent3)}
+.wcard-mastery{position:absolute;top:12px;right:12px;width:8px;height:8px;border-radius:50%}
+.mastery-0{background:var(--accent2)}
+.mastery-1{background:#ff9500}
+.mastery-2{background:var(--accent3)}
+
+/* LOADING */
+.loading{display:flex;align-items:center;gap:10px;color:var(--text2);font-size:14px;padding:20px 0}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Stats section */
+.stats-section{margin-bottom:28px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.stat-box .n{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent)}
+.stat-box .streak-n{color:#ff9500}
+.stat-box .l{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* ── 新增：抽考模式面板 ── */
+.drill-panel{display:none;margin-bottom:24px;animation:fi .3s ease}
+.drill-panel.show{display:block}
+.drill-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:13px;color:var(--text2)}
+.drill-topbar b{font-family:'DM Mono',monospace;color:var(--accent);font-size:16px}
+.drill-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px;position:relative;overflow:hidden}
+.drill-card::after{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(107,255,184,.06),transparent 70%);pointer-events:none}
+.drill-word{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+.drill-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
+.drill-q{font-size:13px;color:var(--text3);margin-bottom:14px;font-style:italic}
+.drill-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.drill-opt{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;text-align:left;color:var(--text);line-height:1.5}
+.drill-opt:hover{border-color:var(--accent3);background:rgba(107,255,184,.05)}
+.drill-opt.correct{border-color:var(--accent3);background:rgba(107,255,184,.1);color:var(--accent3)}
+.drill-opt.wrong{border-color:var(--accent2);background:rgba(255,107,107,.1);color:var(--accent2)}
+.drill-opt:disabled{cursor:not-allowed}
+.drill-fb{font-size:13px;margin-top:10px;min-height:20px;font-weight:500}
+.drill-fb.ok{color:var(--accent3)}
+.drill-fb.bad{color:var(--accent2)}
+.drill-next{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s;display:none;font-family:'DM Sans',sans-serif;margin-top:12px}
+.drill-next:hover{border-color:var(--accent3);color:var(--accent3)}
+.drill-next.show{display:block}
+
+@media(max-width:500px){
+  .word-display,.drill-word{font-size:28px}
+  .options,.drill-opts{grid-template-columns:1fr}
+  .hstats .chip{display:none}
+  .logo{font-size:16px}
+  .word-grid{grid-template-columns:1fr 1fr}
+  .tab{padding:5px 10px;font-size:12px}
+}
+
+/* 提示 & 不知道 按鈕 */
+.hint-row{display:flex;gap:8px;margin-top:10px}
+.hint-btn,.skip-btn{flex:1;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;border:1px solid var(--border)}
+.hint-btn{background:var(--surface2);color:var(--accent);border-color:rgba(232,197,71,.3)}
+.hint-btn:hover{background:rgba(232,197,71,.08)}
+.hint-btn:disabled{opacity:.4;cursor:not-allowed}
+.skip-btn{background:var(--surface2);color:var(--accent2);border-color:rgba(255,107,107,.3)}
+.skip-btn:hover{background:rgba(255,107,107,.08)}
+
+/* 已背單字 複習 Modal */
+.review-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.review-modal-bg.open{display:flex}
+.review-modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;width:100%;max-width:560px;margin-top:20px}
+.review-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.review-modal-header h3{font-family:'Playfair Display',serif;font-size:20px}
+.review-close{background:none;border:1px solid var(--border);border-radius:100px;padding:5px 14px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px}
+.review-progress{font-size:12px;color:var(--text2);margin-bottom:16px}
+.review-qcard{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:14px}
+.review-sentence{font-size:15px;line-height:1.7;color:var(--text2);margin-bottom:16px}
+.review-fi-wrap{display:flex;gap:8px;margin-bottom:8px}
+.review-fi-input{flex:1;background:transparent;border:none;border-bottom:2px solid var(--border);border-radius:0;padding:8px 4px;font-size:16px;font-family:'DM Mono',monospace;color:var(--text);outline:none;transition:border-color .2s;letter-spacing:.05em}
+.review-fi-input:focus{border-color:var(--accent3);border-bottom-width:3px}
+.review-fi-input.correct{border-color:var(--accent3);background:transparent}
+.review-fi-input.wrong{border-color:var(--accent2);background:transparent}
+.review-submit{background:var(--accent3);color:#ffffff;border:none;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.review-hint-row{display:flex;gap:8px;margin-top:8px}
+.review-hint-btn,.review-skip-btn{flex:1;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--surface)}
+.review-hint-btn{color:var(--accent);border-color:rgba(232,197,71,.3)}
+.review-skip-btn{color:var(--accent2);border-color:rgba(255,107,107,.3)}
+.review-hint-btn:disabled{opacity:.4;cursor:not-allowed}
+.review-feedback{font-size:13px;margin-top:8px;min-height:18px;font-weight:500}
+.review-feedback.ok{color:var(--accent3)}
+.review-feedback.bad{color:var(--accent2)}
+.review-next{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;display:none;margin-top:10px;transition:all .2s}
+.review-next:hover{border-color:var(--accent3);color:var(--accent3)}
+.review-next.show{display:block}
+.review-done{text-align:center;padding:40px 20px;color:var(--text2)}
+.review-done h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--accent3);margin-bottom:8px}
+
+/* 例句單字提示 tooltip */
+.word-tip{cursor:pointer;border-bottom:1px dashed var(--accent);color:var(--text);position:relative;white-space:nowrap}
+.word-tip:hover{color:var(--accent)}
+.tip-popup{display:none;position:fixed;z-index:500;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:13px;line-height:1.6;color:var(--text)}
+.tip-popup.show{display:block}
+.tip-popup .tip-word{font-weight:700;color:var(--accent);font-size:14px;margin-bottom:4px}
+.tip-popup .tip-close{float:right;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;margin-left:8px}
+
+/* 心理學優化：連勝火焰動畫 + milestone 彈窗 */
+@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.streak-flame{display:inline-block;animation:flamePulse 1s ease-in-out infinite}
+.milestone-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:600;background:var(--surface);border:2px solid var(--accent);border-radius:24px;padding:32px 40px;text-align:center;opacity:0;transition:all .35s ease;pointer-events:none}
+.milestone-pop.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+.milestone-pop h2{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:8px;color:var(--accent)}
+.milestone-pop p{font-size:14px;color:var(--text2);margin-bottom:20px}
+.milestone-pop button{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.milestone-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:599}
+.milestone-overlay.show{display:block}
+
+/* 拍照匯入 modal */
+.photo-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text2);transition:all .2s;white-space:nowrap}
+.photo-btn:hover{border-color:var(--accent);color:var(--accent)}
+.photo-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;padding:20px}
+.photo-modal-bg.open{display:flex}
+.photo-modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.photo-modal h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:6px}
+.photo-modal .sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.photo-drop{border:2px dashed var(--border);border-radius:16px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;position:relative}
+.photo-drop:hover,.photo-drop.drag{border-color:var(--accent);background:rgba(201,151,58,.04)}
+.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-drop .icon{font-size:36px;margin-bottom:8px}
+.photo-drop p{font-size:14px;color:var(--text2)}
+.photo-drop .hint{font-size:12px;color:var(--text3);margin-top:4px}
+.photo-preview{width:100%;border-radius:12px;margin-bottom:16px;display:none;max-height:280px;object-fit:contain}
+.photo-status{font-size:13px;color:var(--text2);margin-bottom:12px;min-height:20px;display:flex;align-items:center;gap:8px}
+.photo-result-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:300px;overflow-y:auto}
+.photo-word-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.photo-word-item .pw-info{flex:1}
+.photo-word-item .pw-en{font-weight:700;font-size:14px}
+.photo-word-item .pw-zh{font-size:12px;color:var(--text2);margin-top:2px}
+.photo-word-item .pw-tag{font-size:10px;color:var(--text3)}
+.photo-word-item .pw-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px 6px}
+.photo-word-item .pw-del:hover{color:var(--accent2)}
+.photo-import-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:none}
+.photo-import-btn.show{display:block}
+.photo-modal-btns{display:flex;gap:10px;margin-top:14px}
+.photo-scan-btn{flex:1;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.photo-scan-btn:disabled{opacity:.4;cursor:not-allowed}
+.photo-cancel-btn{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:13px 20px;font-size:14px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── 句子練習分頁 ─────────────────────────────── */
+.sent-toolbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;flex-wrap:wrap}
+.sent-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900}
+.sent-subtitle{font-size:13px;color:var(--text2);margin-top:2px}
+.sent-list-header{display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px;font-size:13px;color:var(--text2);flex-wrap:wrap;gap:8px}
+
+/* Practice card */
+.sent-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;margin-bottom:16px;position:relative}
+.sent-card-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sent-mode-badge{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 11px;border-radius:100px}
+.sent-mode-badge.jigsaw{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)}
+.sent-mode-badge.typing{background:rgba(96,165,250,.15);color:#60a5fa;border:1px solid rgba(96,165,250,.3)}
+.sent-mode-badge.review{background:rgba(255,107,107,.15);color:var(--accent2);border:1px solid rgba(255,107,107,.3)}
+.sent-progress-dots{display:flex;gap:5px}
+.sent-dot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.sent-dot.done{background:var(--accent3)}
+.sent-dot.active{background:#a78bfa}
+
+.sent-zh{font-size:17px;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:20px}
+.sent-tag{font-size:11px;color:var(--text3);margin-bottom:14px}
+
+/* Jigsaw mode */
+.jigsaw-area{margin-bottom:16px}
+
+/* Insert gap for jigsaw */
+.insert-gap{display:inline-flex;align-items:center;justify-content:center;width:20px;height:30px;color:var(--border);font-size:14px;cursor:pointer;border-radius:4px;transition:all .2s;vertical-align:middle;user-select:none;border:1px solid transparent}
+.insert-gap:hover,.insert-gap.active{background:rgba(167,139,250,.2);color:#a78bfa;border:1px solid #a78bfa;transform:scale(1.2)}
+.jigsaw-slots{min-height:52px;border:2px dashed var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:12px;background:var(--surface2);transition:border-color .2s;line-height:1.8}
+
+.jigsaw-slots.dragover{border-color:#a78bfa;background:rgba(167,139,250,.05)}
+.jigsaw-tokens{display:flex;flex-wrap:wrap;gap:6px}
+.token{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:14px;cursor:pointer;user-select:none;transition:all .2s;color:var(--text)}
+.token:hover{border-color:#a78bfa;background:rgba(167,139,250,.08)}
+.token.placed{background:rgba(167,139,250,.12);border-color:#a78bfa;color:#a78bfa}
+.token.correct-token{background:rgba(42,171,111,.12);border-color:var(--accent3);color:var(--accent3)}
+.token.wrong-token{background:rgba(255,107,107,.12);border-color:var(--accent2);color:var(--accent2)}
+.slot-token{background:rgba(167,139,250,.12);border:1px solid #a78bfa;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;color:#a78bfa;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.slot-token:hover{background:rgba(255,107,107,.12);border-color:var(--accent2);color:var(--accent2)}
+.slot-token:hover{background:rgba(255,107,107,.1);border-color:var(--accent2)}
+
+/* Typing mode */
+.sent-typing-input{width:100%;background:var(--surface2);border:none;border-bottom:2px solid var(--border);border-radius:0;padding:12px 4px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;resize:none;min-height:80px;transition:border-color .2s;line-height:1.6}
+.sent-typing-input:focus{border-color:#60a5fa}
+.sent-typing-input.correct{border-color:var(--accent3)}
+.sent-typing-input.wrong{border-color:var(--accent2)}
+
+.sent-check-btn{background:linear-gradient(135deg,#a78bfa,#60a5fa);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;width:100%;transition:opacity .2s}
+.sent-check-btn:hover{opacity:.88}
+.sent-check-btn:disabled{opacity:.4;cursor:not-allowed}
+.sent-hint-row{display:flex;gap:8px;margin-top:10px}
+.sent-hint-btn,.sent-skip-btn{flex:1;border-radius:9px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--surface2)}
+.sent-hint-btn{color:#a78bfa;border-color:rgba(167,139,250,.4)}
+.sent-skip-btn{color:var(--accent2);border-color:rgba(255,107,107,.3)}
+.sent-hint-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.sent-feedback{font-size:13px;margin-top:10px;font-weight:500;min-height:18px;line-height:1.6}
+.sent-feedback.ok{color:var(--accent3)}
+.sent-feedback.bad{color:var(--accent2)}
+.sent-correct-ans{font-size:13px;color:var(--text2);margin-top:8px;line-height:1.7;background:var(--surface2);border-radius:10px;padding:10px 14px;border-left:3px solid var(--accent3)}
+
+.sent-next-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;display:none;margin-top:12px;transition:all .2s}
+.sent-next-btn:hover{border-color:#a78bfa;color:#a78bfa}
+.sent-next-btn.show{display:block}
+
+/* Sentence list cards */
+.sent-list-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px}
+.sent-list-card .slc-en{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:4px}
+.sent-list-card .slc-zh{font-size:12px;color:var(--text2)}
+.sent-list-card .slc-meta{font-size:10px;color:var(--text3);margin-top:4px}
+.sent-list-card .slc-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px 6px;flex-shrink:0}
+.sent-list-card .slc-del:hover{color:var(--accent2)}
+.slc-seen{display:inline-flex;gap:3px;margin-top:6px}
+.slc-seen-dot{width:6px;height:6px;border-radius:50%;background:var(--border)}
+.slc-seen-dot.done{background:var(--accent3)}
+.slc-seen-dot.active{background:#a78bfa}
+
+.sent-empty{text-align:center;padding:60px 20px;color:var(--text2)}
+.sent-empty h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:8px}
+
+
+.goal-preset{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text);transition:all .2s}
+.goal-preset:hover{border-color:var(--accent);background:rgba(201,151,58,.06)}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Word<em>Forge</em></div>
+  <div class="hstats">
+    <div class="chip score">⚡ <b id="hScore">0</b> pts</div>
+    <div class="chip streak">🔥 <b id="hStreak">0</b></div>
+    <div class="tabs-wrap">
+      <button class="tab on" onclick="switchPage('quiz',this)">練習</button>
+      <button class="tab" onclick="switchPage('cards',this)">單字卡</button>
+      <button class="tab" onclick="switchPage('sentences',this)">句子</button>
+    </div>
+  </div>
+</header>
+
+<div class="score-pop" id="scorePop">+10 ⚡</div>
+
+<main>
+  <!-- QUIZ PAGE -->
+  <div class="page on" id="page-quiz">
+    <div class="stats-section">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-box"><div class="n" id="statScore">0</div><div class="l">總積分</div></div>
+        <div class="stat-box"><div class="n streak-n" id="statStreak">0</div><div class="l">🔥 連勝</div></div>
+        <div class="stat-box" style="border-color:rgba(255,149,0,.3)"><div class="n" style="color:#ff9500" id="statDayStreak">1</div><div class="l" style="color:#ff9500">📅 連續天數</div></div>
+        <div class="stat-box stat-mastered" onclick="openReview()" style="cursor:pointer;border-color:rgba(42,171,111,.3)" title="點擊複習"><div class="n" id="statMastered" style="color:var(--accent3)">0</div><div class="l" style="color:var(--accent3)">✅ 已背</div></div>
+      </div>
+      <div style="margin-top:14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text3)">
+        <span>今日單字練習</span>
+        <span id="todayCountLabel" style="font-weight:600">0 題</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:4px;margin-bottom:8px;overflow:hidden">
+        <div id="todayBar" style="height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent));border-radius:4px;transition:width .4s ease;width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <span style="font-size:11px;color:var(--text3)">目標：<b id="goalDisplay" style="color:var(--text2)">每日 20 題</b></span>
+        <button onclick="openGoalModal()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif">設定目標</button>
+      </div>
+    </div>
+    <div id="debugInfo" style="font-size:11px;color:red;text-align:center;margin-bottom:8px"></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div id="quizArea">
+      <div class="empty">
+        <h2>還沒有單字</h2>
+        <p>先到「單字卡」頁面新增單字<br>就可以開始練習了！</p>
+        <button onclick="forceLoadSeed()" style="margin-top:20px;background:#c9973a;color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer">點我載入單字</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS PAGE -->
+  <div class="page" id="page-cards">
+    <div class="fc-toolbar">
+      <h2>我的單字庫</h2>
+      <div class="fc-actions">
+        <button class="drill-btn" id="drillBtn" onclick="toggleDrill()">🎯 抽考模式</button>
+        <button class="add-btn" onclick="openModal()">＋ 新增單字</button>
+        <button class="photo-btn" onclick="openPhotoModal()">📷 拍照匯入</button>
+      </div>
+    </div>
+
+    <!-- ── 新增：抽考模式面板（預設隱藏）── -->
+    <div class="drill-panel" id="drillPanel">
+      <div class="drill-topbar">
+        <span>本輪答題：<b id="drillCorrect">0</b> / <b id="drillTotal">0</b> 正確</span>
+        <span style="font-size:11px;color:var(--text3)">看英文 → 選中文字義</span>
+      </div>
+      <div id="drillCard"></div>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <div class="filter-chip on" onclick="setFilter('all',this)">全部</div>
+    </div>
+    <div class="word-grid" id="wordGrid"></div>
+  </div>
+
+  <!-- SENTENCE PAGE -->
+  <div class="page" id="page-sentences">
+    <div class="sent-toolbar">
+      <div>
+        <h2 class="sent-title">句子練習</h2>
+        <div class="sent-subtitle" id="sentDailyLabel">今日：0 / 10 句</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="drill-btn" onclick="openSentPhotoModal()">📷 掃描</button>
+        <button class="add-btn" onclick="openAddSentModal()">＋ 新增</button>
+      </div>
+    </div>
+
+    <!-- Daily progress -->
+    <div style="height:5px;background:var(--surface2);border-radius:4px;margin-bottom:20px;overflow:hidden">
+      <div id="sentDailyBar" style="height:100%;background:linear-gradient(90deg,#a78bfa,#60a5fa);border-radius:4px;transition:width .4s ease;width:0%"></div>
+    </div>
+
+    <!-- Practice area -->
+    <div id="sentPracticeArea"></div>
+
+    <!-- Sentence list -->
+    <div class="sent-list-header">
+      <span id="sentListCount">0 句</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="sentTagFilter"></div>
+    </div>
+    <div id="sentList"></div>
+  </div>
+
+<!-- 已背單字複習 Modal -->
+<div class="review-modal-bg" id="reviewModalBg">
+  <div class="review-modal">
+    <div class="review-modal-header">
+      <h3>🎓 複習已背單字</h3>
+      <button class="review-close" onclick="closeReview()">✕ 關閉</button>
+    </div>
+    <div class="review-progress" id="reviewProgress"></div>
+    <div id="reviewContent"></div>
+  </div>
+</div>
+
+</main>
+
+<!-- ADD WORD MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>新增單字／片語</h3>
+    <div class="form-group">
+      <label>英文單字或片語</label>
+      <input type="text" id="inWord" placeholder="e.g. therapeutic / staying on track">
+    </div>
+    <div class="form-group">
+      <label>中文意思</label>
+      <input type="text" id="inZh" placeholder="e.g. 療癒的 / 保持正軌">
+    </div>
+    <div class="form-group">
+      <label>詞性</label>
+      <select id="inType">
+        <option value="adj">形容詞 adj.</option>
+        <option value="v">動詞 v.</option>
+        <option value="n">名詞 n.</option>
+        <option value="phrase">片語 phrase</option>
+        <option value="adv">副詞 adv.</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>分類標籤（可留空）</label>
+      <input type="text" id="inTag" placeholder="e.g. Flowers, 感受, Plans">
+    </div>
+    <div class="form-group">
+      <label>備註（可留空）</label>
+      <textarea id="inNote" placeholder="額外說明..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="closeModal()">取消</button>
+      <button class="save-btn" onclick="saveWord()">儲存並生成例句</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+// Safe localStorage access
+function lsGet(key, def) { try { return localStorage.getItem(key) || def; } catch(e) { return def; } }
+function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+
+let words; try { words = JSON.parse(lsGet('wf_words', '[]')); } catch(e) { words = []; }
+let score = parseInt(lsGet('wf_score', '0'));
+let streak = parseInt(lsGet('wf_streak', '0'));
+let currentQ = null;
+let answered = false;
+let filterTag = 'all';
+
+// 抽考模式 state
+let drillOn = false;
+let drillC = 0, drillT = 0;
+let drillCur = null, drillAns = false;
+
+// ── SEED ──────────────────────────────────────────────
+const SEED = [
+  {word:'bloom',zh:'花朵盛開',type:'v',tag:'Flowers',note:'bloom / blossom = flower open',
+   example:'The cherry trees bloom beautifully every spring in the park.',
+   exampleZh:'公園裡的櫻花樹每年春天都開得非常美麗。'},
+  {word:'petals',zh:'花瓣',type:'n',tag:'Flowers',note:'',
+   example:'She gently picked up the fallen petals from the ground.',
+   exampleZh:'她輕輕地從地上撿起落下的花瓣。'},
+  {word:'fragrance',zh:'香味',type:'n',tag:'Flowers',note:'',
+   example:'The fragrance of jasmine filled the entire room.',
+   exampleZh:'茉莉花的香味瀰漫了整個房間。'},
+  {word:'floral arrangement',zh:'插花',type:'phrase',tag:'Flowers',note:'',
+   example:'She spent an hour perfecting the floral arrangement for the dining table.',
+   exampleZh:'她花了一個小時為餐桌上的插花作品做最後修飾。'},
+  {word:'vibrant',zh:'充滿生命力的',type:'adj',tag:'Flowers',note:'',
+   example:'The garden was full of vibrant colours that lifted everyone\'s spirits.'},
+  {word:'delicate',zh:'嬌貴的、脆弱的',type:'adj',tag:'Flowers',note:'soft & fragile',
+   example:'These delicate flowers need to be handled with extra care.',
+   exampleZh:'這些嬌貴的花朵需要格外小心地呵護。'},
+  {word:'colourful',zh:'色彩豐富的',type:'adj',tag:'Flowers',note:'',
+   example:'The market was filled with colourful bouquets from local growers.',
+   exampleZh:'市場裡擺滿了當地花農帶來的色彩豐富的花束。'},
+  {word:'optimum',zh:'最適的',type:'adj',tag:'Flowers',note:'',
+   example:'Roses grow best under optimum sunlight and well-drained soil conditions.',
+   exampleZh:'玫瑰在最適的陽光和排水良好的土壤條件下生長最佳。'},
+  {word:'aroma',zh:'濃郁香氣',type:'n',tag:'Flowers',note:'',
+   example:'The aroma of fresh lavender always helps me feel calm.',
+   exampleZh:'新鮮薰衣草的濃郁香氣總能讓我感到平靜。'},
+  {word:'therapeutic',zh:'療癒的',type:'adj',tag:'感受',note:'',
+   example:'Spending time in the garden is truly therapeutic after a stressful week.',
+   exampleZh:'在壓力繁重的一週後，在花園裡度過時光真的非常療癒。'},
+  {word:'soothing',zh:'舒緩的',type:'adj',tag:'感受',note:'',
+   example:'She played soothing music to help the baby fall asleep.',
+   exampleZh:'她播放舒緩的音樂幫助寶寶入睡。'},
+  {word:'refreshing',zh:'提神的',type:'adj',tag:'感受',note:'',
+   example:'A cold shower in the morning is so refreshing on a hot day.',
+   exampleZh:'在炎熱的天氣裡，早上沖個冷水澡真是提神醒腦。'},
+  {word:'subtle',zh:'淡柔的',type:'adj',tag:'感受',note:'',
+   example:'There was a subtle scent of vanilla in the air when she walked in.',
+   exampleZh:'她走進來時，空氣中瀰漫著淡柔的香草氣息。'},
+  {word:'passionate',zh:'熱衷的',type:'adj',tag:'形容詞',note:'passionate about',
+   example:'She is passionate about teaching and never misses a chance to inspire her students.',
+   exampleZh:'她對教學充滿熱忱，從不放過任何激勵學生的機會。'},
+  {word:'humid',zh:'潮濕',type:'adj',tag:'形容詞',note:'',
+   example:'It was so humid outside that my glasses fogged up immediately.',
+   exampleZh:'外面非常潮濕，我的眼鏡立刻就起霧了。'},
+  {word:'scorching',zh:'灼熱的',type:'adj',tag:'形容詞',note:'',
+   example:'We stayed indoors to avoid the scorching afternoon sun.',
+   exampleZh:'我們待在室內，以避開灼熱的午後陽光。'},
+  {word:'furious',zh:'狂怒的',type:'adj',tag:'形容詞',note:'',
+   example:'He was furious when he found out his project had been cancelled without warning.',
+   exampleZh:'當他發現自己的專案在毫無預警的情況下被取消時，他勃然大怒。'},
+  {word:'disrespectful',zh:'不尊重的',type:'adj',tag:'形容詞',note:'',
+   example:'It\'s disrespectful to talk loudly on your phone during a meeting.'},
+  {word:'distinctive',zh:'獨特的',type:'adj',tag:'形容詞',note:'',
+   example:'Her distinctive laugh made her easy to spot across the room.',
+   exampleZh:'她那獨特的笑聲讓她在房間裡很容易被認出。'},
+  {word:'identical',zh:'相同的',type:'adj',tag:'形容詞',note:'',
+   example:'The two sisters wore identical outfits to the party as a joke.',
+   exampleZh:'這對姐妹穿著相同的服裝去派對，只是為了開個玩笑。'},
+  {word:'astonishing',zh:'驚人的、精彩的',type:'adj',tag:'形容詞',note:'',
+   example:'The magician\'s final trick was absolutely astonishing — nobody could figure it out.'},
+  {word:'authentic',zh:'真正的',type:'adj',tag:'形容詞',note:'',
+   example:'This restaurant serves authentic Thai food made with imported ingredients.',
+   exampleZh:'這家餐廳提供用進口食材製作的真正泰國料理。'},
+  {word:'frustrated',zh:'沮喪的',type:'adj',tag:'形容詞',note:'',
+   example:'I felt frustrated after spending two hours on a problem with no solution.',
+   exampleZh:'在一個沒有解決方案的問題上花了兩個小時後，我感到非常沮喪。'},
+  {word:'paralysed',zh:'癱瘓的',type:'adj',tag:'形容詞',note:'',
+   example:'She was paralysed with fear when she heard the strange noise downstairs.',
+   exampleZh:'當她聽到樓下的奇怪聲音時，她嚇得動彈不得。'},
+  {word:'attracts',zh:'吸引',type:'v',tag:'動詞',note:'',
+   example:'The new coffee shop attracts a lot of students because of its cozy atmosphere.',
+   exampleZh:'這家新咖啡店因其舒適的氛圍而吸引了大量學生。'},
+  {word:'convey',zh:'傳達',type:'v',tag:'動詞',note:'',
+   example:'It\'s hard to convey how grateful I am in just a few words.'},
+  {word:'symbolize',zh:'象徵',type:'v',tag:'動詞',note:'',
+   example:'White doves symbolize peace in many cultures around the world.',
+   exampleZh:'白鴿在全球許多文化中象徵著和平。'},
+  {word:'struggle',zh:'掙扎',type:'v',tag:'動詞',note:'',
+   example:'Many students struggle with time management during exam season.',
+   exampleZh:'許多學生在考試季節為時間管理而苦苦掙扎。'},
+  {word:'envision',zh:'想像',type:'v',tag:'動詞',note:'',
+   example:'Close your eyes and envision the life you want to be living in five years.',
+   exampleZh:'閉上眼睛，想像你五年後想要過的生活。'},
+  {word:'execute',zh:'執行',type:'v',tag:'動詞',note:'',
+   example:'She had a great idea but wasn\'t sure how to execute it within the budget.'},
+  {word:'remorse',zh:'悔意',type:'n',tag:'名詞',note:'',
+   example:'He felt deep remorse after realising how his words had hurt his friend.',
+   exampleZh:'當他意識到自己的話傷害了朋友後，他感到深深的悔意。'},
+  {word:'procrastination',zh:'拖延',type:'n',tag:'名詞',note:'',
+   example:'Procrastination is my biggest weakness when it comes to starting new projects.',
+   exampleZh:'在開始新專案方面，拖延是我最大的弱點。'},
+  {word:'satisfaction',zh:'滿足感',type:'n',tag:'名詞',note:'',
+   example:'There\'s a unique satisfaction that comes from finishing a task you\'ve been putting off.'},
+  {word:'accomplishment',zh:'成就感',type:'n',tag:'名詞',note:'',
+   example:'Crossing the finish line gave her an incredible sense of accomplishment.',
+   exampleZh:'越過終點線給了她一種難以置信的成就感。'},
+  {word:'hesitation',zh:'猶豫',type:'n',tag:'名詞',note:'',
+   example:'After a moment of hesitation, she decided to speak up about the problem.',
+   exampleZh:'猶豫片刻後，她決定站出來談論這個問題。'},
+  {word:'fill their lives',zh:'填滿他們的生活',type:'phrase',tag:'片語',note:'',
+   example:'They adopted a puppy to fill their lives with more joy and energy.',
+   exampleZh:'他們領養了一隻小狗，讓他們的生活充滿更多歡樂和活力。'},
+  {word:'only exception',zh:'唯一例外',type:'phrase',tag:'片語',note:'',
+   example:'He never eats dessert — the only exception is his grandmother\'s chocolate cake.'},
+  {word:'creep me out',zh:'讓我毛骨悚然',type:'phrase',tag:'片語',note:'',
+   example:'Those realistic robot faces creep me out every single time.',
+   exampleZh:'那些逼真的機器人臉每次都讓我毛骨悚然。'},
+  {word:'in person',zh:'面對面',type:'phrase',tag:'片語',note:'= face to face',
+   example:'It\'s much easier to resolve conflicts in person than over text.'},
+  {word:'captivated by',zh:'被吸引',type:'phrase',tag:'片語',note:'',
+   example:'I was completely captivated by her storytelling from the very first sentence.',
+   exampleZh:'從第一句話開始，我就完全被她的講故事方式所吸引。'},
+  {word:'cutting edge',zh:'最先進的',type:'phrase',tag:'片語',note:'= modern',
+   example:'This lab is working on cutting edge technology that could change how we travel.',
+   exampleZh:'這個實驗室正在研究最先進的技術，可能改變我們的出行方式。'},
+  {word:"boost someone's mood",zh:'提振心情',type:'phrase',tag:'片語',note:'',
+   example:'A surprise coffee from a friend can really boost someone\'s mood on a tough day.'},
+  {word:'stand out',zh:'很注意的',type:'phrase',tag:'片語',note:'= notable',
+   example:'Her red coat made her stand out in the crowd of grey winter jackets.',
+   exampleZh:'她的紅色外套讓她在一片灰色冬季外套的人群中非常顯眼。'},
+  {word:'prioritize task',zh:'任務優先級',type:'phrase',tag:'片語',note:'',
+   example:'Learning to prioritize task by urgency helped me stop feeling overwhelmed.',
+   exampleZh:'學會按緊急程度排列任務優先順序幫助我不再感到不知所措。'},
+  {word:'digital nomad',zh:'數位遊牧',type:'phrase',tag:'片語',note:'',
+   example:'As a digital nomad, she works from a different city every few months.',
+   exampleZh:'作為一名數位遊牧者，她每隔幾個月就在不同的城市工作。'},
+  {word:'make plans in advance',zh:'提前規劃',type:'phrase',tag:'Plans',note:'',
+   example:'I always make plans in advance so I don\'t have to rush at the last minute.'},
+  {word:'come up with a plan',zh:'想出一個計畫',type:'phrase',tag:'Plans',note:'= think of an idea',
+   example:'We need to come up with a plan before the client meeting on Friday.',
+   exampleZh:'我們需要在週五的客戶會議之前想出一個計畫。'},
+  {word:'go according to plan',zh:'按計畫進行',type:'phrase',tag:'Plans',note:'',
+   example:'The event didn\'t quite go according to plan, but everyone had a good time anyway.'},
+  {word:'staying on track',zh:'保持正軌',type:'phrase',tag:'Plans',note:'',
+   example:'She uses a weekly checklist to make sure she\'s staying on track with her goals.'},
+  {word:'travel itineraries',zh:'旅行行程',type:'phrase',tag:'Plans',note:'',
+   example:'He spent a whole evening researching travel itineraries for their trip to Japan.',
+   exampleZh:'他花了整個晚上研究他們日本之旅的旅行行程。'},
+  {word:'a tight schedule',zh:'緊湊的行程',type:'phrase',tag:'Schedule',note:'',
+   example:'I\'m on a tight schedule this week, so let\'s keep the meeting under thirty minutes.'},
+  {word:'stick to a schedule',zh:'遵守行程',type:'phrase',tag:'Schedule',note:'',
+   example:'It\'s hard to stick to a schedule when unexpected tasks keep popping up.'},
+  {word:'flexible schedule',zh:'彈性行程',type:'phrase',tag:'Schedule',note:'',
+   example:'One thing I love about freelancing is having a flexible schedule every day.',
+   exampleZh:'我喜歡自由職業的一點是每天都有彈性的行程安排。'},
+  {word:'manage my time effectively',zh:'有效管理時間',type:'phrase',tag:'Schedule',note:'',
+   example:'I started using a timer app to help me manage my time effectively during work hours.',
+   exampleZh:'我開始使用計時器應用程式，幫助我在工作時間有效管理時間。'},
+  // ── 新增單字（從筆記照片）──────────────────────────────
+
+  // 片語
+  {word:'carries a profound meaning',zh:'承載著深遠涵義',type:'phrase',tag:'片語',note:'',
+   example:'Every symbol in this painting carries a profound meaning rooted in ancient tradition.',
+   exampleZh:'這幅畫中的每個符號都承載著植根於古老傳統的深遠意義。'},
+  {word:'rooted in',zh:'源自；根植於',type:'phrase',tag:'片語',note:'',
+   example:'Her confidence is rooted in years of hard work and dedication.',
+   exampleZh:'她的自信源自多年的努力和奉獻。'},
+  {word:'fortune teller',zh:'算命師',type:'n',tag:'名詞',note:'',
+   example:'She visited a fortune teller out of curiosity, not really believing in predictions.',
+   exampleZh:'她出於好奇去看了算命師，其實並不真的相信預言。'},
+  {word:'superstition',zh:'迷信',type:'n',tag:'名詞',note:'',
+   example:'Avoiding the number thirteen is a common superstition in many Western cultures.',
+   exampleZh:'在許多西方文化中，避免使用數字十三是一種常見的迷信。'},
+  {word:'among all of them',zh:'在所有人/事物之中',type:'phrase',tag:'片語',note:'',
+   example:'Among all of them, she was the one who stayed calm under pressure.',
+   exampleZh:'在所有人中，她是在壓力下保持冷靜的那一個。'},
+  {word:'left me with a lasting impression',zh:'給我留下深刻印象',type:'phrase',tag:'片語',note:'',
+   example:'Her speech left me with a lasting impression that I still think about today.',
+   exampleZh:'她的演講給我留下了深刻的印象，我至今仍會思考。'},
+  {word:'well equipped',zh:'設備齊全的；準備充分的',type:'adj',tag:'片語',note:'',
+   example:'The new gym is well equipped with the latest machines and training tools.',
+   exampleZh:'新體育館設備齊全，配備了最新的機器和訓練工具。'},
+  {word:'add a touch of',zh:'添加一點；增添一絲',type:'phrase',tag:'片語',note:'',
+   example:'She added a touch of lemon to the sauce to brighten the flavour.',
+   exampleZh:'她在醬汁中加入了一點檸檬，讓味道更加鮮亮。'},
+  {word:'making fun out of',zh:'從...中找到樂趣；拿...開玩笑',type:'phrase',tag:'片語',note:'',
+   example:'He has a talent for making fun out of everyday situations.',
+   exampleZh:'他有一種從日常情境中找到樂趣的天賦。'},
+  {word:'firm believer',zh:'堅定的信奉者',type:'phrase',tag:'片語',note:'',
+   example:'She is a firm believer that consistency matters more than talent.',
+   exampleZh:'她堅定相信持之以恆比天賦更重要。'},
+  {word:'a means to an end',zh:'達成目的的手段',type:'phrase',tag:'片語',note:'',
+   example:'For him, the part-time job was just a means to an end while he finished his degree.',
+   exampleZh:'對他來說，兼職工作只是完成學業期間的一種達成目的的手段。'},
+  {word:'attention drawn to',zh:'注意力被吸引到',type:'phrase',tag:'片語',note:'',
+   example:'My attention was drawn to the small painting in the corner of the gallery.',
+   exampleZh:'我的注意力被畫廊角落裡的那幅小畫所吸引。'},
+  {word:'goes toward',zh:'用於；朝向',type:'phrase',tag:'片語',note:'',
+   example:'Most of my salary goes toward rent and daily expenses.',
+   exampleZh:'我大部分的薪水都用於房租和日常開銷。'},
+  {word:'serves as a form of',zh:'作為一種...的形式',type:'phrase',tag:'片語',note:'',
+   example:'Journaling serves as a form of therapy for many people dealing with stress.',
+   exampleZh:'對許多承受壓力的人來說，寫日記是一種治療方式。'},
+
+  // 形容詞
+  {word:'hospitality',zh:'熱情款待',type:'n',tag:'名詞',note:'',
+   example:'The hospitality of the local people made our trip truly unforgettable.',
+   exampleZh:'當地人的熱情款待讓我們的旅程真正難以忘懷。'},
+  {word:'effective',zh:'有效的',type:'adj',tag:'形容詞',note:'',
+   example:'Taking short breaks is an effective way to maintain focus throughout the day.',
+   exampleZh:'短暫休息是全天保持專注的有效方法。'},
+  {word:'efficient',zh:'有效率的',type:'adj',tag:'形容詞',note:'',
+   example:'She is incredibly efficient — she always finishes her work ahead of schedule.',
+   exampleZh:'她非常有效率——她總是提前完成工作。'},
+  {word:'productive',zh:'有成效的；高產的',type:'adj',tag:'形容詞',note:'',
+   example:'I feel most productive in the early morning before any distractions start.',
+   exampleZh:'我在清晨、干擾開始之前感到最有效率。'},
+  {word:'disciplined',zh:'自律的',type:'adj',tag:'形容詞',note:'',
+   example:'Being disciplined about your sleep schedule can dramatically improve your energy levels.',
+   exampleZh:'對睡眠時間保持自律可以顯著改善你的精力水平。'},
+  {word:'unassuming',zh:'不起眼的；謙遜的',type:'adj',tag:'形容詞',note:'',
+   example:'Despite being famous, she remains unassuming and easy to talk to.',
+   exampleZh:'儘管很有名，她仍然謙遜低調，容易交談。'},
+  {word:'literally',zh:'確實地；字面上地',type:'adv',tag:'形容詞',note:'',
+   example:'I was so tired I could literally fall asleep standing up.',
+   exampleZh:'我累到確實可以站著睡著。'},
+  {word:'compassionate',zh:'有同情心的',type:'adj',tag:'形容詞',note:'',
+   example:'A good nurse needs to be skilled, patient, and genuinely compassionate.',
+   exampleZh:'一個好護士需要技術精湛、有耐心，並且真正富有同情心。'},
+  {word:'fluffy',zh:'毛絨絨的；蓬鬆的',type:'adj',tag:'形容詞',note:'',
+   example:'She wrapped herself in a fluffy blanket and curled up on the sofa.',
+   exampleZh:'她把自己裹在毛絨絨的毯子裡，蜷縮在沙發上。'},
+  {word:'impulsively',zh:'衝動地',type:'adv',tag:'形容詞',note:'',
+   example:'He impulsively booked a flight to Tokyo without telling anyone.',
+   exampleZh:'他衝動地訂了一張去東京的機票，沒有告訴任何人。'},
+
+  // 動詞／名詞
+  {word:'pursuit',zh:'追求；追逐',type:'n',tag:'名詞',note:'',
+   example:'The pursuit of happiness looks different for everyone.',
+   exampleZh:'對每個人來說，追求幸福的樣子都不同。'},
+  {word:'reckon',zh:'認為；估計',type:'v',tag:'動詞',note:'= think',
+   example:'I reckon we should leave early to avoid the traffic.',
+   exampleZh:'我認為我們應該早點出發以避開交通堵塞。'},
+  {word:'encourage',zh:'鼓勵',type:'v',tag:'動詞',note:'',
+   example:'My teacher always encouraged me to speak up, even when I was unsure.',
+   exampleZh:'我的老師總是鼓勵我大聲說出來，即使我不確定的時候也是。'},
+  {word:'destinations',zh:'目的地',type:'n',tag:'名詞',note:'',
+   example:'Kyoto and Osaka are two of the most popular travel destinations in Japan.',
+   exampleZh:'京都和大阪是日本最受歡迎的兩個旅遊目的地。'},
+  {word:'roadmap',zh:'路線圖；計畫藍圖',type:'n',tag:'名詞',note:'',
+   example:'The manager shared a roadmap for the project so the team knew what to expect.',
+   exampleZh:'經理分享了專案的路線圖，讓團隊知道預期會發生什麼。'},
+  {word:'companionship',zh:'陪伴；情誼',type:'n',tag:'名詞',note:'',
+   example:'Many people adopt pets for the companionship they provide.',
+   exampleZh:'許多人養寵物是為了它們所提供的陪伴。'},
+  {word:'accessorise',zh:'搭配配件；用配件裝飾',type:'v',tag:'動詞',note:'',
+   example:'She knows how to accessorise a simple outfit and make it look stylish.',
+   exampleZh:'她知道如何為簡單的穿搭搭配配件，讓它看起來時尚。'},
+  {word:'bargain',zh:'便宜貨；討價還價',type:'n',tag:'名詞',note:'',
+   example:'I found a real bargain at the market — a beautiful scarf for only two dollars.',
+   exampleZh:'我在市場上找到了一個真正的便宜貨——一條漂亮的圍巾只要兩美元。'},
+  {word:'battle',zh:'奮鬥；戰鬥',type:'n',tag:'名詞',note:'',
+   example:'Getting enough sleep is a daily battle when you have a newborn.',
+   exampleZh:'當你有了新生兒時，獲得足夠的睡眠是每天的一場奮鬥。'},
+  {word:'incredibly',zh:'難以置信地；非常',type:'adv',tag:'副詞',note:'',
+   example:'The view from the top of the mountain was incredibly beautiful.',
+   exampleZh:'從山頂看到的景色難以置信地美麗。'},
+  {word:'exceptionally',zh:'異常地；特別地',type:'adv',tag:'副詞',note:'',
+   example:'She performed exceptionally well in the interview and got the job on the spot.',
+   exampleZh:'她在面試中表現得異常出色，當場就得到了這份工作。'},
+  {word:'definitely',zh:'絕對地；肯定地',type:'adv',tag:'副詞',note:'',
+   example:'You should definitely try the ramen here — it is the best in the city.',
+   exampleZh:'你一定要嘗試這裡的拉麵——這是城裡最好吃的。'},
+  {word:'absolutely',zh:'完全地；當然',type:'adv',tag:'副詞',note:'',
+   example:'I absolutely love waking up early and watching the sunrise with a coffee.',
+   exampleZh:'我完全愛上了早起，一邊喝咖啡一邊看日出。'},
+  {word:'not that often',zh:'不常；不太頻繁',type:'phrase',tag:'片語',note:'',
+   example:'I eat out, but not that often — maybe once or twice a week.',
+   exampleZh:'我有外出用餐，但不太頻繁——大概一週一兩次。'},
+  {word:'fortunately',zh:'幸運地',type:'adv',tag:'副詞',note:'',
+   example:'Fortunately, I remembered my umbrella before the rain started.',
+   exampleZh:'幸運地，在下雨之前我記起了帶傘。'},
+
+  // Spare Time
+  {word:'in my spare time',zh:'在我空閒時間',type:'phrase',tag:'Spare Time',note:'',
+   example:'In my spare time, I enjoy sketching and listening to podcasts.',
+   exampleZh:'在我的空閒時間，我喜歡素描和聽播客。'},
+  {word:'unwind by',zh:'藉由...放鬆舒壓',type:'phrase',tag:'Spare Time',note:'',
+   example:'After a long week, I unwind by taking a slow walk along the river.',
+   exampleZh:'漫長的一週後，我藉由沿著河邊慢慢散步來放鬆。'},
+  {word:'kill time by mindlessly',zh:'漫無目的地打發時間',type:'phrase',tag:'Spare Time',note:'',
+   example:'I sometimes kill time by mindlessly scrolling through social media.',
+   exampleZh:'我有時會漫無目的地刷社交媒體來打發時間。'},
+  {word:'engage in hobbies',zh:'投入興趣愛好',type:'phrase',tag:'Spare Time',note:'',
+   example:'It is important to engage in hobbies that bring you genuine joy.',
+   exampleZh:'投入能帶給你真正快樂的興趣愛好是很重要的。'},
+  {word:'take a break from work',zh:'從工作中休息',type:'phrase',tag:'Spare Time',note:'',
+   example:'She decided to take a break from work and travel through Southeast Asia.',
+   exampleZh:'她決定從工作中休息一下，去東南亞旅行。'},
+  {word:'fragmented time',zh:'碎片化時間',type:'phrase',tag:'Spare Time',note:'',
+   example:'I use fragmented time during my commute to review vocabulary.',
+   exampleZh:'我利用通勤途中的碎片化時間來複習詞彙。'},
+  {word:'solitude',zh:'獨處；孤獨',type:'n',tag:'Spare Time',note:'',
+   example:'She craves solitude after a week of back-to-back social events.',
+   exampleZh:'在連續一週的社交活動後，她渴望獨處。'},
+
+  // Money
+  {word:'a worthwhile investment',zh:'值得投資的事',type:'phrase',tag:'Money',note:'',
+   example:'Learning a new language is always a worthwhile investment of your time.',
+   exampleZh:'學習一門新語言永遠是值得投資的時間。'},
+  {word:'budget allocation',zh:'預算配置',type:'phrase',tag:'Money',note:'',
+   example:'Careful budget allocation helped them save enough for a house deposit.',
+   exampleZh:'謹慎的預算配置幫助他們存夠了房屋訂金。'},
+  {word:'living expenses',zh:'生活開銷',type:'phrase',tag:'Money',note:'',
+   example:'Her scholarship covered tuition but not her living expenses.',
+   exampleZh:'她的獎學金支付了學費，但不包括她的生活開銷。'},
+  {word:'monetary values',zh:'金錢價值',type:'phrase',tag:'Money',note:'',
+   example:'Some experiences cannot be measured by monetary values alone.',
+   exampleZh:'有些經歷是無法單純用金錢價值來衡量的。'},
+  {word:'incredibly materialistic',zh:'極度物質主義的',type:'phrase',tag:'Money',note:'',
+   example:'He grew up in an incredibly materialistic household where success meant luxury.',
+   exampleZh:'他在一個極度物質主義的家庭中長大，成功在那裡意味著奢華。'},
+  {word:'priceless',zh:'無價的',type:'adj',tag:'Money',note:'',
+   example:'The memories from that trip are priceless — no amount of money could recreate them.',
+   exampleZh:'那次旅行的回憶是無價的——再多的錢也無法重現。'},
+  {word:'properties',zh:'財產；房產',type:'n',tag:'Money',note:'',
+   example:'She invested in properties in three different cities before turning forty.',
+   exampleZh:'她在四十歲之前就在三個不同的城市投資了房產。'},
+  {word:'material possession',zh:'物質財產',type:'phrase',tag:'Money',note:'',
+   example:'He realised that material possession never gave him the sense of fulfilment he wanted.',
+   exampleZh:'他意識到物質財產從未給他帶來他想要的那種成就感。'},
+  {word:'lavish lifestyle',zh:'奢華生活',type:'phrase',tag:'Money',note:'',
+   example:'Winning the lottery did not change her values — she never pursued a lavish lifestyle.',
+   exampleZh:'贏得彩票並沒有改變她的價值觀——她從未追求奢華的生活方式。'},
+  {word:'mutual fund',zh:'共同基金',type:'n',tag:'Money',note:'',
+   example:'He started putting a small amount into a mutual fund every month from his first paycheck.',
+   exampleZh:'從第一份薪水起，他就開始每月將一小筆錢存入共同基金。'},
+  {word:'compound interest',zh:'複利',type:'n',tag:'Money',note:'',
+   example:'Compound interest means your savings grow faster the longer you leave them untouched.',
+   exampleZh:'複利意味著你的儲蓄放得越久，增長就越快。'},
+  {word:'drive happiness from',zh:'從...獲得快樂',type:'phrase',tag:'Money',note:'',
+   example:'She drives happiness from helping others, not from accumulating things.',
+   exampleZh:'她從幫助他人中獲得快樂，而不是從積累物品中。'},
+
+  // Emotions
+  {word:'a deep sense of fulfillment',zh:'深層的成就感',type:'phrase',tag:'Emotions',note:'',
+   example:'Finishing the marathon gave her a deep sense of fulfillment she had never felt before.',
+   exampleZh:'完成馬拉松給了她一種前所未有的深層成就感。'},
+  {word:'a lasting sense of contentment',zh:'持久的滿足感',type:'phrase',tag:'Emotions',note:'',
+   example:'Simple routines like morning tea can bring a lasting sense of contentment.',
+   exampleZh:'像早茶這樣簡單的日常慣例可以帶來持久的滿足感。'},
+  {word:'bring immense joy',zh:'帶來巨大的快樂',type:'phrase',tag:'Emotions',note:'',
+   example:'Watching my niece take her first steps brought immense joy to the whole family.',
+   exampleZh:'看著我的外甥女踏出第一步給整個家庭帶來了巨大的快樂。'},
+  {word:'emotionally rewarding',zh:'情感上充實的',type:'phrase',tag:'Emotions',note:'',
+   example:'Volunteering is not paid, but it is emotionally rewarding in ways money cannot match.',
+   exampleZh:'志願服務沒有報酬，但它在情感上的回報是金錢無法比擬的。'},
+  {word:'instant gratification',zh:'即時滿足',type:'phrase',tag:'Emotions',note:'',
+   example:'Social media is designed to give you instant gratification through likes and comments.',
+   exampleZh:'社交媒體的設計是通過點讚和評論給你即時的滿足感。'},
+  {word:'short-lived pleasure',zh:'短暫的愉悅',type:'phrase',tag:'Emotions',note:'',
+   example:'Impulse shopping gives short-lived pleasure but often leads to regret.',
+   exampleZh:'衝動購物帶來短暫的愉悅，但往往導致後悔。'},
+  {word:'strengthen social bonds',zh:'強化社會連結',type:'phrase',tag:'Emotions',note:'',
+   example:'Shared experiences like cooking together can really strengthen social bonds.',
+   exampleZh:'像一起烹飪這樣的共同體驗真的可以強化社會連結。'},
+  {word:'healthy work-life balance',zh:'健康的工作生活平衡',type:'phrase',tag:'Emotions',note:'',
+   example:'The company actively promotes a healthy work-life balance for all employees.',
+   exampleZh:'該公司積極為所有員工推廣健康的工作生活平衡。'},
+];
+
+function init() {
+  // 強制確保有單字資料
+  try {
+    if (!words || words.length === 0) {
+      words = SEED.map((w,i) => ({
+        id: i+1, word: w.word, zh: w.zh, type: w.type,
+        tag: w.tag||'', note: w.note||'', example: w.example||'', exampleZh: w.exampleZh||'',
+        seen: 0, correct: 0, wrong: 0, mastery: 0,
+        fi_correct: 0, nextDue: 0
+      }));
+      save();
+    }
+  } catch(e) {
+    words = SEED.map((w,i) => ({
+      id: i+1, word: w.word, zh: w.zh, type: w.type,
+      tag: w.tag||'', note: w.note||'', example: w.example||'', exampleZh: w.exampleZh||'',
+      seen: 0, correct: 0, wrong: 0, mastery: 0,
+      fi_correct: 0, nextDue: 0
+    }));
+  }
+  // 相容舊資料：補 nextDue、把內建例句回填給沒例句的舊單字
+  let dirty = false;
+  words.forEach(w => {
+    if (w.nextDue === undefined) { w.nextDue = 0; dirty = true; }
+    if (w.fi_correct === undefined) { w.fi_correct = 0; dirty = true; }
+    if (!w.example) {
+      const seed = SEED.find(s => s.word === w.word);
+      if (seed?.example) { w.example = seed.example; dirty = true; }
+    }
+    if (!w.exampleZh) {
+      const seed = SEED.find(s => s.word === w.word);
+      if (seed?.exampleZh) { w.exampleZh = seed.exampleZh; dirty = true; }
+    }
+  });
+  if (dirty) save();
+  try { checkDailyStreak(); } catch(e) {}
+  updateStats(); renderFilters(); renderCards(); buildQuiz();
+  // Debug: show word count
+  const dbg = document.getElementById('debugInfo');
+  if (dbg) dbg.textContent = '單字數: ' + words.length + ' | localStorage: ' + (typeof localStorage !== 'undefined' ? 'OK' : 'blocked');
+}
+
+function save() {
+  lsSet('wf_words', JSON.stringify(words));
+  lsSet('wf_score', score);
+  lsSet('wf_streak', streak);
+}
+
+function updateStats() {
+  document.getElementById('hScore').textContent = score;
+  document.getElementById('hStreak').textContent = streak;
+  document.getElementById('statScore').textContent = score;
+  document.getElementById('statStreak').textContent = streak;
+  const masteredCount = words.filter(w => (w.fi_correct||0) >= 3).length;
+  document.getElementById('statMastered').textContent = masteredCount;
+  // Daily streak
+  const ds = getDailyStreak();
+  const dsel = document.getElementById('statDayStreak');
+  if (dsel) dsel.textContent = ds;
+  // Today count bar (dynamic goal)
+  const DAILY_GOAL = typeof getDailyGoal === 'function' ? getDailyGoal() : 20;
+  const todayN = getTodayCount();
+  const todayLabel = document.getElementById('todayCountLabel');
+  const todayBar = document.getElementById('todayBar');
+  const goalDisplay = document.getElementById('goalDisplay');
+  if (todayLabel) todayLabel.textContent = `${todayN} / ${DAILY_GOAL} 題`;
+  if (todayBar) todayBar.style.width = Math.min(100, todayN/DAILY_GOAL*100) + '%';
+  if (goalDisplay) goalDisplay.textContent = `每日 ${DAILY_GOAL} 題`;
+}
+
+function switchPage(p, el) {
+  document.querySelectorAll('.page').forEach(e => e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  if (el) el.classList.add('on');
+}
+
+// ── QUIZ ───────────────────────────────────────────────
+// 規則（原版保留 + nextDue 間隔）：
+//   seen === 0  →  選擇題（例句挖空，選英文）
+//   seen >= 1   →  填空題（例句挖空，自己拼）
+//   答對 → 設定 nextDue（間隔複習，不馬上再出）
+//   答錯 → nextDue = 1小時後，優先重複
+
+function pickWord() {
+  if (words.length === 0) return null;
+  const now = Date.now();
+  // 優先選「到期」的單字
+  let pool = words.filter(w => w.nextDue <= now);
+  if (pool.length === 0) {
+    // 全部都還沒到期：等最快到期的那個（或選 seen=0 的，因為未練過的 nextDue=0 永遠到期）
+    pool = [...words].sort((a,b) => a.nextDue - b.nextDue);
+    pool = pool.slice(0, Math.max(1, Math.ceil(pool.length * 0.2)));
+  }
+  pool.sort((a,b) => {
+    const wa = (a.seen===0?100:0) + (a.wrong*10) - (a.mastery*5);
+    const wb = (b.seen===0?100:0) + (b.wrong*10) - (b.mastery*5);
+    return wb - wa + (Math.random()-.5)*20;
+  });
+  return pool[0];
+}
+
+function buildQuiz() {
+  if (words.length === 0) {
+    document.getElementById('quizArea').innerHTML = `<div class="empty"><h2>還沒有單字</h2><p>先到「單字卡」頁面新增單字<br>就可以開始練習了！</p></div>`;
+    return;
+  }
+  const w = pickWord();
+  currentQ = w;
+  answered = false;
+  hintRevealCount = 0;
+
+  const total = words.length;
+  const mastered = words.filter(x => x.mastery >= 2).length;
+  document.getElementById('progressFill').style.width = (mastered/total*100)+'%';
+
+  // seen === 0 → 選擇題；seen >= 1 → 填空
+  const isMC = (w.seen === 0);
+  const isReview = w.wrong > 0;
+  const badgeClass = isMC ? 'mc' : (isReview ? 'rev' : 'fi');
+  const badgeText  = isMC ? '選擇題' : (isReview ? '⚠ 複習填空' : '填空');
+
+  // 例句（含挖空 + 難字標注）
+  let sentHTML = '';
+  if (w.example) {
+    const masked = isMC
+      ? w.example.replace(new RegExp(escRegex(w.word),'gi'), '<span class="blank"></span>')
+      : w.example.replace(new RegExp(escRegex(w.word),'gi'), '______');
+    // 標注難字（排除被挖空的目標單字）
+    const annotated = masked.replace(/<span[^>]*>.*?<\/span>|______/g,
+      m => m).replace(/(?<![<>"])\b([A-Za-z][a-z-]{3,})\b(?![^<]*>)/g, tok => {
+      const clean = tok.toLowerCase();
+      const entry = typeof HARD_WORDS !== 'undefined' && (HARD_WORDS[clean] || HARD_WORDS[clean.replace(/-/g,'')]);
+      if (entry && tok.toLowerCase() !== w.word.toLowerCase().split(' ')[0]) {
+        const pos = entry[0].replace(/'/g,"\'");
+        const def = entry[1].replace(/'/g,"\'");
+        return `<span class="word-tip" onclick="showTip(event,'${tok}','${pos}','${def}')">${tok}</span>`;
+      }
+      return tok;
+    });
+    sentHTML = `<div class="sentence" id="sentenceEl">${annotated}</div>`;
+  } else {
+    sentHTML = `<div class="loading" id="loadingEl"><div class="spinner"></div>正在生成例句…</div>
+                <div class="sentence" id="sentenceEl" style="display:none"></div>`;
+  }
+
+  let html = `<div class="qcard">
+    <div class="qmeta">
+      <span class="badge ${badgeClass}">${badgeText}</span>
+      <button class="speak-btn" onclick="speak('${escQ(w.word)}')">🔊 發音</button>
+    </div>
+    <div class="word-hint">${w.type} · ${w.tag||''}${w.note?' · '+escQ(w.note):''}</div>
+    ${sentHTML}`;
+
+  if (isMC) {
+    const opts = getMCOptions(w);
+    html += `<div class="options" id="optionsEl">`;
+    opts.forEach(o => {
+      html += `<button class="opt" data-zh="${escQ(o.zh)}" onclick="checkMC(this,'${escQ(o.word)}','${escQ(w.word)}')">${escQ(o.word)}</button>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div class="fi-wrap">
+      <input class="fi-input" id="fiInput" placeholder="拼出答案…" onkeydown="if(event.key==='Enter')checkFI()">
+      <button class="submit-btn" id="submitBtn" onclick="checkFI()">確認</button>
+    </div>
+    <div class="hint-row" id="hintRow">
+      <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 提示</button>
+      <button class="skip-btn" onclick="checkFI(true)">❌ 不知道</button>
+    </div>`;
+  }
+
+  html += `<div class="feedback" id="feedbackEl"></div>
+    <button class="next-btn" id="nextBtn" onclick="buildQuiz()">下一題 →</button>
+  </div>`;
+
+  document.getElementById('quizArea').innerHTML = html;
+
+  if (!isMC) setTimeout(() => document.getElementById('fiInput')?.focus(), 100);
+  if (!w.example) fetchExample(w);
+  // 不自動念，答對後才念
+}
+
+function getMCOptions(w) {
+  const others = words.filter(x => x.id !== w.id);
+  const pool = others.length >= 3 ? others : words.filter(x => x.id !== w.id);
+  const shuffled = pool.sort(() => Math.random()-.5).slice(0,3);
+  return [...shuffled, w].sort(() => Math.random()-.5);
+}
+
+function checkMC(btn, chosen, correct) {
+  if (answered) return;
+  answered = true;
+  const norm = s => s.toLowerCase().trim();
+  const isOk = norm(chosen) === norm(correct);
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (isOk) {
+    btn.classList.add('correct');
+    onCorrect();
+    playSound('correct');
+    speak(correct, 700);  // 音效後再念
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt').forEach(b => {
+      if (norm(b.textContent) === norm(correct)) b.classList.add('correct');
+    });
+    onWrong();
+    playSound('wrong');
+    speak(correct, 600);  // 答錯也念正確答案
+  }
+  // 答題後在每個選項下方顯示中文字義
+  document.querySelectorAll('.opt').forEach(b => {
+    const zh = b.dataset.zh;
+    if (zh) {
+      const tag = document.createElement('span');
+      tag.style.cssText = 'display:block;font-size:11px;color:var(--text3);margin-top:4px;font-weight:400';
+      tag.textContent = zh;
+      b.appendChild(tag);
+    }
+  });
+  showFeedback(isOk);
+  // 例句揭示：填回完整例句 + 下方顯示例句中文翻譯
+  if (currentQ && currentQ.example) {
+    const sentEl = document.getElementById('sentenceEl');
+    if (sentEl) {
+      sentEl.innerHTML = escH(currentQ.example);
+      if (currentQ.exampleZh) {
+        sentEl.innerHTML += '<div style="margin-top:8px;font-size:13px;color:var(--text2);padding-top:8px;border-top:1px solid var(--border)">' + escH(currentQ.exampleZh) + '</div>';
+      } else {
+        // 沒有預存翻譯，用 AI 即時翻
+        sentEl.innerHTML += '<div id="exZhLoading" style="margin-top:8px;font-size:12px;color:var(--text3);padding-top:8px;border-top:1px solid var(--border)">翻譯載入中…</div>';
+        fetchExampleZh(currentQ);
+      }
+    }
+  }
+  document.getElementById('nextBtn').classList.add('show');
+  updateWord(currentQ.id, isOk);
+}
+
+function checkFI(skipToAnswer) {
+  if (answered) return;
+  const input = document.getElementById('fiInput');
+  if (!input) return;
+  const val = skipToAnswer ? '' : input.value.trim();
+  if (!skipToAnswer && !val) return;
+  answered = true;
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9\s']/g,'').trim();
+  const isOk = !skipToAnswer && norm(val) === norm(currentQ.word);
+  input.disabled = true;
+  document.getElementById('submitBtn').disabled = true;
+
+  // Hide hint/skip buttons
+  const hintRow = document.getElementById('hintRow');
+  if (hintRow) hintRow.style.display = 'none';
+
+  if (isOk) {
+    input.classList.add('correct');
+    onCorrect();
+    playSound('correct');
+    speak(currentQ.word, 700);  // 音效後再念
+    showFeedback(true);
+    // Track fill-in correct streak for "mastered"
+    currentQ.fi_correct = (currentQ.fi_correct || 0) + 1;
+    if (currentQ.fi_correct === 3) {
+      setTimeout(() => {
+        const fb = document.getElementById('feedbackEl');
+        if (fb) fb.innerHTML += '<br><span style="color:var(--accent3);font-weight:700">🎓 已背起來！加入已背單字</span>';
+      }, 100);
+    }
+  } else {
+    input.classList.add('wrong');
+    // Show user's wrong attempt in red, then correct answer
+    const wrongDisplay = skipToAnswer ? '' : `<span style="color:var(--accent2);text-decoration:line-through">${escQ(val)}</span> → `;
+    const fb = document.getElementById('feedbackEl');
+    fb.className = 'feedback bad';
+    fb.innerHTML = `${wrongDisplay}<b style="color:var(--accent2)">${escQ(currentQ.word)}</b>`;
+    onWrong();
+    playSound('wrong');
+    speak(currentQ.word, 700);  // 答錯也念正確答案
+    // Reset fi_correct on wrong
+    currentQ.fi_correct = 0;
+  }
+  // 例句揭示：填空答完後顯示完整例句 + 例句中文翻譯
+  if (currentQ && currentQ.example) {
+    const sentEl = document.getElementById('sentenceEl');
+    if (sentEl) {
+      sentEl.innerHTML = escH(currentQ.example);
+      if (currentQ.exampleZh) {
+        sentEl.innerHTML += '<div style="margin-top:8px;font-size:13px;color:var(--text2);padding-top:8px;border-top:1px solid var(--border)">' + escH(currentQ.exampleZh) + '</div>';
+      } else {
+        sentEl.innerHTML += '<div id="exZhLoading" style="margin-top:8px;font-size:12px;color:var(--text3);padding-top:8px;border-top:1px solid var(--border)">翻譯載入中…</div>';
+        fetchExampleZh(currentQ);
+      }
+    }
+  }
+  document.getElementById('nextBtn').classList.add('show');
+  updateWord(currentQ.id, isOk);
+}
+
+// hint state
+let hintRevealCount = 0;
+
+function showHint() {
+  const input = document.getElementById('fiInput');
+  if (!input || answered) return;
+  if (!currentQ) return;
+
+  hintRevealCount++;
+  const word = currentQ.word;
+  const maxHints = 5;
+
+  // Reveal letters one by one up to hintRevealCount
+  const revealed = word.slice(0, hintRevealCount);
+  const hidden = '_ '.repeat(word.length - hintRevealCount).trim();
+  const hintText = revealed + (hintRevealCount < word.length ? ' ' + hidden : '');
+
+  // Put hint in input so user can see progress, clear wrong text
+  input.value = '';
+  input.placeholder = hintText + '  ← 繼續拼完整';
+  input.focus();
+
+  const hintBtn = document.getElementById('hintBtn');
+  const remaining = maxHints - hintRevealCount;
+
+  if (hintRevealCount >= maxHints || hintRevealCount >= word.length) {
+    // Out of hints → show answer as wrong
+    if (hintBtn) { hintBtn.disabled = true; hintBtn.style.opacity = '0.4'; }
+    setTimeout(() => checkFI(true), 400);
+  } else {
+    if (hintBtn) hintBtn.textContent = '💡 提示（剩 ' + remaining + ' 次）';
+  }
+}
+
+function onCorrect() {
+  score += 10 + streak; streak++;
+  showScorePop(`+${10+Math.max(0,streak-1)} ⚡`);
+  incTodayCount();
+  save(); updateStats();
+  checkMilestone(streak);
+}
+function onWrong() {
+  streak = 0;
+  incTodayCount();
+  save(); updateStats();
+}
+
+function showScorePop(txt) {
+  const el = document.getElementById('scorePop');
+  el.textContent = txt; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function showFeedback(ok) {
+  const el = document.getElementById('feedbackEl');
+  el.className = 'feedback '+(ok?'ok':'bad');
+  el.textContent = ok
+    ? ['答對了！🎉','完美！','太棒了！','正確！✨'][Math.floor(Math.random()*4)]
+    : ['再試試看…','不對喔！','繼續加油！'][Math.floor(Math.random()*3)];
+}
+
+function updateWord(id, ok) {
+  const w = words.find(x => x.id === id);
+  if (!w) return;
+  w.seen++;
+  if (w.fi_correct === undefined) w.fi_correct = 0;
+  if (ok) {
+    w.correct++;
+    w.mastery = Math.min(2, w.mastery+1);
+    // 填空答對才算 fi_correct（選擇題不算）
+    if (currentQ && currentQ.id === id && w.seen > 1) {
+      w.fi_correct = (w.fi_correct || 0) + 1;
+    }
+    const days = [1, 3, 7][Math.min(w.mastery, 2)];
+    w.nextDue = Date.now() + days * 86400000;
+  } else {
+    w.wrong++;
+    w.mastery = Math.max(0, w.mastery-1);
+    // 答錯：fi_correct 歸零，1小時後重考
+    w.fi_correct = 0;
+    w.nextDue = Date.now() + 3600000;
+  }
+  save();
+}
+
+// ── AI EXAMPLE GENERATION ─────────────────────────────
+async function fetchExample(w) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 150,
+        messages: [{
+          role: 'user',
+          content: `Create ONE natural English example sentence using the word/phrase: "${w.word}" (${w.zh}). The sentence should be conversational, 10-20 words, and clearly show the meaning. The word/phrase must appear exactly as written. Return ONLY the sentence, nothing else.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const ex = data.content?.[0]?.text?.trim() || '';
+    if (ex) {
+      w.example = ex;
+      const idx = words.findIndex(x => x.id === w.id);
+      if (idx !== -1) words[idx].example = ex;
+      save();
+      const loadEl = document.getElementById('loadingEl');
+      const sentEl = document.getElementById('sentenceEl');
+      if (loadEl && sentEl && currentQ?.id === w.id) {
+        loadEl.style.display = 'none';
+        const isMC = (w.seen === 0);
+        const masked = isMC
+          ? ex.replace(new RegExp(escRegex(w.word),'gi'), '<span class="blank"></span>')
+          : ex.replace(new RegExp(escRegex(w.word),'gi'), '______');
+        sentEl.innerHTML = masked;
+        sentEl.style.display = 'block';
+        // 不自動念
+      }
+    }
+  } catch(e) {
+    const loadEl = document.getElementById('loadingEl');
+    if (loadEl) loadEl.innerHTML = '<span style="color:var(--text3);font-size:12px">（例句生成需要 API 連接）</span>';
+  }
+}
+
+// ── SPEECH ────────────────────────────────────────────
+// Web Audio sound effects
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (type === 'correct') {
+      // 叮～ 上揚音
+      const freqs = [523, 659, 784];
+      freqs.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = f;
+        osc.type = 'sine';
+        const t = ctx.currentTime + i * 0.12;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        osc.start(t); osc.stop(t + 0.36);
+      });
+    } else {
+      // ㄉㄟˉㄉㄟˉ 下降音
+      const beeps = [320, 240];
+      beeps.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = f;
+        osc.type = 'square';
+        const t = ctx.currentTime + i * 0.22;
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        osc.start(t); osc.stop(t + 0.19);
+      });
+    }
+  } catch(e) {}
+}
+
+function speak(word, delay) {
+  if (!window.speechSynthesis) return;
+  const doSpeak = () => {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US'; u.rate = 0.85;
+    speechSynthesis.speak(u);
+  };
+  if (delay) setTimeout(doSpeak, delay);
+  else doSpeak();
+}
+
+
+// ── 例句中文翻譯（即時 AI 翻譯，結果快取到 word.exampleZh）──
+async function fetchExampleZh(w) {
+  if (!w.example) return;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 120,
+        messages: [{
+          role: 'user',
+          content: 'Translate this English sentence to Traditional Chinese (繁體中文). Return ONLY the Chinese translation, nothing else:\n\n' + w.example
+        }]
+      })
+    });
+    const data = await res.json();
+    const zh = data.content?.[0]?.text?.trim() || '';
+    if (zh) {
+      // 快取翻譯
+      w.exampleZh = zh;
+      const idx = words.findIndex(x => x.id === w.id);
+      if (idx !== -1) words[idx].exampleZh = zh;
+      save();
+      // 如果目前還顯示這題，更新 UI
+      const loadEl = document.getElementById('exZhLoading');
+      if (loadEl && currentQ?.id === w.id) {
+        loadEl.textContent = zh;
+        loadEl.style.color = 'var(--text2)';
+        loadEl.style.fontSize = '13px';
+      }
+    }
+  } catch(e) {
+    const loadEl = document.getElementById('exZhLoading');
+    if (loadEl) loadEl.style.display = 'none';
+  }
+}
+
+// ── 抽考模式（單字卡分頁新增） ────────────────────────
+// 規則：看英文單字 → 從4個選項中選中文字義
+// 和練習頁完全分開，不影響 seen/mastery
+
+function toggleDrill() {
+  drillOn = !drillOn;
+  const btn = document.getElementById('drillBtn');
+  const panel = document.getElementById('drillPanel');
+  if (drillOn) {
+    btn.textContent = '✕ 結束抽考';
+    btn.classList.add('on');
+    panel.classList.add('show');
+    drillC = 0; drillT = 0;
+    buildDrill();
+  } else {
+    btn.textContent = '🎯 抽考模式';
+    btn.classList.remove('on');
+    panel.classList.remove('show');
+  }
+}
+
+function buildDrill() {
+  if (words.length < 2) {
+    document.getElementById('drillCard').innerHTML = `<div class="empty" style="padding:40px 0"><h2>單字不夠</h2><p>至少需要 2 個單字</p></div>`;
+    return;
+  }
+  drillAns = false;
+  // 隨機挑一個
+  drillCur = words[Math.floor(Math.random()*words.length)];
+  // 3個干擾選項（不同 id）
+  const distractors = words
+    .filter(w => w.id !== drillCur.id)
+    .sort(() => Math.random()-.5)
+    .slice(0, 3);
+  const opts = [...distractors, drillCur].sort(() => Math.random()-.5);
+
+  document.getElementById('drillCorrect').textContent = drillC;
+  document.getElementById('drillTotal').textContent = drillT;
+
+  const html = `<div class="drill-card">
+    <div class="qmeta">
+      <span class="badge mc">字義選擇</span>
+      <button class="speak-btn" onclick="speak('${escQ(drillCur.word)}')">🔊 發音</button>
+    </div>
+    <div class="drill-word">${escQ(drillCur.word)}</div>
+    <div class="drill-sub">${drillCur.type}${drillCur.tag?' · '+escQ(drillCur.tag):''}${drillCur.note?' · '+escQ(drillCur.note):''}</div>
+    <div class="drill-q">這個單字的中文意思是？</div>
+    <div class="drill-opts">
+      ${opts.map(o =>
+        `<button class="drill-opt" data-id="${o.id}" onclick="checkDrill(this)">${escQ(o.zh)}</button>`
+      ).join('')}
+    </div>
+    <div class="drill-fb" id="drillFb"></div>
+    <button class="drill-next" id="drillNext" onclick="buildDrill()">下一題 →</button>
+  </div>`;
+
+  document.getElementById('drillCard').innerHTML = html;
+  // 不自動念
+}
+
+function checkDrill(btn) {
+  if (drillAns) return;
+  drillAns = true;
+  drillT++;
+  const chosenId = parseInt(btn.dataset.id);
+  const isOk = chosenId === drillCur.id;
+
+  document.querySelectorAll('.drill-opt').forEach(b => b.disabled = true);
+  if (isOk) {
+    btn.classList.add('correct');
+    drillC++;
+  } else {
+    btn.classList.add('wrong');
+    // 標出正確選項
+    document.querySelectorAll('.drill-opt').forEach(b => {
+      if (parseInt(b.dataset.id) === drillCur.id) b.classList.add('correct');
+    });
+  }
+
+  document.getElementById('drillCorrect').textContent = drillC;
+  document.getElementById('drillTotal').textContent = drillT;
+
+  const fb = document.getElementById('drillFb');
+  fb.className = 'drill-fb '+(isOk?'ok':'bad');
+  if (isOk) {
+    fb.textContent = ['答對了！🎉','正確！✨','太棒了！'][Math.floor(Math.random()*3)];
+  } else {
+    fb.innerHTML = `不對喔！<b style="color:var(--accent)">${escQ(drillCur.word)}</b> = <b style="color:var(--accent3)">${escQ(drillCur.zh)}</b>`;
+  }
+  document.getElementById('drillNext').classList.add('show');
+}
+
+// ── FLASHCARDS ────────────────────────────────────────
+function renderFilters() {
+  const tags = [...new Set(words.map(w => w.tag).filter(Boolean))];
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = `<div class="filter-chip ${filterTag==='all'?'on':''}" onclick="setFilter('all',this)">全部</div>`;
+  tags.forEach(t => {
+    bar.innerHTML += `<div class="filter-chip ${filterTag===t?'on':''}" onclick="setFilter('${escQ(t)}',this)">${escQ(t)}</div>`;
+  });
+}
+
+function setFilter(tag, el) {
+  filterTag = tag;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderCards();
+}
+
+function renderCards() {
+  const grid = document.getElementById('wordGrid');
+  const list = filterTag === 'all' ? words : words.filter(w => w.tag === filterTag);
+  if (list.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:40px">這個分類還沒有單字</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(w => {
+    const mc = ['mastery-0','mastery-1','mastery-2'][w.mastery||0];
+    return `<div class="wcard" id="wcard-${w.id}">
+      <div class="wcard-mastery ${mc}"></div>
+      <div class="wcard-front">
+        <div class="wcard-word">${escQ(w.word)}</div>
+        <div class="wcard-type">${w.type}${w.tag?' · '+escQ(w.tag):''}</div>
+        <div class="wcard-zh">${escQ(w.zh)}</div>
+        ${w.note?`<div style="font-size:11px;color:var(--text3);margin-top:4px">${escQ(w.note)}</div>`:''}
+        <div class="wcard-actions">
+          <button class="wcard-act speak" onclick="event.stopPropagation();speak('${escQ(w.word)}')">🔊</button>
+          <button class="wcard-act" onclick="event.stopPropagation();flipCard(${w.id})">例句</button>
+          <button class="wcard-act" onclick="event.stopPropagation();deleteWord(${w.id})">🗑</button>
+        </div>
+      </div>
+      <div class="wcard-back">
+        <div class="wcard-word" style="font-size:14px">${escQ(w.word)}</div>
+        <div class="wcard-def">${escQ(w.zh)}</div>
+        <div class="wcard-ex">${w.example || '（尚未生成例句）'}</div>
+        <div class="wcard-actions">
+          <button class="wcard-act" onclick="event.stopPropagation();flipCard(${w.id})">返回</button>
+          ${!w.example?`<button class="wcard-act" onclick="event.stopPropagation();genExample(${w.id})">生成例句</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function flipCard(id) { document.getElementById('wcard-'+id)?.classList.toggle('flipped'); }
+
+async function genExample(id) {
+  const w = words.find(x => x.id === id);
+  if (!w) return;
+  await fetchExample(w);
+  renderCards();
+}
+
+function deleteWord(id) {
+  if (!confirm('確定要刪除這個單字？')) return;
+  words = words.filter(w => w.id !== id);
+  save(); renderFilters(); renderCards(); updateStats();
+}
+
+// ── ADD WORD MODAL ─────────────────────────────────────
+function openModal() { document.getElementById('modalBg').classList.add('open'); document.getElementById('inWord').focus(); }
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('open');
+  ['inWord','inZh','inTag','inNote'].forEach(id => document.getElementById(id).value = '');
+}
+
+async function saveWord() {
+  const word = document.getElementById('inWord').value.trim();
+  const zh = document.getElementById('inZh').value.trim();
+  if (!word || !zh) { alert('請填入英文和中文意思'); return; }
+  const type = document.getElementById('inType').value;
+  const tag = document.getElementById('inTag').value.trim();
+  const note = document.getElementById('inNote').value.trim();
+  const newId = Date.now();
+  const newWord = {id:newId, word, zh, type, tag, note, example:'', seen:0, correct:0, wrong:0, mastery:0, nextDue:0};
+  words.push(newWord);
+  save(); closeModal(); renderFilters(); renderCards(); updateStats();
+  fetchExample(newWord).then(() => renderCards());
+}
+
+// ── UTILS ──────────────────────────────────────────────
+function escQ(s) { return String(s).replace(/'/g,"\\'").replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+
+// ── 已背單字複習 Modal ─────────────────────────────────
+let reviewWords = [];
+let reviewIdx = 0;
+let reviewAnswered = false;
+
+function openReview() {
+  // 已背 = fi_correct >= 3
+  reviewWords = words.filter(w => (w.fi_correct || 0) >= 3).sort(() => Math.random() - .5);
+  if (reviewWords.length === 0) {
+    alert('還沒有已背單字！填空拼對 3 次後就會加入這裡。');
+    return;
+  }
+  reviewIdx = 0;
+  document.getElementById('reviewModalBg').classList.add('open');
+  renderReview();
+}
+
+function closeReview() {
+  document.getElementById('reviewModalBg').classList.remove('open');
+}
+
+function renderReview() {
+  const w = reviewWords[reviewIdx];
+  reviewAnswered = false;
+  document.getElementById('reviewProgress').textContent =
+    `第 ${reviewIdx + 1} / ${reviewWords.length} 個`;
+
+  if (!w) {
+    document.getElementById('reviewContent').innerHTML = `
+      <div class="review-done">
+        <h3>複習完成！🎉</h3>
+        <p>你複習了全部 ${reviewWords.length} 個已背單字</p>
+      </div>`;
+    return;
+  }
+
+  const masked = w.example
+    ? w.example.replace(new RegExp(escRegex(w.word), 'gi'), '______')
+    : '（尚無例句）';
+
+  document.getElementById('reviewContent').innerHTML = `
+    <div class="review-qcard">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase">${w.type} · ${w.tag || ''}</span>
+        <button style="background:none;border:1px solid var(--border);border-radius:100px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer" onclick="speak('${escQ(w.word)}')">🔊</button>
+      </div>
+      <div class="review-sentence">${masked}</div>
+      <div class="review-fi-wrap">
+        <input class="review-fi-input" id="reviewInput" placeholder="拼出被挖空的單字…" onkeydown="if(event.key==='Enter')checkReview()">
+        <button class="review-submit" onclick="checkReview()">確認</button>
+      </div>
+      <div class="review-hint-row">
+        <button class="review-hint-btn" id="reviewHintBtn" onclick="showReviewHint()">💡 提示</button>
+        <button class="review-skip-btn" onclick="checkReview(true)">❌ 不知道</button>
+      </div>
+      <div class="review-feedback" id="reviewFeedback"></div>
+      <button class="review-next" id="reviewNext" onclick="nextReview()">
+        ${reviewIdx + 1 < reviewWords.length ? '下一個 →' : '完成複習 ✓'}
+      </button>
+    </div>`;
+
+  setTimeout(() => document.getElementById('reviewInput')?.focus(), 100);
+  // 不自動念
+}
+
+function checkReview(skipToAnswer) {
+  if (reviewAnswered) return;
+  const input = document.getElementById('reviewInput');
+  if (!input) return;
+  const val = skipToAnswer ? '' : input.value.trim();
+  if (!skipToAnswer && !val) return;
+  reviewAnswered = true;
+
+  const w = reviewWords[reviewIdx];
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9\s']/g, '').trim();
+  const isOk = !skipToAnswer && norm(val) === norm(w.word);
+
+  input.disabled = true;
+  document.getElementById('reviewHintBtn').disabled = true;
+  const hintRow = input.parentElement?.nextElementSibling;
+
+  const fb = document.getElementById('reviewFeedback');
+  if (isOk) {
+    input.classList.add('correct');
+    fb.className = 'review-feedback ok';
+    fb.textContent = ['答對了！🎉', '完美！✨', '記得很清楚！'][Math.floor(Math.random() * 3)];
+    playSound('correct');
+    speak(w.word, 700);
+  } else {
+    input.classList.add('wrong');
+    fb.className = 'review-feedback bad';
+    const wrongPart = (!skipToAnswer && val)
+      ? `<span style="color:var(--accent2);text-decoration:line-through">${escQ(val)}</span> → `
+      : '';
+    fb.innerHTML = `${wrongPart}<b style="color:var(--accent2)">${escQ(w.word)}</b>`;
+    playSound('wrong');
+    speak(w.word, 700);
+  }
+
+  document.getElementById('reviewNext').classList.add('show');
+}
+
+function showReviewHint() {
+  const w = reviewWords[reviewIdx];
+  const input = document.getElementById('reviewInput');
+  if (!input || reviewAnswered) return;
+  input.placeholder = `${w.word[0].toUpperCase()}… (開頭字母提示)`;
+  input.focus();
+  const btn = document.getElementById('reviewHintBtn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; }
+}
+
+function nextReview() {
+  reviewIdx++;
+  renderReview();
+}
+
+
+// ── 單字提示系統 ─────────────────────────────────────────
+// 雅思 5.5 程度可能不熟悉的詞彙，點了彈出解釋
+const HARD_WORDS = {
+  "well-drained":["adj.","排水良好的（土壤不積水）"],
+  "drained":["adj.","排乾的；精疲力竭的"],
+  "compost":["n.","堆肥"],
+  "fertilizer":["n.","肥料"],
+  "indigenous":["adj.","原生的；本土的"],
+  "perennial":["adj.","多年生的；長期的"],
+  "biodegradable":["adj.","可生物降解的"],
+  "photosynthesis":["n.","光合作用"],
+  "chlorophyll":["n.","葉綠素"],
+  "connoisseur":["n.","鑑賞家；行家"],
+  "ephemeral":["adj.","短暫的；朝生暮死的"],
+  "nocturnal":["adj.","夜行性的"],
+  "equinox":["n.","晝夜平分點"],
+  "solstice":["n.","至日（夏至/冬至）"],
+  "temperate":["adj.","溫和的；溫帶的"],
+  "pristine":["adj.","原始的；純潔的"],
+  "verdant":["adj.","翠綠的"],
+  "dormant":["adj.","休眠的"],
+  "propagate":["v.","繁殖；傳播"],
+  "germinate":["v.","發芽"],
+  "albeit":["conj.","雖然；儘管"],
+  "consequently":["adv.","因此；結果"],
+  "nevertheless":["adv.","然而；儘管如此"],
+  "subsequently":["adv.","隨後；後來"],
+  "simultaneously":["adv.","同時地"],
+  "predominantly":["adv.","主要地；主導地"],
+  "intrinsically":["adv.","本質上；固有地"],
+  "empirically":["adv.","憑經驗地"],
+  "tangible":["adj.","有形的；實際的"],
+  "intangible":["adj.","無形的；難以捉摸的"],
+  "impeccable":["adj.","無瑕的；完美的"],
+  "meticulous":["adj.","一絲不苟的；仔細的"],
+  "eloquent":["adj.","雄辯的；有說服力的"],
+  "resilient":["adj.","有彈性的；快速恢復的"],
+  "inevitable":["adj.","不可避免的"],
+  "unprecedented":["adj.","前所未有的"],
+  "catastrophic":["adj.","災難性的"],
+  "detrimental":["adj.","有害的"],
+  "paramount":["adj.","最重要的；首要的"],
+  "plausible":["adj.","看似合理的；可信的"],
+  "ambiguous":["adj.","模糊的；有歧義的"],
+  "concise":["adj.","簡潔的"],
+  "coherent":["adj.","條理清晰的；連貫的"],
+  "legitimate":["adj.","合法的；正當的"],
+  "arbitrary":["adj.","任意的；武斷的"],
+  "monotonous":["adj.","單調的；無變化的"],
+  "strenuous":["adj.","費力的；艱苦的"],
+  "vigorous":["adj.","精力充沛的；強健的"],
+  "sporadic":["adj.","零星的；偶爾發生的"],
+  "chronic":["adj.","慢性的；長期的"],
+  "acute":["adj.","急性的；敏銳的"],
+  "diminish":["v.","減少；縮小"],
+  "alleviate":["v.","減輕；緩和"],
+  "exacerbate":["v.","使惡化；加重"],
+  "mitigate":["v.","緩解；減輕"],
+  "facilitate":["v.","促進；使便利"],
+  "inhibit":["v.","抑制；阻礙"],
+  "stimulate":["v.","刺激；激勵"],
+  "depict":["v.","描繪；描述"],
+  "portray":["v.","描繪；扮演"],
+  "contemplate":["v.","沉思；考慮"],
+  "perceive":["v.","察覺；感知"],
+  "acknowledge":["v.","承認；認可"],
+  "demonstrate":["v.","證明；示範"],
+  "incorporate":["v.","納入；合併"],
+  "implement":["v.","實施；執行"],
+  "advocate":["v./n.","提倡；支持者"],
+  "scrutinize":["v.","仔細審查；細看"],
+  "articulate":["v./adj.","清楚表達；口齒清晰的"],
+  "elaborate":["v./adj.","詳述；精心製作的"],
+  "spontaneous":["adj.","自發的；自然的"],
+  "deliberate":["adj./v.","故意的；深思熟慮"],
+  "momentum":["n.","動力；勢頭"],
+  "paradigm":["n.","範例；模式"],
+  "phenomenon":["n.","現象"],
+  "hypothesis":["n.","假設；假說"],
+  "ideology":["n.","意識形態"],
+  "consensus":["n.","共識"],
+  "hierarchy":["n.","等級制度；層次"],
+  "rhetoric":["n.","修辭；花言巧語"],
+  "analogy":["n.","類比；比喻"],
+  "nuance":["n.","細微差別；微妙之處"],
+  "dilemma":["n.","兩難困境"],
+  "cynical":["adj.","憤世嫉俗的；懷疑的"],
+  "pragmatic":["adj.","務實的；實際的"],
+  "naive":["adj.","天真的；幼稚的"],
+  "skeptical":["adj.","懷疑的"],
+  "versatile":["adj.","多才多藝的；多功能的"],
+  "ambivalent":["adj.","矛盾的；左右為難的"],
+  "compel":["v.","強迫；迫使"],
+  "deter":["v.","阻止；使打消念頭"],
+  "persist":["v.","堅持；持續"],
+  "fluctuate":["v.","波動；起伏"],
+  "accumulate":["v.","積累；積聚"],
+  "compensate":["v.","補償；彌補"],
+  "substitute":["v./n.","替代；替代品"],
+  "complement":["v./n.","補充；互補"],
+  "contradict":["v.","矛盾；反駁"],
+  "elaborate":["v.","詳細說明"],
+  "tedious":["adj.","枯燥乏味的"],
+  "frugal":["adj.","節儉的"],
+  "obscure":["adj./v.","模糊的；使模糊"],
+  "profound":["adj.","深刻的；深遠的"],
+  "substantial":["adj.","大量的；重要的"],
+  "comprehensive":["adj.","全面的；綜合的"],
+  "transparent":["adj.","透明的；坦率的"],
+  "prominent":["adj.","突出的；顯著的"],
+  "controversial":["adj.","有爭議的"],
+  "bureaucratic":["adj.","官僚的"],
+  "diplomatic":["adj.","外交的；圓滑的"],
+  "devastating":["adj.","毀滅性的"],
+  "overwhelming":["adj.","壓倒性的；令人不知所措的"],
+  "counterproductive":["adj.","適得其反的"],
+  "indispensable":["adj.","不可或缺的"],
+  "superficial":["adj.","膚淺的；表面的"],
+  "rigorous":["adj.","嚴格的；嚴謹的"],
+  "tedious":["adj.","冗長乏味的"],
+  "aesthetic":["adj./n.","美學的；美感"],
+  "indigenous":["adj.","本土的；固有的"],
+  "coherence":["n.","連貫性"],
+  "validity":["n.","有效性；正確性"],
+  "integrity":["n.","誠信；完整性"],
+  "sustainability":["n.","可持續性"],
+  "accountability":["n.","責任；問責制"],
+};
+
+function annotateSentence(sentence) {
+  // Tokenize and wrap potentially unknown words with .word-tip
+  // Split keeping punctuation
+  const tokens = sentence.split(/(\s+|[,.\'!?;:()\[\]])/);
+  return tokens.map(tok => {
+    const clean = tok.replace(/[^a-zA-Z-]/g, '').toLowerCase();
+    const entry = HARD_WORDS[clean] || HARD_WORDS[clean.replace(/-/g,'')];
+    if (entry && clean.length > 3) {
+      const escaped = tok.replace(/'/g, "\'");
+      const pos = entry[0].replace(/'/g,"\'");
+      const def = entry[1].replace(/'/g,"\'");
+      return `<span class="word-tip" onclick="showTip(event,'${escaped}','${pos}','${def}')">${tok}</span>`;
+    }
+    return tok;
+  }).join('');
+}
+
+function showTip(e, word, pos, def) {
+  e.stopPropagation();
+  const popup = document.getElementById('tipPopup');
+  document.getElementById('tipWord').textContent = word + ' ' + pos;
+  document.getElementById('tipBody').textContent = def;
+  // Position near tap
+  const x = Math.min(e.clientX, window.innerWidth - 280);
+  const y = e.clientY + 12;
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  popup.classList.add('show');
+}
+
+function closeTip() {
+  document.getElementById('tipPopup').classList.remove('show');
+}
+document.addEventListener('click', () => closeTip());
+
+
+// ── 心理學優化：里程碑 + 連勝動畫 ───────────────────────
+const MILESTONES = {
+  5:  ['🔥','連勝 5！','你的大腦正在預熱，繼續！'],
+  10: ['⚡','連勝 10！','記憶迴路全速運轉中！'],
+  20: ['🚀','連勝 20！','你已經進入心流狀態！'],
+  50: ['🏆','連勝 50！','你是單字記憶大師！'],
+};
+
+function checkMilestone(newStreak) {
+  const m = MILESTONES[newStreak];
+  if (!m) return;
+  const [emoji, title, msg] = m;
+  document.getElementById('milestoneEmoji').textContent = emoji;
+  document.getElementById('milestoneTitle').textContent = title;
+  document.getElementById('milestoneMsg').textContent = msg;
+  document.getElementById('milestoneOverlay').classList.add('show');
+  document.getElementById('milestonePop').classList.add('show');
+  playSound('correct');
+}
+
+function closeMilestone() {
+  document.getElementById('milestoneOverlay').classList.remove('show');
+  document.getElementById('milestonePop').classList.remove('show');
+}
+
+
+// ── 每日連續登入 streak ──────────────────────────────────
+function checkDailyStreak() {
+  const today = new Date().toDateString();
+  const lastDate = lsGet('wf_lastDate', '');
+  let dayStreak = parseInt(lsGet('wf_dayStreak', '1'));
+
+  if (lastDate === today) return dayStreak; // 已簽到
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (lastDate === yesterday) {
+    dayStreak++;
+  } else if (lastDate !== '') {
+    dayStreak = 1; // 斷了
+  }
+  lsSet('wf_lastDate', today);
+  lsSet('wf_dayStreak', dayStreak);
+  return dayStreak;
+}
+
+function getDailyStreak() {
+  return parseInt(lsGet('wf_dayStreak', '1'));
+}
+
+// 今日答題數
+function getTodayCount() {
+  const today = new Date().toDateString();
+  const key = 'wf_today_' + today;
+  return parseInt(lsGet(key, '0'));
+}
+function incTodayCount() {
+  const today = new Date().toDateString();
+  const key = 'wf_today_' + today;
+  const n = getTodayCount() + 1;
+  lsSet(key, n);
+  return n;
+}
+
+
+// ── 拍照匯入系統 ─────────────────────────────────────────
+let photoBase64 = null;
+let photoResults = [];
+
+function openPhotoModal() {
+  photoBase64 = null;
+  photoResults = [];
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoResultList').innerHTML = '';
+  document.getElementById('photoImportBtn').classList.remove('show');
+  document.getElementById('photoStatus').textContent = '';
+  document.getElementById('photoScanBtn').disabled = true;
+  document.getElementById('photoInput').value = '';
+  document.getElementById('photoModalBg').classList.add('open');
+}
+
+function closePhotoModal() {
+  document.getElementById('photoModalBg').classList.remove('open');
+}
+
+function handlePhotoSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    // Show preview
+    const preview = document.getElementById('photoPreview');
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    // Store base64 (strip prefix)
+    photoBase64 = dataUrl.split(',')[1];
+    document.getElementById('photoScanBtn').disabled = false;
+    document.getElementById('photoStatus').textContent = '圖片已載入，點擊「AI 辨識」開始掃描';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function scanPhoto() {
+  if (!photoBase64) return;
+  const btn = document.getElementById('photoScanBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 辨識中…';
+  document.getElementById('photoStatus').innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block"></div> AI 正在辨識單字筆記…';
+  document.getElementById('photoResultList').innerHTML = '';
+  document.getElementById('photoImportBtn').classList.remove('show');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: 'image/jpeg', data: photoBase64 }
+            },
+            {
+              type: 'text',
+              text: `You are a vocabulary extraction assistant. Look at this handwritten English vocabulary note image.
+
+Extract ALL English words and phrases with their Chinese translations.
+For each item, also determine the part of speech and category/topic tag if visible.
+
+Return ONLY a JSON array, no other text, no markdown. Format:
+[
+  {
+    "word": "the English word or phrase exactly as written",
+    "zh": "Chinese meaning",
+    "type": "adj|v|n|phrase|adv|other",
+    "tag": "the topic category if visible, e.g. Flowers, 形容詞, 片語, Plans, Money, Emotions, Spare Time, or best guess"
+  }
+]
+
+Important:
+- Fix obvious spelling errors (e.g. "persuit" → "pursuit", "efficiente" → "efficient")
+- If no Chinese translation is visible, infer a short Chinese meaning
+- Extract every single vocabulary item you can see
+- For phrases without a clear type, use "phrase"`
+            }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text?.trim() || '[]';
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      throw new Error('解析失敗，請再試一次');
+    }
+
+    photoResults = parsed.map((item, i) => ({ ...item, _id: i, _include: true }));
+    renderPhotoResults();
+    document.getElementById('photoStatus').textContent = `✅ 找到 ${photoResults.length} 個單字，可以刪除不要的再匯入`;
+    document.getElementById('photoImportBtn').classList.add('show');
+
+  } catch(err) {
+    document.getElementById('photoStatus').textContent = '❌ 辨識失敗：' + (err.message || '請確認網路連線');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 重新辨識';
+  }
+}
+
+function renderPhotoResults() {
+  const list = document.getElementById('photoResultList');
+  list.innerHTML = photoResults.filter(w => w._include).map(w => `
+    <div class="photo-word-item">
+      <div class="pw-info">
+        <div class="pw-en">${escQ(w.word)}</div>
+        <div class="pw-zh">${escQ(w.zh)}</div>
+        <div class="pw-tag">${w.type} · ${escQ(w.tag || '')}</div>
+      </div>
+      <button class="pw-del" onclick="removePhotoWord(${w._id})" title="移除">×</button>
+    </div>
+  `).join('');
+}
+
+function removePhotoWord(id) {
+  const item = photoResults.find(w => w._id === id);
+  if (item) item._include = false;
+  renderPhotoResults();
+  const remaining = photoResults.filter(w => w._include).length;
+  document.getElementById('photoStatus').textContent = `剩餘 ${remaining} 個單字`;
+  if (remaining === 0) document.getElementById('photoImportBtn').classList.remove('show');
+}
+
+async function importPhotoWords() {
+  const toImport = photoResults.filter(w => w._include);
+  if (toImport.length === 0) return;
+
+  const btn = document.getElementById('photoImportBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 匯入中，產生例句…';
+  document.getElementById('photoStatus').textContent = `正在為 ${toImport.length} 個單字生成例句，請稍候…`;
+
+  let added = 0;
+  for (const item of toImport) {
+    // Skip if already exists
+    if (words.find(w => w.word.toLowerCase() === item.word.toLowerCase())) continue;
+    const newId = Date.now() + Math.random();
+    const newWord = {
+      id: newId, word: item.word, zh: item.zh,
+      type: item.type || 'phrase', tag: item.tag || '',
+      note: '', example: '',
+      seen: 0, correct: 0, wrong: 0, mastery: 0,
+      fi_correct: 0, nextDue: 0
+    };
+    words.push(newWord);
+    added++;
+    // Generate example in background
+    fetchExample(newWord);
+  }
+
+  save();
+  renderFilters();
+  renderCards();
+  updateStats();
+  closePhotoModal();
+  document.getElementById('photoStatus').textContent = '';
+
+  // Show success
+  showScorePop(`+${added} 個新單字 🎉`);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// SENTENCE SYSTEM
+// ══════════════════════════════════════════════════════════
+
+const SENT_SEED = [
+  // Money
+  {en:"Money is a tool that adds a touch of quality to my life.",zh:"金錢是一個為我的生活增添品質的工具。",tag:"Money"},
+  {en:"Even though I enjoy the instant gratification of spending, I'm a firm believer in budget allocation.",zh:"雖然我享受消費帶來的即時滿足，但我堅信預算配置的重要性。",tag:"Money"},
+  {en:"I usually follow the rule where I save 30% of my income, set aside 40% for living expenses, and use the remaining 30% for leisure and entertainment.",zh:"我通常遵循這個規則：儲蓄30%收入，留出40%用於生活開銷，剩下30%用於休閒娛樂。",tag:"Money"},
+  {en:"The joy and companionship he brings me are truly priceless and far exceed his monetary value.",zh:"他帶給我的快樂和陪伴是真正無價的，遠遠超過他的金錢價值。",tag:"Money"},
+  {en:"I reckon saving is crucial, particularly when it's invested in stocks or mutual funds.",zh:"我認為儲蓄至關重要，尤其是當它被投資於股票或共同基金時。",tag:"Money"},
+  {en:"The power of compound interest over time is absolutely astonishing; it's like a snowball effect for your wealth.",zh:"複利隨時間的力量真是令人嘆為觀止；它就像你財富的滾雪球效應。",tag:"Money"},
+  {en:"In my opinion, money might not be able to buy happiness directly, but it's a powerful tool that makes pursuing happiness a lot easier by providing security and options.",zh:"在我看來，金錢可能無法直接購買幸福，但它是一個強大的工具，通過提供安全感和選擇來讓追求幸福變得容易得多。",tag:"Money"},
+  {en:"I think modern society is incredibly materialistic, and we're often blinded by the lavish lifestyles we see online.",zh:"我認為現代社會極度物質主義，我們常常被網路上看到的奢華生活方式所蒙蔽。",tag:"Money"},
+  {en:"Money should simply be a means to an end to improve our quality of life.",zh:"金錢應該只是改善我們生活品質的一種手段。",tag:"Money"},
+  {en:"Instead of blindly chasing wealth, people should first define what a meaningful life looks like to them, and then manage their finances to support that vision.",zh:"人們應該先定義對自己而言有意義的生活是什麼樣子，然後管理財務來支持那個願景，而不是盲目地追求財富。",tag:"Money"},
+  {en:"About a year ago, I walked into an unassuming pet shop near my campus.",zh:"大約一年前，我走進了我校園附近一家不起眼的寵物店。",tag:"Money"},
+  {en:"My attention was immediately drawn to a tiny black-and-white rabbit.",zh:"我的注意力立刻被一隻小小的黑白兔子所吸引。",tag:"Money"},
+  {en:"Unlike the other beige rabbits in the cage, this little guy stood out, but he was being bullied and literally stepped on by the others.",zh:"與籠子裡其他米色的兔子不同，這個小傢伙很顯眼，但他正在被其他兔子欺負，甚至被踩踏。",tag:"Money"},
+  {en:"So I felt compassionate and decided to bring him home.",zh:"所以我感到同情，決定把他帶回家。",tag:"Money"},
+  {en:"Even though he was a bargain, I've actually spent dozens of times his price on his food, toys, and health check-ups.",zh:"雖然他很便宜，但我實際上在他的食物、玩具和健康檢查上花了幾十倍他的價格。",tag:"Money"},
+  {en:"Watching him grow and interact with me gives me a huge sense of accomplishment.",zh:"看著他成長並與我互動給了我巨大的成就感。",tag:"Money"},
+  {en:"I think the companionship and pure happiness he provides are truly priceless — having him around is incredibly therapeutic.",zh:"我認為他提供的陪伴和純粹的幸福是真正無價的——有他在身邊是非常療癒的。",tag:"Money"},
+  {en:"Most of my money goes toward fashion-related items, particularly clothes, accessories, and getting my nails done, because self-care is one of my top priorities.",zh:"我大部分的錢用於時尚相關物品，特別是衣服、配件和做指甲，因為自我照顧是我最優先考量的事之一。",tag:"Money"},
+  {en:"Buying things for myself is far more emotionally rewarding because it serves as a form of stress relief and encourages me to work harder toward my goals.",zh:"為自己購物在情感上更有回報，因為它是一種減壓方式，並激勵我更努力地朝目標前進。",tag:"Money"},
+  {en:"When I was younger, I tended to buy things impulsively for instant gratification; however, as I've become more mature, I prefer to save my money for authentic, urgent events.",zh:"當我年輕時，我傾向於衝動購物來獲得即時滿足；然而，隨著我變得更成熟，我更喜歡把錢留給真正重要的事。",tag:"Money"},
+  {en:"Although wealthy people may enjoy financial freedom, they still have their own battles that people don't see.",zh:"雖然富有的人可能享有財務自由，但他們仍然有著別人看不見的自己的困境。",tag:"Money"},
+  {en:"Experiences such as travelling can give us meaningful memories, compared to buying material possessions which only provide instant gratification.",zh:"旅行等體驗能給我們帶來有意義的回憶，相比之下購買物質財產只能提供即時的滿足感。",tag:"Money"},
+  // Spare Time
+  {en:"Back then, I had plenty of time to kill time mindlessly, but nowadays my schedule is much tighter, so I have to manage my time effectively to find any gaps for relaxation.",zh:"那時候我有大把時間漫無目的地打發時間，但如今我的日程緊湊得多，所以我必須有效管理時間，才能找到任何放鬆的空隙。",tag:"Spare Time"},
+  {en:"There's a growing trend of young people seeking 'me-time' in quiet places to take a break from work.",zh:"越來越多的年輕人趨向於在安靜的地方尋求「個人時間」，從工作中休息一下。",tag:"Spare Time"},
+  {en:"Without enough rest, we can't remain productive in the long run.",zh:"沒有足夠的休息，我們從長遠來看無法保持高效。",tag:"Spare Time"},
+  {en:"It's all about finding a perfect balance between chasing our goals and enjoying life.",zh:"這一切都是關於在追求目標和享受生活之間找到完美的平衡。",tag:"Spare Time"},
+  {en:"In the past, I used to kill time by mindlessly scrolling through my social media; however, as my life became busier, I realized I shouldn't waste my time like that.",zh:"過去，我常常漫無目的地刷社交媒體來打發時間；然而，隨著生活變得更忙碌，我意識到我不應該那樣浪費時間。",tag:"Spare Time"},
+  {en:"Now I prefer to enrich myself during my spare time by listening to podcasts, researching the stock market, or memorizing English vocabulary.",zh:"現在我更喜歡在空閒時間通過聽播客、研究股市或背英文單字來充實自己。",tag:"Spare Time"},
+  {en:"I usually make use of fragmented time — for instance, I listen to book-summary podcasts while doing my make-up or taking a shower, and I practice vocabulary on my way to class or meals.",zh:"我通常善用碎片化時間——例如，我在化妝或洗澡時聽書摘播客，在去上課或用餐的路上練習詞彙。",tag:"Spare Time"},
+  {en:"During longer breaks, I unwind by visiting cafes for afternoon tea or watching classic movies.",zh:"在較長的休息時間裡，我通過去咖啡廳喝下午茶或觀看經典電影來放鬆。",tag:"Spare Time"},
+  {en:"Most of the time, I prefer to be alone — I'm a person who needs solitude to recharge my batteries.",zh:"大多數時候，我更喜歡獨處——我是一個需要獨處來為自己充電的人。",tag:"Spare Time"},
+  {en:"These small moments of relaxation add a touch of quality to my busy life, making me feel that my time is both well-spent and meaningful.",zh:"這些小小的放鬆時刻為我忙碌的生活增添了一絲品質，讓我感到我的時間既有價值又有意義。",tag:"Spare Time"},
+  // Plans
+  {en:"I'm a firm believer that making plans in advance is essential for achieving goals.",zh:"我堅信提前制定計畫對於實現目標至關重要。",tag:"Plans"},
+  {en:"It helps me prioritize tasks, ensuring that my daily schedule remains manageable and organized.",zh:"這幫助我排列任務優先順序，確保我的日常行程保持可管理且有條理。",tag:"Plans"},
+  {en:"Even though I love planning, I often struggle with laziness and procrastination, which prevent me from staying on track.",zh:"儘管我喜歡計畫，但我常常與懶惰和拖延作鬥爭，這讓我難以保持正軌。",tag:"Plans"},
+  {en:"When things don't go according to plan, I tend to get frustrated and even feel paralysed for a while before I can finally regroup and adjust my schedule.",zh:"當事情不按計畫進行時，我往往會感到沮喪，甚至有一段時間感到癱瘓，才能最終重新整合並調整我的計畫。",tag:"Plans"},
+  {en:"When I'm planning, I tend to create a tight schedule to avoid wasting a single second; however, in practice, I prefer a flexible one so that I don't feel pressed for time.",zh:"在計畫時，我傾向於制定緊湊的行程以避免浪費一分一秒；然而在實際執行中，我更偏好彈性的安排，這樣我就不會感到時間緊迫。",tag:"Plans"},
+  {en:"I believe the solution is to allow myself some downtime by incorporating breaks into my schedule, so I can actually stick to it more effectively.",zh:"我相信解決方案是通過在行程中加入休息時間來給自己一些喘息空間，這樣我才能更有效地堅持執行。",tag:"Plans"},
+  {en:"Among all types of plans, I find that my travel itineraries are usually the most successful.",zh:"在所有類型的計畫中，我發現我的旅行行程通常是最成功的。",tag:"Plans"},
+  {en:"When everything is executed perfectly as planned, it gives me a great sense of satisfaction and accomplishment.",zh:"當一切都按計畫完美執行時，它給了我巨大的滿足感和成就感。",tag:"Plans"},
+  // Future Plans
+  {en:"As a person who firmly believes that planning is essential, I have a clear roadmap for my future.",zh:"作為一個堅定相信計畫重要性的人，我對自己的未來有一個清晰的路線圖。",tag:"Future"},
+  {en:"In the short term, my priority is to finish my graduation project and achieve an outstanding IELTS score, which will allow me to graduate and apply for my master's degree.",zh:"短期內，我的優先事項是完成畢業專題並取得優秀的雅思成績，這將讓我順利畢業並申請碩士學位。",tag:"Future"},
+  {en:"Following that, I plan to spend the next two years diving into neuroscience and finding internships in relevant labs or companies.",zh:"接下來，我計畫花兩年時間深入研究神經科學，並在相關實驗室或公司尋找實習機會。",tag:"Future"},
+  {en:"I'm preparing myself by improving my time management and trying to avoid procrastination.",zh:"我通過改善時間管理和努力避免拖延來為自己做準備。",tag:"Future"},
+  {en:"My dream is to work for a multinational company as a digital nomad — I envision myself travelling with my laptop and exploring the world while I work.",zh:"我的夢想是作為數位遊牧者為跨國公司工作——我想像自己帶著筆電旅行，一邊探索世界一邊工作。",tag:"Future"},
+  {en:"It's about balancing my career and freedom.",zh:"這是關於平衡我的職業和自由。",tag:"Future"},
+  // Name
+  {en:"My name carries a profound meaning rooted in the values of education and kindness.",zh:"我的名字承載著植根於教育和善良價值觀的深遠意義。",tag:"Name"},
+  {en:"I strongly believe that a name reflects the profound expectations and aspirations that parents or grandparents have for a child's future.",zh:"我強烈相信名字反映了父母或祖父母對孩子未來的深切期望和抱負。",tag:"Name"},
+  {en:"I feel that a unique name often aligns with a person's temperament; in my case, I'm fortunate that my name embodies the essence of kindness and benevolence.",zh:"我覺得獨特的名字往往與一個人的氣質相符；就我而言，我很幸運我的名字體現了善良和仁慈的本質。",tag:"Name"},
+  {en:"It serves as a constant reminder for me to remain innocent and true to myself.",zh:"它時刻提醒我保持純真和忠於自我。",tag:"Name"},
+  {en:"Some parents consulted a fortune teller before naming their children, as they believed a name could influence their future.",zh:"一些父母在為孩子命名前會諮詢算命師，因為他們相信名字能影響孩子的未來。",tag:"Name"},
+  {en:"In our culture, people tend to avoid using names that are identical to those of their relatives.",zh:"在我們的文化中，人們傾向於避免使用與親戚相同的名字。",tag:"Name"},
+  {en:"That experience taught me an important lesson — having a distinctive name makes people stand out.",zh:"那次經歷教會了我一個重要的教訓——擁有獨特的名字讓人與眾不同。",tag:"Name"},
+];
+
+// Sentence state
+let sentences = JSON.parse(lsGet('wf_sentences', '[]') || '[]');
+let sentPracticeIdx = 0;
+let sentAnswered = false;
+let sentJigsawPlaced = []; // indices of tokens placed in order
+let sentPhotoBase64S = null;
+let sentPhotoResultsArr = [];
+
+function initSentences() {
+  if (sentences.length === 0) {
+    sentences = SENT_SEED.map((s, i) => ({
+      id: i + 1,
+      en: s.en, zh: s.zh, tag: s.tag || '',
+      seen: 0,   // total practice count
+      mastery: 0 // 0-4; at 4 enters spaced review
+    }));
+    saveSentences();
+  }
+  renderSentTagFilter();
+  renderSentList();
+  buildSentPractice();
+  updateSentDailyBar();
+}
+
+function saveSentences() {
+  lsSet('wf_sentences', JSON.stringify(sentences));
+}
+
+// Daily sentence count
+function getSentTodayCount() {
+  const key = 'wf_sent_today_' + new Date().toDateString();
+  return parseInt(lsGet(key, '0'));
+}
+function incSentTodayCount() {
+  const key = 'wf_sent_today_' + new Date().toDateString();
+  const n = getSentTodayCount() + 1;
+  lsSet(key, n);
+  return n;
+}
+function updateSentDailyBar() {
+  const GOAL = 10;
+  const n = getSentTodayCount();
+  const label = document.getElementById('sentDailyLabel');
+  const bar = document.getElementById('sentDailyBar');
+  if (label) label.textContent = `今日：${n} / ${GOAL} 句`;
+  if (bar) bar.style.width = Math.min(100, n / GOAL * 100) + '%';
+}
+
+// Pick next sentence to practice
+function pickSentence() {
+  if (sentences.length === 0) return null;
+  const pool = sentences.filter(s => s.mastery < 4).sort((a, b) => {
+    const wa = (a.seen === 0 ? 100 : 0) + (4 - a.mastery) * 10 + Math.random() * 5;
+    const wb = (b.seen === 0 ? 100 : 0) + (4 - b.mastery) * 10 + Math.random() * 5;
+    return wb - wa;
+  });
+  return pool[0] || sentences[Math.floor(Math.random() * sentences.length)];
+}
+
+// Mode: seen 0-1 → jigsaw, seen 2-3 → typing, seen>=4 → spaced typing review
+function getSentMode(s) {
+  if (s.seen <= 1) return 'jigsaw';
+  return 'typing';
+}
+
+function buildSentPractice() {
+  const area = document.getElementById('sentPracticeArea');
+  if (!area) return;
+  const s = pickSentence();
+  if (!s) {
+    area.innerHTML = `<div class="sent-empty"><h3>🎉 全部練習完了！</h3><p>新增更多句子繼續練習</p></div>`;
+    return;
+  }
+  sentAnswered = false;
+  sentJigsawPlaced = [];
+  slotOrder = [];
+  selectedSlotIdx = null;
+  jigsawHintsLeft = 5;
+  const mode = getSentMode(s);
+  const dots = Array.from({length: 4}, (_, i) =>
+    `<div class="sent-dot ${i < s.mastery ? 'done' : (i === s.mastery ? 'active' : '')}"></div>`
+  ).join('');
+
+  let modeHTML = '';
+  if (mode === 'jigsaw') {
+    // Tokenize: split by spaces keeping punctuation attached
+    const tokens = s.en.match(/[\w']+[.,;!?]?|[.,;!?]/g) || s.en.split(' ');
+    window._currentSentData = { en: s.en, id: s.id, tokens };
+    const shuffled = [...tokens].sort(() => Math.random() - .5);
+    const tokensHTML = shuffled.map((t, i) =>
+      `<span class="token" data-token="${t.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-idx="${i}" onclick="jigsawClick(this)">${escH(t)}</span>`
+    ).join('');
+    modeHTML = `
+      <div class="jigsaw-area">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px">點擊單詞，按正確順序排列句子：</div>
+        <div class="jigsaw-slots" id="jigsawSlots"></div>
+        <div class="jigsaw-tokens" id="jigsawTokens">${tokensHTML}</div>
+      </div>
+      <div class="sent-hint-row" style="margin-bottom:8px">
+        <button class="sent-hint-btn" id="jigsawHintBtn" onclick="jigsawHint()">💡 提示 (<span id="jigsawHintsCount">5</span>次)</button>
+        <button class="sent-skip-btn" onclick="jigsawShowAnswer()">❌ 不知道</button>
+      </div>
+      <button class="sent-check-btn" id="sentCheckBtn" onclick="checkJigsaw()" disabled>確認順序 ✓</button>
+    `;
+  } else {
+    // Store current sentence for typing mode
+    window._currentSentData = { en: s.en, id: s.id };
+    modeHTML = `
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">根據中文，用英文寫出完整句子：</div>
+      <textarea class="sent-typing-input" id="sentTypingInput" placeholder="在這裡輸入英文句子…" oninput="sentTypingChange()"></textarea>
+      <div class="sent-hint-row">
+        <button class="sent-hint-btn" id="sentHintBtn" onclick="showSentHint()">💡 提示（首字）</button>
+        <button class="sent-skip-btn" onclick="skipSent()">❌ 不知道</button>
+      </div>
+      <button class="sent-check-btn" id="sentCheckBtn" onclick="checkTyping()" disabled>確認 ✓</button>
+    `;
+  }
+
+  area.innerHTML = `<div class="sent-card">
+    <div class="sent-card-meta">
+      <span class="sent-mode-badge ${mode === 'jigsaw' ? 'jigsaw' : 'typing'}">${mode === 'jigsaw' ? '🧩 排列句子' : '✏️ 自由書寫'}</span>
+      <div class="sent-progress-dots">${dots}</div>
+    </div>
+    <div class="sent-tag">${s.tag || ''}</div>
+    <div class="sent-zh">${escQ(s.zh)}</div>
+    ${modeHTML}
+    <div class="sent-feedback" id="sentFeedback"></div>
+    <div id="sentCorrectAns"></div>
+    <div id="sentZhBox" style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6;display:none"></div>
+    <button class="sent-next-btn" id="sentNextBtn" onclick="buildSentPractice()">下一句 →</button>
+  </div>`;
+}
+
+
+// ── Jigsaw 提示功能 ──────────────────────────────────────
+function jigsawHint() {
+  if (sentAnswered || jigsawHintsLeft <= 0) return;
+  const { tokens } = window._currentSentData || {};
+  if (!tokens) return;
+
+  // 找第一個錯誤位置：比對 slotOrder 和 tokens，找出哪裡開始不對
+  let firstWrongPos = -1;
+  for (let i = 0; i < tokens.length; i++) {
+    if (i >= slotOrder.length || slotOrder[i].token !== tokens[i]) {
+      firstWrongPos = i;
+      break;
+    }
+  }
+  // 如果全部都對了，從最後繼續接
+  if (firstWrongPos === -1) firstWrongPos = slotOrder.length;
+  if (firstWrongPos >= tokens.length) return;
+
+  // 移除從 firstWrongPos 開始的錯誤 token，還回 pool
+  const wrongItems = slotOrder.splice(firstWrongPos);
+  wrongItems.forEach(item => {
+    const origEl = document.querySelector(`.token[data-idx="${item.tokenIdx}"]`);
+    if (origEl) origEl.classList.remove('placed');
+  });
+
+  // 放入正確的下一個 token
+  const correctToken = tokens[firstWrongPos];
+  const allTokenEls = Array.from(document.querySelectorAll('.token'));
+
+  // 找未放置且文字相符的 token
+  const tokenEl = allTokenEls.find(el =>
+    !el.classList.contains('placed') &&
+    (el.dataset.token === correctToken || el.textContent.trim() === correctToken)
+  );
+
+  if (tokenEl) {
+    tokenEl.classList.add('placed');
+    // 閃爍提示
+    tokenEl.style.outline = '2px solid #a78bfa';
+    setTimeout(() => { tokenEl.style.outline = ''; }, 800);
+    slotOrder.push({ tokenIdx: tokenEl.dataset.idx, token: correctToken });
+  }
+
+  selectedSlotIdx = null;
+  renderSlots();
+  checkJigsawBtn();
+
+  jigsawHintsLeft--;
+  const hintBtn = document.getElementById('jigsawHintBtn');
+
+  if (jigsawHintsLeft <= 0) {
+    if (hintBtn) { hintBtn.disabled = true; hintBtn.style.opacity = '0.4'; }
+    setTimeout(() => jigsawShowAnswer(), 500);
+  } else {
+    if (hintBtn) hintBtn.textContent = '💡 提示（剩 ' + jigsawHintsLeft + ' 次）';
+  }
+}
+
+function jigsawShowAnswer() {
+  if (sentAnswered) return;
+  const { tokens, id: sentId } = window._currentSentData || {};
+  if (!tokens) return;
+
+  // Place all tokens in correct order
+  slotOrder = tokens.map((tok, i) => ({ tokenIdx: String(i), token: tok }));
+  document.querySelectorAll('.token').forEach(el => el.classList.add('placed'));
+  selectedSlotIdx = null;
+  renderSlots();
+
+  // Mark as wrong and show answer
+  sentAnswered = true;
+  document.getElementById('sentCheckBtn').disabled = true;
+  const hintBtn = document.getElementById('jigsawHintBtn');
+  if (hintBtn) { hintBtn.disabled = true; hintBtn.style.opacity = '0.4'; }
+
+  const slots = document.getElementById('jigsawSlots');
+  if (slots) {
+    slots.innerHTML = tokens.map(t => `<span class="slot-token correct-token">${escH(t)}</span>`).join(' ');
+  }
+
+  const fb = document.getElementById('sentFeedback');
+  fb.className = 'sent-feedback bad';
+  const showAnsS = sentences.find(x => String(x.id) === String(sentId));
+  fb.textContent = '看看正確句子，記起來再繼續！';
+  if (showAnsS) {
+    const zhBox = document.getElementById('sentZhBox');
+    if (zhBox) { zhBox.innerHTML = escH(showAnsS.zh); zhBox.style.display = 'block'; }
+  }
+  playSound('wrong');
+  updateSentence(sentId, false);
+  incSentTodayCount();
+  updateSentDailyBar();
+  const nb = document.getElementById('sentNextBtn');
+  if (nb) nb.classList.add('show');
+}
+
+// ── Jigsaw logic ──
+// State: slotOrder = array of {tokenIdx, token} in placed order
+let slotOrder = [];
+let selectedSlotIdx = null; // index in slotOrder that is "selected for insert"
+let jigsawHintsLeft = 5; // max 5 hints per jigsaw question
+
+function jigsawClick(tokenEl) {
+  if (sentAnswered) return;
+  const idx = tokenEl.dataset.idx;
+  const token = tokenEl.dataset.token;
+
+  if (tokenEl.classList.contains('placed')) {
+    // Remove from slotOrder
+    slotOrder = slotOrder.filter(s => s.tokenIdx !== idx);
+    tokenEl.classList.remove('placed');
+    selectedSlotIdx = null;
+  } else {
+    // Add to slotOrder (at selectedSlotIdx if set, otherwise end)
+    tokenEl.classList.add('placed');
+    const item = { tokenIdx: idx, token };
+    if (selectedSlotIdx !== null && selectedSlotIdx <= slotOrder.length) {
+      slotOrder.splice(selectedSlotIdx, 0, item);
+      selectedSlotIdx = null;
+    } else {
+      slotOrder.push(item);
+    }
+  }
+  renderSlots();
+  checkJigsawBtn();
+}
+
+function slotTokenClick(slotIdx) {
+  if (sentAnswered) return;
+  // If clicking same → deselect and return to pool
+  if (selectedSlotIdx === slotIdx) {
+    selectedSlotIdx = null;
+    renderSlots();
+    return;
+  }
+  // Return this token to pool
+  const removed = slotOrder.splice(slotIdx, 1)[0];
+  const origEl = document.querySelector(`.token[data-idx="${removed.tokenIdx}"]`);
+  if (origEl) origEl.classList.remove('placed');
+  selectedSlotIdx = null;
+  renderSlots();
+  checkJigsawBtn();
+}
+
+function insertGapClick(afterIdx) {
+  if (sentAnswered) return;
+  // afterIdx = insert position (0 = before first, n = after last)
+  selectedSlotIdx = afterIdx;
+  renderSlots();
+}
+
+function renderSlots() {
+  const slots = document.getElementById('jigsawSlots');
+  if (!slots) return;
+  if (slotOrder.length === 0) {
+    slots.innerHTML = '<span style="color:var(--text3);font-size:13px;padding:4px 8px">點下方單詞放入這裡 ↓</span>';
+    return;
+  }
+  let html = '';
+  // Insert gap at position 0
+  const gap0active = selectedSlotIdx === 0;
+  html += `<span class="insert-gap ${gap0active?'active':''}" onclick="insertGapClick(0)">⬩</span>`;
+  slotOrder.forEach((item, i) => {
+    const isSelected = false; // slot tokens are never "selected" visually
+    html += `<span class="slot-token" onclick="slotTokenClick(${i})">${escH(item.token)} <span style="font-size:9px;opacity:.5">✕</span></span>`;
+    const gapActive = selectedSlotIdx === (i + 1);
+    html += `<span class="insert-gap ${gapActive?'active':''}" onclick="insertGapClick(${i+1})">⬩</span>`;
+  });
+  // Show hint when a slot is selected
+  if (selectedSlotIdx !== null) {
+    html += `<span style="font-size:11px;color:#a78bfa;margin-left:4px">← 點下方單詞插入此處</span>`;
+  }
+  slots.innerHTML = html;
+}
+
+function checkJigsawBtn() {
+  const checkBtn = document.getElementById('sentCheckBtn');
+  if (!checkBtn) return;
+  const total = document.querySelectorAll('.token').length;
+  checkBtn.disabled = slotOrder.length < total;
+}
+
+function checkJigsaw() {
+  if (sentAnswered) return;
+  const { tokens, id: sentId } = window._currentSentData || {};
+  if (!tokens) return;
+  sentAnswered = true;
+  const correct = tokens;
+  const placed = slotOrder.map(s => s.token);
+  const isOk = placed.join(' ') === correct.join(' ');
+
+  document.getElementById('sentCheckBtn').disabled = true;
+
+  // Re-render slots with color feedback
+  const slots = document.getElementById('jigsawSlots');
+  if (slots) {
+    let html = '';
+    slotOrder.forEach((item, i) => {
+      const ok = item.token === correct[i];
+      html += `<span class="slot-token ${ok ? 'correct-token' : 'wrong-token'}">${escH(item.token)}</span> `;
+    });
+    slots.innerHTML = html;
+  }
+
+  const fb = document.getElementById('sentFeedback');
+  const nextBtn = document.getElementById('sentNextBtn');
+  const curSent = sentences.find(x => String(x.id) === String(sentId));
+  // 答完後在句子中文意思區顯示
+  if (curSent) {
+    const zhBox = document.getElementById('sentZhBox');
+    if (zhBox) { zhBox.innerHTML = escH(curSent.zh); zhBox.style.display = 'block'; }
+  }
+  if (isOk) {
+    fb.className = 'sent-feedback ok';
+    fb.textContent = ['排列正確！🎉','完美！✨','太棒了！'][Math.floor(Math.random() * 3)];
+    playSound('correct');
+    updateSentence(sentId, true);
+  } else {
+    fb.className = 'sent-feedback bad';
+    fb.textContent = '順序有點不對，正確句子：';
+    playSound('wrong');
+    document.getElementById('sentCorrectAns').innerHTML =
+      `<div class="sent-correct-ans">${escH(correct.join(' '))}</div>`;
+    updateSentence(sentId, false);
+  }
+  incSentTodayCount();
+  updateSentDailyBar();
+  if (nextBtn) nextBtn.classList.add('show');
+}
+
+// ── Typing logic ──
+function sentTypingChange() {
+  const input = document.getElementById('sentTypingInput');
+  const btn = document.getElementById('sentCheckBtn');
+  if (btn) btn.disabled = !input?.value.trim();
+}
+
+function showSentHint() {
+  const { en } = window._currentSentData || {};
+  if (!en) return;
+  const words = en.split(' ');
+  const hint = words.slice(0, 3).join(' ') + '…';
+  const input = document.getElementById('sentTypingInput');
+  if (input) { input.placeholder = hint; input.focus(); }
+  const btn = document.getElementById('sentHintBtn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; }
+}
+
+function skipSent() {
+  if (sentAnswered) return;
+  const { en, id: sentId } = window._currentSentData || {};
+  if (!en) return;
+  sentAnswered = true;
+  document.getElementById('sentCheckBtn').disabled = true;
+  const input = document.getElementById('sentTypingInput');
+  if (input) { input.disabled = true; input.classList.add('wrong'); }
+  const fb = document.getElementById('sentFeedback');
+  fb.className = 'sent-feedback bad';
+  fb.textContent = '沒關係，看看正確答案：';
+  const skipSent_ = sentences.find(x => String(x.id) === String(sentId));
+  if (skipSent_) {
+    const zhBox = document.getElementById('sentZhBox');
+    if (zhBox) { zhBox.innerHTML = escH(skipSent_.zh); zhBox.style.display = 'block'; }
+  }
+  document.getElementById('sentCorrectAns').innerHTML =
+    `<div class="sent-correct-ans">${escH(en)}</div>`;
+  playSound('wrong');
+  updateSentence(sentId, false);
+  incSentTodayCount();
+  updateSentDailyBar();
+  const nb = document.getElementById('sentNextBtn');
+  if (nb) nb.classList.add('show');
+}
+
+function checkTyping() {
+  if (sentAnswered) return;
+  const { en, id: sentId } = window._currentSentData || {};
+  if (!en) return;
+  const input = document.getElementById('sentTypingInput');
+  const val = input?.value.trim() || '';
+  if (!val) return;
+  sentAnswered = true;
+  input.disabled = true;
+  document.getElementById('sentCheckBtn').disabled = true;
+
+  const norm = s => s.toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ').trim();
+  const isOk = norm(val) === norm(en);
+
+  const fb = document.getElementById('sentFeedback');
+  const typingSent = sentences.find(x => String(x.id) === String(sentId));
+  // 顯示中文
+  if (typingSent) {
+    const zhBox = document.getElementById('sentZhBox');
+    if (zhBox) { zhBox.innerHTML = escH(typingSent.zh); zhBox.style.display = 'block'; }
+  }
+  if (isOk) {
+    input.classList.add('correct');
+    fb.className = 'sent-feedback ok';
+    fb.textContent = ['完美！🎉','寫得很好！✨','一模一樣！'][Math.floor(Math.random() * 3)];
+    playSound('correct');
+    updateSentence(sentId, true);
+  } else {
+    input.classList.add('wrong');
+    fb.className = 'sent-feedback bad';
+    fb.innerHTML = `<span style="color:var(--accent2);text-decoration:line-through">${escH(val)}</span>`;
+    document.getElementById('sentCorrectAns').innerHTML =
+      `<div class="sent-correct-ans">${escH(en)}</div>`;
+    playSound('wrong');
+    updateSentence(sentId, false);
+  }
+  incSentTodayCount();
+  updateSentDailyBar();
+  const nb = document.getElementById('sentNextBtn');
+  if (nb) nb.classList.add('show');
+}
+
+function updateSentence(id, ok) {
+  const s = sentences.find(x => String(x.id) === String(id));
+  if (!s) return;
+  s.seen++;
+  if (ok) s.mastery = Math.min(4, s.mastery + 1);
+  else s.mastery = Math.max(0, s.mastery - 1);
+  saveSentences();
+  renderSentList();
+}
+
+// ── Sentence list ──
+let sentTagFilter2 = 'all';
+function renderSentTagFilter() {
+  const tags = [...new Set(sentences.map(s => s.tag).filter(Boolean))];
+  const bar = document.getElementById('sentTagFilter');
+  if (!bar) return;
+  bar.innerHTML = `<span class="filter-chip ${sentTagFilter2==='all'?'on':''}" onclick="setSentFilter('all',this)">全部</span>` +
+    tags.map(t => `<span class="filter-chip ${sentTagFilter2===t?'on':''}" onclick="setSentFilter('${escQ(t)}',this)">${escQ(t)}</span>`).join('');
+}
+function setSentFilter(tag, el) {
+  sentTagFilter2 = tag;
+  document.querySelectorAll('#sentTagFilter .filter-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderSentList();
+}
+function renderSentList() {
+  const list = document.getElementById('sentList');
+  const countEl = document.getElementById('sentListCount');
+  if (!list) return;
+  const filtered = sentTagFilter2 === 'all' ? sentences : sentences.filter(s => s.tag === sentTagFilter2);
+  if (countEl) countEl.textContent = filtered.length + ' 句';
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="sent-empty"><h3>還沒有句子</h3><p>點擊「＋ 新增」或「📷 掃描」加入句子</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(s => {
+    const dots = Array.from({length:4},(_,i)=>`<div class="slc-seen-dot ${i<s.mastery?'done':(i===s.mastery?'active':'')}"></div>`).join('');
+    return `<div class="sent-list-card">
+      <div style="flex:1">
+        <div class="slc-en">${escQ(s.en)}</div>
+        <div class="slc-zh">${escQ(s.zh)}</div>
+        <div class="slc-meta">${s.tag || ''} · 練習 ${s.seen} 次</div>
+        <div class="slc-seen">${dots}</div>
+      </div>
+      <button class="slc-del" onclick="deleteSent(${s.id})" title="刪除">×</button>
+    </div>`;
+  }).join('');
+}
+function deleteSent(id) {
+  if (!confirm('確定要刪除這個句子？')) return;
+  sentences = sentences.filter(s => s.id !== id);
+  saveSentences(); renderSentTagFilter(); renderSentList();
+}
+
+// ── Add sentence modal ──
+function openAddSentModal() { document.getElementById('addSentModalBg').classList.add('open'); }
+function closeAddSentModal() {
+  document.getElementById('addSentModalBg').classList.remove('open');
+  ['inSentEn','inSentZh','inSentTag'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+}
+function saveNewSent() {
+  const en = document.getElementById('inSentEn').value.trim();
+  const zh = document.getElementById('inSentZh').value.trim();
+  if (!en || !zh) { alert('請填入英文句子和中文意思'); return; }
+  const tag = document.getElementById('inSentTag').value.trim();
+  const newId = Date.now();
+  sentences.push({ id:newId, en, zh, tag, seen:0, mastery:0 });
+  saveSentences(); closeAddSentModal(); renderSentTagFilter(); renderSentList();
+  buildSentPractice();
+}
+
+// ── Photo scan for sentences ──
+function openSentPhotoModal() {
+  sentPhotoBase64S = null; sentPhotoResultsArr = [];
+  ['sentPhotoPreview','sentPhotoResultList','sentPhotoImportBtn','sentPhotoStatus'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style && (el.style.display = 'none'); el.innerHTML && (el.innerHTML = ''); el.textContent && (el.textContent = ''); }
+  });
+  document.getElementById('sentPhotoPreview').style.display = 'none';
+  document.getElementById('sentPhotoStatus').textContent = '';
+  document.getElementById('sentPhotoScanBtn').disabled = true;
+  document.getElementById('sentPhotoInput').value = '';
+  document.getElementById('sentPhotoModalBg').classList.add('open');
+}
+function closeSentPhotoModal() { document.getElementById('sentPhotoModalBg').classList.remove('open'); }
+
+function handleSentPhotoSelect(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const preview = document.getElementById('sentPhotoPreview');
+    preview.src = dataUrl; preview.style.display = 'block';
+    sentPhotoBase64S = dataUrl.split(',')[1];
+    document.getElementById('sentPhotoScanBtn').disabled = false;
+    document.getElementById('sentPhotoStatus').textContent = '圖片已載入，點擊「AI 辨識」';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function scanSentPhoto() {
+  if (!sentPhotoBase64S) return;
+  const btn = document.getElementById('sentPhotoScanBtn');
+  btn.disabled = true; btn.textContent = '⏳ 辨識中…';
+  document.getElementById('sentPhotoStatus').textContent = 'AI 正在辨識口說句子…';
+  document.getElementById('sentPhotoResultList').innerHTML = '';
+  document.getElementById('sentPhotoImportBtn').classList.remove('show');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: sentPhotoBase64S } },
+            { type: 'text', text: `You are an IELTS speaking practice assistant. Look at this handwritten English speaking note image.
+
+Extract ALL complete English sentences or phrases that appear to be example sentences for speaking practice. These are usually bullet points or numbered items.
+
+For each sentence:
+1. Copy the English sentence exactly (fix obvious spelling errors)
+2. Translate it to Traditional Chinese (繁體中文)
+3. Identify the topic tag (e.g. Plans, Money, Spare Time, Future, Name, Emotions, or infer from context)
+
+Return ONLY a JSON array, no other text:
+[
+  {
+    "en": "the complete English sentence",
+    "zh": "繁體中文翻譯",
+    "tag": "topic tag"
+  }
+]
+
+Focus on complete sentences, not individual vocabulary words.` }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text?.trim() || '[]';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch(e) { throw new Error('解析失敗'); }
+
+    sentPhotoResultsArr = parsed.map((item, i) => ({ ...item, _id: i, _include: true }));
+    renderSentPhotoResults();
+    document.getElementById('sentPhotoStatus').textContent = `✅ 找到 ${sentPhotoResultsArr.length} 個句子`;
+    document.getElementById('sentPhotoImportBtn').classList.add('show');
+  } catch(err) {
+    document.getElementById('sentPhotoStatus').textContent = '❌ 辨識失敗：' + (err.message || '請確認網路');
+  } finally {
+    btn.disabled = false; btn.textContent = '🔍 重新辨識';
+  }
+}
+
+function renderSentPhotoResults() {
+  const list = document.getElementById('sentPhotoResultList');
+  list.style.display = 'flex';
+  list.innerHTML = sentPhotoResultsArr.filter(s => s._include).map(s => `
+    <div class="photo-word-item">
+      <div class="pw-info">
+        <div class="pw-en" style="font-size:13px;line-height:1.5">${escQ(s.en)}</div>
+        <div class="pw-zh">${escQ(s.zh)}</div>
+        <div class="pw-tag">${escQ(s.tag || '')}</div>
+      </div>
+      <button class="pw-del" onclick="removeSentPhotoItem(${s._id})">×</button>
+    </div>`).join('');
+}
+function removeSentPhotoItem(id) {
+  const item = sentPhotoResultsArr.find(s => s._id === id);
+  if (item) item._include = false;
+  renderSentPhotoResults();
+  const n = sentPhotoResultsArr.filter(s => s._include).length;
+  document.getElementById('sentPhotoStatus').textContent = `剩餘 ${n} 個句子`;
+  if (n === 0) document.getElementById('sentPhotoImportBtn').classList.remove('show');
+}
+function importSentPhotoResults() {
+  const toImport = sentPhotoResultsArr.filter(s => s._include);
+  let added = 0;
+  toImport.forEach(item => {
+    if (sentences.find(s => s.en.toLowerCase() === item.en.toLowerCase())) return;
+    sentences.push({ id: Date.now() + Math.random(), en: item.en, zh: item.zh, tag: item.tag||'', seen:0, mastery:0 });
+    added++;
+  });
+  saveSentences(); closeSentPhotoModal(); renderSentTagFilter(); renderSentList(); buildSentPractice();
+  showScorePop(`+${added} 個句子 🎉`);
+}
+
+
+// ── Daily Goal Setting ──────────────────────────────────
+function getDailyGoal() {
+  return parseInt(lsGet('wf_daily_goal', '20'));
+}
+function openGoalModal() { document.getElementById('goalModalBg').classList.add('open'); }
+function closeGoalModal() { document.getElementById('goalModalBg').classList.remove('open'); }
+function setGoalPreset(n, label) {
+  lsSet('wf_daily_goal', n);
+  closeGoalModal();
+  updateStats();
+  showScorePop('目標：' + n + ' 題 ✓');
+}
+function setCustomGoal() {
+  const n = parseInt(document.getElementById('customGoalInput').value);
+  if (!n || n < 1) return;
+  lsSet('wf_daily_goal', n);
+  closeGoalModal();
+  updateStats();
+  showScorePop('目標：' + n + ' 題 ✓');
+}
+
+
+function forceLoadSeed() {
+  words = SEED.map((w,i) => ({
+    id: i+1, word: w.word, zh: w.zh, type: w.type,
+    tag: w.tag||'', note: w.note||'', example: w.example||'', exampleZh: w.exampleZh||'',
+    seen: 0, correct: 0, wrong: 0, mastery: 0,
+    fi_correct: 0, nextDue: 0
+  }));
+  save();
+  updateStats(); renderFilters(); renderCards(); buildQuiz();
+  alert('載入完成！' + words.length + ' 個單字');
+}
+
+// ── BOOT ──────────────────────────────────────────────
+init();
+try { initSentences(); } catch(e) { console.log("sentences init error:", e); }
+</script>
+
+<!-- Milestone popup -->
+<div class="milestone-overlay" id="milestoneOverlay" onclick="closeMilestone()"></div>
+<div class="milestone-pop" id="milestonePop">
+  <h2 id="milestoneEmoji">🔥</h2>
+  <h2 id="milestoneTitle">連勝 10！</h2>
+  <p id="milestoneMsg">你的記憶力正在加速！</p>
+  <button onclick="closeMilestone()">繼續練習 →</button>
+</div>
+
+<!-- Tooltip popup -->
+<div class="tip-popup" id="tipPopup">
+  <span class="tip-close" onclick="closeTip()">×</span>
+  <div class="tip-word" id="tipWord"></div>
+  <div id="tipBody"></div>
+</div>
+
+<!-- 拍照匯入 Modal -->
+<div class="photo-modal-bg" id="photoModalBg">
+  <div class="photo-modal">
+    <h3>📷 拍照匯入單字</h3>
+    <p class="sub">拍下你的單字筆記，AI 會自動辨識並整理成單字卡（含例句）</p>
+
+    <div class="photo-drop" id="photoDrop">
+      <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoSelect(this)">
+      <div class="icon">📸</div>
+      <p>點擊拍照或選擇圖片</p>
+      <p class="hint">支援 JPG、PNG，直接對著筆記拍即可</p>
+    </div>
+
+    <img id="photoPreview" class="photo-preview" alt="預覽">
+
+    <div class="photo-status" id="photoStatus"></div>
+
+    <div class="photo-result-list" id="photoResultList"></div>
+
+    <button class="photo-import-btn" id="photoImportBtn" onclick="importPhotoWords()">
+      ✅ 全部匯入單字庫
+    </button>
+
+    <div class="photo-modal-btns">
+      <button class="photo-scan-btn" id="photoScanBtn" onclick="scanPhoto()" disabled>🔍 AI 辨識</button>
+      <button class="photo-cancel-btn" onclick="closePhotoModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Sentence Modal -->
+<div class="modal-bg" id="addSentModalBg">
+  <div class="modal">
+    <h3>新增句子</h3>
+    <div class="form-group">
+      <label>英文句子</label>
+      <textarea id="inSentEn" placeholder="e.g. I'm a firm believer that making plans in advance is essential for achieving goals." style="min-height:80px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>中文意思</label>
+      <textarea id="inSentZh" placeholder="e.g. 我堅信提前做計畫對達成目標至關重要。" style="min-height:60px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>主題標籤</label>
+      <input type="text" id="inSentTag" placeholder="e.g. Plans, Money, Spare Time">
+    </div>
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="closeAddSentModal()">取消</button>
+      <button class="save-btn" onclick="saveNewSent()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sentence Photo Modal -->
+<div class="photo-modal-bg" id="sentPhotoModalBg">
+  <div class="photo-modal">
+    <h3>📷 拍照匯入句子</h3>
+    <p class="sub">拍下你的口說筆記，AI 自動辨識長句與中文意思</p>
+    <div class="photo-drop">
+      <input type="file" id="sentPhotoInput" accept="image/*" capture="environment" onchange="handleSentPhotoSelect(this)">
+      <div class="icon">📸</div>
+      <p>點擊拍照或選擇圖片</p>
+      <p class="hint">支援 JPG、PNG</p>
+    </div>
+    <img id="sentPhotoPreview" class="photo-preview" alt="預覽">
+    <div class="photo-status" id="sentPhotoStatus"></div>
+    <div class="photo-result-list" id="sentPhotoResultList"></div>
+    <button class="photo-import-btn" id="sentPhotoImportBtn" onclick="importSentPhotoResults()">✅ 全部匯入句子庫</button>
+    <div class="photo-modal-btns">
+      <button class="photo-scan-btn" id="sentPhotoScanBtn" onclick="scanSentPhoto()" disabled>🔍 AI 辨識</button>
+      <button class="photo-cancel-btn" onclick="closeSentPhotoModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW failed:', err));
+  });
+}
+</script>
+
+<!-- Goal Setting Modal -->
+<div class="modal-bg" id="goalModalBg">
+  <div class="modal" style="max-width:360px">
+    <h3>🎯 設定每日目標</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px">根據你的雅思目標，建議每日練習量：</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <button class="goal-preset" onclick="setGoalPreset(10,'輕鬆維持')">10 題／天 &nbsp;<span style="color:var(--text3)">輕鬆維持</span></button>
+      <button class="goal-preset" onclick="setGoalPreset(20,'穩定進步')">20 題／天 &nbsp;<span style="color:var(--text3)">穩定進步</span></button>
+      <button class="goal-preset" onclick="setGoalPreset(30,'雅思衝刺')">30 題／天 &nbsp;<span style="color:var(--text3)">雅思 6.0+ 衝刺</span></button>
+      <button class="goal-preset" onclick="setGoalPreset(50,'密集訓練')">50 題／天 &nbsp;<span style="color:var(--text3)">密集訓練</span></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <span style="font-size:13px;color:var(--text2)">自訂：</span>
+      <input type="number" id="customGoalInput" min="5" max="200" placeholder="題數" style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;color:var(--text);outline:none">
+      <button onclick="setCustomGoal()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">確認</button>
+    </div>
+    <button class="cancel-btn" onclick="closeGoalModal()">關閉</button>
+  </div>
+</div>
+
+</body>
+</html>
