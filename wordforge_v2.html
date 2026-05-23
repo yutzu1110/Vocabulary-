@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f5f0;--surface:#fff;--surface2:#f0ede6;--border:#e2ddd5;--accent:#c4813a;--accent2:#d95f5f;--accent3:#4a9e7a;--purple:#7c6fd4;--text:#1c1814;--text2:#6b6358;--text3:#a8a099;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px}
+.logo em{color:var(--accent);font-style:italic}
+.hstats{display:flex;align-items:center;gap:10px}
+.stat-chip{font-size:13px;font-weight:600;color:var(--text2)}
+.stat-chip b{font-family:'DM Mono',monospace;color:var(--accent)}
+.tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;gap:0}
+.tab-btn{padding:12px 16px;font-size:13px;font-weight:600;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'DM Sans',sans-serif}
+.tab-btn.on{color:var(--accent);border-bottom-color:var(--accent)}
+main{padding:20px;max-width:680px;margin:0 auto}
+.page{display:none}.page.on{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.goal-card{background:var(--accent);color:#fff;border-radius:20px;padding:16px 20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.goal-num{font-family:'Instrument Serif',serif;font-size:36px;line-height:1}
+.goal-label{font-size:11px;opacity:.8;margin-top:2px}
+.goal-bar-wrap{height:4px;background:rgba(255,255,255,.3);border-radius:4px;margin-top:6px;width:100px}
+.goal-bar-fill{height:100%;background:#fff;border-radius:4px;transition:width .4s}
+.section-label{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.topic-grid{display:grid;gap:10px}
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px 20px;cursor:pointer;transition:all .2s;display:flex;justify-content:space-between;align-items:center}
+.topic-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px rgba(196,129,58,.1)}
+.topic-emoji{font-size:24px;margin-bottom:4px}
+.topic-name{font-family:'Instrument Serif',serif;font-size:20px}
+.topic-meta{font-size:12px;color:var(--text3);margin-top:3px}
+.ring-wrap{position:relative;width:44px;height:44px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:3}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace}
+.back-btn{background:none;border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.unit-header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.unit-title{font-family:'Instrument Serif',serif;font-size:18px}
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:24px;margin-bottom:14px}
+.qcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:100px}
+.badge-mc{background:rgba(124,111,212,.12);color:var(--purple);border:1px solid rgba(124,111,212,.25)}
+.badge-fi{background:rgba(196,129,58,.12);color:var(--accent);border:1px solid rgba(196,129,58,.25)}
+.badge-sent{background:rgba(124,111,212,.12);color:var(--purple);border:1px solid rgba(124,111,212,.25)}
+.speak-btn{background:none;border:1px solid var(--border);border-radius:100px;color:var(--text3);padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'DM Sans',sans-serif;transition:all .2s}
+.speak-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pdots{display:flex;gap:5px;margin-bottom:14px}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.pdot.done{background:var(--accent3)}
+.pdot.active{background:var(--accent)}
+.word-hint{font-size:12px;color:var(--text3);margin-bottom:6px}
+.sent-box{background:var(--surface2);border-radius:12px;padding:13px 15px;font-size:15px;line-height:1.7;color:var(--text2);margin-bottom:18px;border-left:3px solid var(--border)}
+.blank{display:inline-block;background:var(--border);border-radius:5px;min-width:65px;height:19px;vertical-align:middle;position:relative;top:-1px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.opt{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:11px 13px;cursor:pointer;font-size:14px;font-weight:500;text-align:left;color:var(--text);transition:all .2s;font-family:'DM Sans',sans-serif}
+.opt:hover{border-color:var(--accent);background:rgba(196,129,58,.05)}
+.opt.correct{border-color:var(--accent3);background:rgba(74,158,122,.08);color:var(--accent3)}
+.opt.wrong{border-color:var(--accent2);background:rgba(217,95,95,.08);color:var(--accent2)}
+.opt-zh{display:block;font-size:11px;color:var(--text3);margin-top:3px;font-weight:400}
+.opt.correct .opt-zh{color:var(--accent3)}.opt.wrong .opt-zh{color:var(--accent2)}
+.fi-wrap{display:flex;gap:8px;margin-bottom:8px}
+.fi-input{flex:1;background:transparent;border:none;border-bottom:2px solid var(--border);padding:10px 4px;font-size:17px;font-family:'DM Mono',monospace;color:var(--text);outline:none;transition:border-color .2s}
+.fi-input:focus{border-color:var(--accent)}
+.fi-input.correct{border-color:var(--accent3)}.fi-input.wrong{border-color:var(--accent2)}
+.check-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.check-btn:hover{opacity:.85}.check-btn:disabled{opacity:.35;cursor:not-allowed}
+.hint-row{display:flex;gap:8px;margin-top:8px}
+.hint-btn,.skip-btn{flex:1;border-radius:10px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--surface2);transition:all .2s}
+.hint-btn{color:var(--accent);border-color:rgba(196,129,58,.3)}.hint-btn:disabled{opacity:.4;cursor:not-allowed}
+.skip-btn{color:var(--accent2);border-color:rgba(217,95,95,.3)}
+.feedback{font-size:13px;margin-top:10px;min-height:18px;font-weight:500;line-height:1.6}
+.feedback.ok{color:var(--accent3)}.feedback.bad{color:var(--accent2)}
+.sent-zh-reveal{font-size:13px;color:var(--text2);margin-top:8px;padding:10px 14px;background:var(--surface2);border-radius:10px;border-left:3px solid var(--accent3);display:none;line-height:1.6}
+.mastered-banner{background:var(--accent3);color:#fff;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:13px;font-weight:600;display:none}
+.mastered-banner.show{display:block}
+.next-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:13px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s;display:none;margin-top:10px;font-family:'DM Sans',sans-serif}
+.next-btn:hover{border-color:var(--accent);color:var(--accent)}.next-btn.show{display:block}
+.score-pop{position:fixed;top:66px;right:14px;z-index:200;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;color:var(--accent);transform:translateX(120%);transition:transform .3s;pointer-events:none;font-family:'DM Mono',monospace}
+.score-pop.show{transform:translateX(0)}
+.jigsaw-slots{min-height:46px;border:2px dashed var(--border);border-radius:12px;padding:9px 11px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px;background:var(--surface2);transition:border-color .2s}
+.jigsaw-tokens{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.token{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 11px;font-size:14px;cursor:pointer;user-select:none;transition:all .2s;color:var(--text)}
+.token:hover{border-color:var(--purple);background:rgba(124,111,212,.06)}
+.token.placed{background:rgba(124,111,212,.1);border-color:var(--purple);color:var(--purple)}
+.slot-token{background:rgba(124,111,212,.1);border:1px solid var(--purple);border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;color:var(--purple);display:inline-flex;align-items:center;gap:3px;transition:all .2s}
+.slot-token:hover{background:rgba(217,95,95,.1);border-color:var(--accent2);color:var(--accent2)}
+.insert-gap{display:inline-flex;align-items:center;justify-content:center;width:18px;height:26px;color:var(--border);font-size:12px;cursor:pointer;border-radius:4px;transition:all .2s;border:1px solid transparent;user-select:none}
+.insert-gap:hover,.insert-gap.active{background:rgba(124,111,212,.15);color:var(--purple);border-color:var(--purple)}
+.token.correct-token{background:rgba(74,158,122,.12);border-color:var(--accent3);color:var(--accent3)}
+.token.wrong-token{background:rgba(217,95,95,.1);border-color:var(--accent2);color:var(--accent2)}
+.sent-typing{width:100%;background:transparent;border:none;border-bottom:2px solid var(--border);padding:10px 4px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;resize:none;min-height:70px;transition:border-color .2s;line-height:1.6}
+.sent-typing:focus{border-color:var(--purple)}.sent-typing.correct{border-color:var(--accent3)}.sent-typing.wrong{border-color:var(--accent2)}
+.word-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.wcard{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px;position:relative;cursor:pointer;transition:all .2s}
+.wcard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.wcard-en{font-weight:700;font-size:13px;margin-bottom:3px}
+.wcard-zh{font-size:11px;color:var(--text2)}
+.wcard-type{font-size:10px;color:var(--text3);margin-top:4px;font-weight:600;letter-spacing:.7px;text-transform:uppercase}
+.mdot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%}
+.m0{background:var(--border)}.m1{background:#f0a500}.m2{background:#f0a500}.m3,.m4{background:var(--accent3)}
+.sent-item{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 15px;margin-bottom:9px}
+.sent-item.mastered{border-color:var(--accent3)}
+.sent-item-en{font-size:14px;line-height:1.6;margin-bottom:4px}
+.sent-item-zh{font-size:12px;color:var(--text3)}
+.sent-item-meta{font-size:10px;color:var(--text3);margin-top:5px;font-weight:600}
+.complete-card{text-align:center;padding:50px 20px}
+.complete-card h2{font-family:'Instrument Serif',serif;font-size:28px;color:var(--accent3);margin-bottom:8px}
+.complete-card p{color:var(--text2);font-size:14px;margin-bottom:20px}
+select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer}
+@media(max-width:480px){.opts{grid-template-columns:1fr}.word-grid{grid-template-columns:1fr 1fr}.tab-btn{padding:10px 10px;font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Word<em>Forge</em></div>
+  <div class="hstats">
+    <span class="stat-chip">⚡ <b id="hScore">0</b></span>
+    <span class="stat-chip">🔥 <b id="hStreak">0</b></span>
+  </div>
+</header>
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="switchTab('practice',this)">Practice</button>
+  <button class="tab-btn" onclick="switchTab('words',this)">Word Bank</button>
+  <button class="tab-btn" onclick="switchTab('sentences',this)">Sentences</button>
+</div>
+<div class="score-pop" id="scorePop"></div>
+<main>
+  <div class="page on" id="page-practice">
+    <div id="topicListView">
+      <!-- Stats row at top -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--accent3)" id="statAccNum">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Accuracy</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--purple)" id="statNewWords">0</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Words mastered</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--accent)" id="statNewSents">0</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Sents mastered</div>
+        </div>
+      </div>
+      <div class="section-label">Choose a Unit</div>
+      <div class="topic-grid" id="topicGrid"></div>
+    </div>
+    <div id="practiceView" style="display:none">
+      <!-- Word progress bar shown during practice -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px">📝</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text2)">Today's Words</span>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700">
+            <span id="wordDoneNum" style="color:var(--accent)">0</span>
+            <span style="color:var(--text3)"> / 30</span>
+          </div>
+        </div>
+        <div style="height:10px;background:var(--surface2);border-radius:100px;overflow:hidden">
+          <div id="wordBar" style="height:100%;background:linear-gradient(90deg,var(--accent),#e8a04a);border-radius:100px;width:0%;transition:width .5s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px">
+          <div style="font-size:11px;color:var(--text3)" id="todayDateLabel"></div>
+          <div style="font-size:11px;color:var(--accent);font-weight:600" id="wordGoalStatus"></div>
+        </div>
+      </div>
+      <div class="unit-header">
+        <button class="back-btn" onclick="backToTopics()">← Units</button>
+        <div class="unit-title" id="practiceUnitName"></div>
+      </div>
+      <div id="practiceArea"></div>
+    </div>
+  </div>
+  <div class="page" id="page-words">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-family:'Instrument Serif',serif;font-size:20px">Word Bank</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="wbSel" onchange="renderWB()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer"><option value="all">All Units</option></select>
+        <button onclick="startWordQuiz()" style="background:var(--purple);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">🎯 Quiz</button>
+      </div>
+    </div>
+    <!-- Word Quiz Area -->
+    <div id="wordQuizArea" style="display:none;margin-bottom:20px"></div>
+    <div class="word-grid" id="wordGrid"></div>
+  </div>
+  <div class="page" id="page-sentences">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-family:'Instrument Serif',serif;font-size:20px">Sentences</div>
+      <select id="sentSel" onchange="initSentTab()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer"><option value="all">All Units</option></select>
+    </div>
+    <!-- Sentence daily progress bar -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:14px">🧩</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text2)">Today's Sentences</span>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700">
+          <span id="sentDoneNum" style="color:var(--purple)">0</span>
+          <span style="color:var(--text3)"> / 20</span>
+        </div>
+      </div>
+      <div style="height:10px;background:var(--surface2);border-radius:100px;overflow:hidden">
+        <div id="sentBar" style="height:100%;background:linear-gradient(90deg,var(--purple),#a89be8);border-radius:100px;width:0%;transition:width .5s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <div style="font-size:11px;color:var(--text3)" id="sentTabDateLabel"></div>
+        <div style="font-size:11px;color:var(--purple);font-weight:600" id="sentGoalStatus"></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Arrange words in the correct order. Tap ⬩ to insert between words.</div>
+    <div id="sentPracticeArea"></div>
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">All Sentences</div>
+      <div id="sentListArea"></div>
+    </div>
+  </div>
+</main>
+<script>
+const UNITS=[{id:'inspiration',name:'Inspiration',emoji:'✨',words:[
+{w:'counselor',zh:'顧問；輔導員',type:'n',ex:'The person who influenced me most is my high school counselor.',exZh:'對我影響最深的是我的高中輔導員。'},
+{w:'inner thoughts',zh:'內心想法',type:'phrase',ex:'He helped me gain a deeper understanding of my personality and inner thoughts.',exZh:'他幫助我更深入地了解自己的個性和內心想法。'},
+{w:'have a huge influence on',zh:'對...有巨大影響',type:'phrase',ex:'Role models have a huge influence on the way young people think.',exZh:'榜樣對年輕人的思維方式有巨大的影響。'},
+{w:'step out of my comfort zone',zh:'走出舒適圈',type:'phrase',ex:'His story encouraged me to step out of my comfort zone and try new things.',exZh:'他的故事鼓勵我走出舒適圈，嘗試新事物。'},
+{w:'realize my potential',zh:'發揮潛力',type:'phrase',ex:'She always believed I could realize my potential if I worked hard enough.',exZh:'她始終相信只要我足夠努力就能發揮自己的潛力。'},
+{w:'change my perspective on life',zh:'改變我對生活的看法',type:'phrase',ex:'Traveling alone completely changed my perspective on life.',exZh:'獨自旅行徹底改變了我對生活的看法。'},
+{w:'set a good example for others',zh:'為他人樹立好榜樣',type:'phrase',ex:'My parents set a good example for others through their kindness and hard work.',exZh:'我的父母以善良和努力為他人樹立了好榜樣。'},
+{w:'look up to someone',zh:'仰慕某人',type:'phrase',ex:'I have always looked up to my father for his patience and dedication.',exZh:'我一直仰慕我父親的耐心和奉獻精神。'},
+{w:'make a lasting impression on me',zh:'給我留下深刻印象',type:'phrase',ex:'His kindness made a lasting impression on me that I still carry today.',exZh:'他的善意給我留下了深刻的印象，至今仍銘記於心。'},
+{w:'drive',zh:'幹勁；驅動力',type:'n',ex:'What I admire most about her is her incredible drive to keep improving.',exZh:'我最欣賞她的就是她不斷進步的驚人幹勁。'},
+{w:'perseverance',zh:'毅力；堅持不懈',type:'n',ex:'His perseverance in the face of failure is what makes him truly inspiring.',exZh:'他面對失敗時的堅持不懈才是他真正令人鼓舞的地方。'},
+{w:'resilience',zh:'韌性；恢復力',type:'n',ex:'My mother showed incredible resilience managing our home through every hardship.',exZh:'我母親在每次逆境中管理家庭展現了令人難以置信的韌性。'},
+{w:'proactive',zh:'積極主動的',type:'adj',ex:'She is always driven, passionate, and highly proactive in everything she does.',exZh:'她在做任何事上都充滿動力、熱情且高度積極主動。'},
+{w:'emulate her positive traits',zh:'效仿她的優點',type:'phrase',ex:'I truly hope to learn from her and emulate her positive traits.',exZh:'我真心希望向她學習並效仿她的優點。'},
+{w:'know me inside out',zh:'非常了解我',type:'phrase',ex:'My best friend knows me inside out and always gives the right advice.',exZh:'我最好的朋友對我了如指掌，總是給我正確的建議。'},
+{w:'sort through my thoughts',zh:'整理思緒',type:'phrase',ex:'Talking to her always helps me sort through my thoughts and feel calmer.',exZh:'與她交談總能幫助我整理思緒讓我感到更平靜。'},
+{w:'profound',zh:'深刻的；深遠的',type:'adj',ex:'Steve Jobs had the most profound influence on how I think about creativity.',exZh:'賈伯斯對我思考創意的方式有著最深刻的影響。'},
+{w:'legendary',zh:'傳奇的',type:'adj',ex:'He is the legendary founder of Apple, admired by millions worldwide.',exZh:'他是蘋果公司的傳奇創始人，受到全球數百萬人的仰慕。'},
+{w:'dedicated',zh:'專注的；獻身的',type:'adj',ex:'Seeing how dedicated my parents were motivated me to work just as hard.',exZh:'看到父母如此專注投入激勵了我同樣努力。'},
+{w:'sacrifices',zh:'犧牲',type:'n',ex:'Their sacrifices taught me the true meaning of love and responsibility.',exZh:'他們的犧牲教導了我愛與責任的真正含義。'},
+{w:'adversities',zh:'逆境；困境',type:'n',ex:'Everyone needs inspiration, especially when facing adversities in life.',exZh:'每個人都需要激勵，尤其是在面對人生逆境時。'},
+{w:'reflect on ourselves',zh:'反思自己',type:'phrase',ex:'Reading great books allows us to slow down and reflect on ourselves.',exZh:'閱讀好書讓我們放慢腳步，反思自己。'},
+{w:'critically',zh:'批判性地',type:'adv',ex:'We should think critically rather than blindly following what celebrities do.',exZh:'我們應該批判性地思考，而不是盲目跟隨名人。'},
+{w:'imitate celebrities blindly',zh:'盲目模仿名人',type:'phrase',ex:'Young people should form their own judgement instead of imitating celebrities blindly.',exZh:'年輕人應形成自己的判斷而不是盲目模仿名人。'},
+{w:'unity',zh:'團結',type:'n',ex:'International sports events stimulate passion and unity among people of all nations.',exZh:'國際體育賽事激發了各國人民之間的熱情和團結。'},
+{w:'tremendously',zh:'極大地；非常',type:'adv',ex:'She has inspired me tremendously with her courage and determination.',exZh:'她的勇氣和決心極大地激勵了我。'},
+{w:'renowned',zh:'享有盛譽的',type:'adj',ex:'He is globally renowned as a visionary who changed modern communication.',exZh:'他作為改變現代通訊的遠見者而享譽全球。'},
+{w:'single-handedly',zh:'靠一己之力',type:'adv',ex:'My father single-handedly managed all household finances while working full-time.',exZh:'我父親在全職工作的同時靠一己之力管理所有家庭財務。'},
+{w:'hardworking',zh:'勤奮的',type:'adj',ex:'Seeing their dedication inspired me to become more responsible and hardworking.',exZh:'看到他們的奉獻精神激勵我變得更有責任感和更加勤奮。'},
+{w:'self-discipline',zh:'自律',type:'n',ex:'Success is achieved through hard work and self-discipline, not luck alone.',exZh:'成功是通過努力和自律達成的，而不僅僅靠運氣。'},
+{w:'role model',zh:'榜樣；典範',type:'n',ex:'A true role model inspires others through consistent actions, not just words.',exZh:'真正的榜樣以持之以恆的行動而非只是言語來激勵他人。'},
+{w:'tech visionary',zh:'科技遠見者',type:'phrase',ex:'Jobs was regarded as a tech visionary who transformed how we communicate.',exZh:'賈伯斯被視為一位改變我們溝通方式的科技遠見者。'},
+{w:'mass killings',zh:'大規模殺戮',type:'phrase',ex:'Hitler became widely known due to violence and mass killings, not positive actions.',exZh:'希特勒因暴力和大規模殺戮而廣為人知，而非正面行動。'},
+],sentences:[
+{en:'The person who has influenced me the most in my life is my high school counselor.',zh:'在我生命中對我影響最深的人是我的高中輔導員。'},
+{en:'He led me to explore my interests and helped me gain a deeper understanding of my personality and inner thoughts.',zh:'他引導我探索自己的興趣，並幫助我更深入地了解自己的個性和內心想法。'},
+{en:"Throughout my growth, I've been inspired by many people — it could be my family, classmates, or even a book or a movie.",zh:'在我成長的過程中，許多人給了我啟發——可能是家人、同學，甚至是一本書或一部電影。'},
+{en:'I truly admire his drive and perseverance.',zh:'我真心欽佩他的幹勁和毅力。'},
+{en:'What I admire most about him is his incredible drive and perseverance.',zh:'我最欽佩他的是他令人難以置信的幹勁和毅力。'},
+{en:"Whenever he sets a goal, he never gives up until it's achieved.",zh:'每當他設定一個目標，他從不放棄，直到實現為止。'},
+{en:'My father is incredibly responsible, single-handedly shouldering all of our household expenses.',zh:'我父親極其負責任，靠一己之力承擔所有家庭開銷。'},
+{en:'My mother possesses immense patience and resilience, managing every aspect of our home beautifully.',zh:'我母親擁有無比的耐心和韌性，將家中的每個方面都打理得井井有條。'},
+{en:'Together, they truly set a wonderful example for us.',zh:'他們共同為我們樹立了一個美好的榜樣。'},
+{en:'I have a friend named Karen who has inspired me tremendously.',zh:'我有一位名叫Karen的朋友，她極大地激勵了我。'},
+{en:'She is always driven, passionate, and highly proactive in everything she does.',zh:'她在做任何事情上都充滿動力、熱情，且高度積極主動。'},
+{en:'I truly hope to learn from her and emulate her positive traits.',zh:'我真心希望向她學習，並效仿她的優點。'},
+{en:"When I'm in need of guidance, I usually turn to my close friends.",zh:'當我需要指引時，我通常會向親近的朋友求助。'},
+{en:"They know me inside out, so through our conversations, I'm always able to sort through my thoughts and clear my mind.",zh:'他們對我了如指掌，所以通過我們的對話，我總能整理思緒、清醒頭腦。'},
+{en:'If I had to choose one public figure who has the most profound influence on me, it would definitely be the late Steve Jobs.',zh:'如果我必須選一位對我影響最深遠的公眾人物，那肯定是已故的史蒂夫·賈伯斯。'},
+{en:'He is globally renowned as a tech visionary, most notably for inventing the iPhone.',zh:'他以科技遠見者的身份享譽全球，最著名的是發明了iPhone。'},
+{en:'What made a lasting impression on me was how he was once removed from his company, but he never gave up.',zh:'讓我印象深刻的是，他曾被自己的公司解僱，但他從未放棄。'},
+{en:'His story truly changed my perspective on life — it encouraged me to step out of my comfort zone and push myself to improve.',zh:'他的故事真正改變了我對生活的看法——它鼓勵我走出舒適圈，督促自己不斷進步。'},
+{en:'He proved that success is achieved through hard work and self-discipline.',zh:'他證明了成功是通過努力和自律實現的。'},
+{en:'Because of his incredible drive and perseverance, I will always look up to him.',zh:'因為他令人難以置信的幹勁和毅力，我將永遠仰慕他。'},
+{en:'I think role models have a significant influence on people because they can encourage others to emulate their positive traits.',zh:'我認為榜樣對人們有著重要的影響，因為他們能鼓勵他人效仿其優點。'},
+{en:'My father carried most of the responsibilities while we were growing up.',zh:'在我們成長的過程中，父親承擔了大部分的責任。'},
+{en:'My mother showed incredible resilience by taking care of many aspects of our lives and supporting the family.',zh:'我母親通過照料我們生活的方方面面並支持家庭，展現了令人難以置信的韌性。'},
+{en:'Seeing their dedication and sacrifices has motivated me to become more responsible and hardworking.',zh:'看到他們的奉獻和犧牲，激勵了我變得更有責任感和更加勤奮。'},
+{en:'Not only young people but everyone needs inspiration, especially when facing adversities in life.',zh:'不僅是年輕人，每個人都需要激勵，尤其是在面對人生逆境時。'},
+{en:'We need something that can motivate us, allowing us to reflect on ourselves and realize our potential.',zh:'我們需要一些能激勵我們的東西，讓我們得以反思自己、發揮潛力。'},
+{en:'I think parents usually have a stronger influence on children when they are young.',zh:'我認為父母通常在孩子年幼時對他們有更強的影響力。'},
+{en:'Once children start going to school, teachers and classmates begin to influence their behavior and way of thinking.',zh:'一旦孩子開始上學，老師和同學就開始影響他們的行為和思維方式。'},
+{en:'Some people become famous because of negative actions rather than positive contributions to society.',zh:'有些人因負面行為而出名，而非對社會的正面貢獻。'},
+{en:'People should think critically and form their own judgement rather than imitate celebrities blindly.',zh:'人們應該批判性地思考，形成自己的判斷，而不是盲目模仿名人。'},
+{en:'I think international sport events can inspire people because they stimulate passion and unity among individuals.',zh:'我認為國際體育賽事能激勵人們，因為它們激發個人之間的熱情與團結。'},
+{en:'When people support their national team, they feel proud of their country and share the same excitement with others.',zh:'當人們支持自己的國家隊時，他們為國家感到自豪，並與他人分享同樣的興奮之情。'},
+]},
+{id:'money_emotions',name:'Money & Emotions',emoji:'💰',words:[
+{w:'budget allocation',zh:'預算配置',type:'n',ex:'I follow a strict budget allocation to manage my income wisely.',exZh:'我遵循嚴格的預算配置來明智地管理收入。'},
+{w:'living expenses',zh:'生活開銷',type:'n',ex:'I set aside 40% of my income to cover all my living expenses.',exZh:'我撥出40%的收入來支付所有生活開銷。'},
+{w:'monetary values',zh:'金錢價值',type:'n',ex:'The joy he brings me far exceeds his monetary values.',exZh:'他帶給我的快樂遠遠超過他的金錢價值。'},
+{w:'incredibly materialistic',zh:'極度物質主義的',type:'phrase',ex:'Modern society has become incredibly materialistic in recent decades.',exZh:'現代社會在近幾十年變得極度物質主義。'},
+{w:'priceless',zh:'無價的',type:'adj',ex:'The companionship my pet provides is truly priceless.',exZh:'我的寵物所提供的陪伴是真正無價的。'},
+{w:'material possessions',zh:'物質財產',type:'n',ex:'Experiences give us lasting memories, unlike material possessions.',exZh:'與物質財產不同，體驗給我們帶來持久的回憶。'},
+{w:'lavish lifestyles',zh:'奢華生活方式',type:'phrase',ex:'We are constantly exposed to lavish lifestyles on social media.',exZh:'我們在社交媒體上不斷接觸到奢華的生活方式。'},
+{w:'mutual fund',zh:'共同基金',type:'n',ex:'I invest a portion of my savings into a mutual fund every month.',exZh:'我每月將部分儲蓄投入共同基金。'},
+{w:'compound interest',zh:'複利',type:'n',ex:'The power of compound interest grows your wealth like a snowball.',exZh:'複利的力量像滾雪球一樣增長你的財富。'},
+{w:'a means to an end',zh:'達到目的的手段',type:'phrase',ex:'Money should be a means to an end, not the goal itself.',exZh:'金錢應該是達到目的的手段，而不是目標本身。'},
+{w:'bargain',zh:'划算；便宜貨',type:'n',ex:'My rabbit only cost ten dollars, which was an incredible bargain.',exZh:'我的兔子只花了十美元，這真是非常划算。'},
+{w:'companionship',zh:'陪伴',type:'n',ex:'The companionship of a pet can greatly improve your mental wellbeing.',exZh:'寵物的陪伴可以大大改善你的心理健康。'},
+{w:'worthwhile investment',zh:'值得的投資',type:'phrase',ex:'Spending on education is always a worthwhile investment for your future.',exZh:'在教育上的投資對你的未來始終是值得的。'},
+{w:'reckон',zh:'認為；估計',type:'v',ex:'I reckon saving early is the smartest financial decision you can make.',exZh:'我認為及早儲蓄是你能做出的最明智的財務決定。'},
+{w:'astonishing',zh:'令人驚嘆的',type:'adj',ex:'The effect of compound interest over thirty years is absolutely astonishing.',exZh:'三十年複利的效果絕對令人驚嘆。'},
+{w:'gradually',zh:'逐漸地',type:'adv',ex:'I gradually built my savings by cutting unnecessary daily expenses.',exZh:'我通過削減不必要的日常開銷逐漸積累了儲蓄。'},
+{w:'constantly',zh:'持續地',type:'adv',ex:'We are constantly bombarded with ads encouraging us to spend more.',exZh:'我們不斷受到鼓勵我們多消費的廣告轟炸。'},
+{w:'countless',zh:'數不清的',type:'adj',ex:'There are countless advertisements designed to persuade us to buy things.',exZh:'有數不清的廣告旨在說服我們購買東西。'},
+{w:'persuade',zh:'說服',type:'v',ex:'Clever marketing can easily persuade consumers to buy what they do not need.',exZh:'聰明的行銷很容易說服消費者購買他們不需要的東西。'},
+{w:'genuinely',zh:'真誠地；真正地',type:'adv',ex:'She genuinely enjoys helping others and finds deep satisfaction in it.',exZh:'她真正享受幫助他人，並從中找到深深的滿足感。'},
+{w:'dedicate',zh:'投入；奉獻',type:'v',ex:'I need to dedicate more time to studying if I want to improve.',exZh:'如果我想進步，就需要投入更多時間學習。'},
+{w:'unassuming',zh:'謙遜低調的',type:'adj',ex:'I walked into an unassuming little pet shop near my campus.',exZh:'我走進了校園附近一家低調的小寵物店。'},
+{w:'compassionate',zh:'有同情心的',type:'adj',ex:'I felt compassionate toward the bullied rabbit and decided to take him home.',exZh:'我對那隻被欺負的兔子感到同情，決定帶他回家。'},
+{w:'fluffy',zh:'毛茸茸的',type:'adj',ex:'He was just a tiny fluffy baby when I first brought him home.',exZh:'我第一次把他帶回家時，他只是一個小小的毛茸茸的寶寶。'},
+{w:'emotionally rewarding',zh:'情感上有回報的',type:'phrase',ex:'Buying gifts for people I love is far more emotionally rewarding than buying for myself.',exZh:'為我愛的人買禮物在情感上遠比為自己購買更有回報。'},
+{w:'instant gratification',zh:'即時滿足',type:'phrase',ex:'Impulsive shopping gives instant gratification but often leads to regret.',exZh:'衝動購物帶來即時滿足，但往往導致後悔。'},
+{w:'short-lived pleasure',zh:'短暫的愉悅',type:'phrase',ex:'Material possessions often bring only short-lived pleasure rather than lasting happiness.',exZh:'物質財產往往只帶來短暫的愉悅，而非持久的幸福。'},
+{w:'strengthen social bonds',zh:'強化社交連結',type:'phrase',ex:'Shared experiences like traveling together can strengthen social bonds significantly.',exZh:'像一起旅行這樣的共同體驗可以顯著強化社交連結。'},
+{w:'a deep sense of fulfillment',zh:'深層的成就感',type:'phrase',ex:'Achieving a long-term goal gives me a deep sense of fulfillment.',exZh:'實現長期目標給了我深層的成就感。'},
+{w:'a lasting sense of contentment',zh:'持久的滿足感',type:'phrase',ex:'True happiness comes from achieving a lasting sense of contentment, not wealth.',exZh:'真正的幸福來自於實現持久的滿足感，而非財富。'},
+{w:'emotional satisfaction',zh:'情感上的滿足',type:'phrase',ex:'She told me that helping others gives her deep emotional satisfaction.',exZh:'她告訴我，幫助他人給她帶來深深的情感滿足。'},
+{w:'emotionally unfulfilled',zh:'情感上不滿足的',type:'phrase',ex:'Despite owning several properties, he still feels emotionally unfulfilled.',exZh:'儘管擁有幾處房產，他仍然感到情感上的不滿足。'},
+{w:'incredibly therapeutic',zh:'極具療癒效果的',type:'phrase',ex:'Having a pet around every day is incredibly therapeutic for my mental health.',exZh:'每天有一隻寵物陪伴對我的心理健康極具療癒效果。'},
+],sentences:[
+{en:'In my opinion, achieving a lasting sense of contentment requires clear goals.',zh:'我認為，實現持久的滿足感需要明確的目標。'},
+{en:'We need to work toward our goals gradually to feel truly fulfilled.',zh:'我們需要逐漸朝著目標努力，才能真正感到充實。'},
+{en:'I need to achieve my target IELTS score and dedicate time to prepare.',zh:'我需要達到目標雅思分數，並投入時間備考。'},
+{en:'Accomplishing this goal will give me a deep sense of fulfillment.',zh:'完成這個目標將給我帶來深層的成就感。'},
+{en:"There's no denying that the media has influenced people's spending habits.",zh:'不可否認，媒體影響了人們的消費習慣。'},
+{en:'People are constantly exposed to other individuals\' lavish lifestyles.',zh:'人們不斷接觸到他人奢華的生活方式。'},
+{en:'There are countless advertisements that can easily persuade consumers.',zh:'有數不清的廣告可以輕易說服消費者。'},
+{en:'It depends on whether individuals are capable of distinguishing between want and need.',zh:'這取決於個人是否能夠區分想要和需要。'},
+{en:'Money is a tool that adds a touch of quality to my life.',zh:'金錢是一種為我的生活增添品質的工具。'},
+{en:"I'm a firm believer in budget allocation despite enjoying instant gratification.",zh:'儘管享受即時滿足，我仍堅定相信預算配置的重要性。'},
+{en:'I save 30% of my income and set aside 40% for living expenses.',zh:'我存下30%的收入，並撥出40%用於生活開銷。'},
+{en:'I use the remaining 30% for leisure and entertainment.',zh:'我將剩餘的30%用於休閒和娛樂。'},
+{en:"The best value-for-money purchase I've ever made is my pet rabbit.",zh:'我買過的最超值的東西是我的寵物兔。'},
+{en:'He only cost me about 10 dollars, which was a bargain.',zh:'他只花了我大約10美元，真的非常划算。'},
+{en:'The joy and companionship he brings me are truly priceless.',zh:'他帶給我的快樂和陪伴是真正無價的。'},
+{en:'His companionship far exceeds his monetary value.',zh:'他的陪伴遠遠超過了他的金錢價值。'},
+{en:'I reckon saving is crucial, particularly when invested in stocks or mutual funds.',zh:'我認為儲蓄至關重要，尤其是投資於股票或共同基金時。'},
+{en:'The power of compound interest over time is absolutely astonishing.',zh:'複利隨時間累積的力量是絕對令人驚嘆的。'},
+{en:"Money might not buy happiness directly, but it provides security and options.",zh:'金錢可能無法直接購買幸福，但它提供了安全感和選擇。'},
+{en:"It's a powerful tool that makes pursuing happiness a lot easier.",zh:'它是一個讓追求幸福變得容易得多的強大工具。'},
+{en:'Modern society is incredibly materialistic.',zh:'現代社會極度物質主義。'},
+{en:"We're often blinded by the lavish lifestyles we see online.",zh:'我們常常被網上看到的奢華生活方式所蒙蔽。'},
+{en:'Money should simply be a means to an end.',zh:'金錢應該只是達到目的的手段。'},
+{en:'People should define what a meaningful life looks like to them.',zh:'人們應該定義對他們來說有意義的生活是什麼樣子。'},
+{en:'Then they should manage their finances to support that vision.',zh:'然後他們應該管理財務來支持那個願景。'},
+{en:'Most of my money goes toward fashion-related items and self-care.',zh:'我大部分的錢都用在時尚相關物品和自我照顧上。'},
+{en:'Self-care is one of my top priorities.',zh:'自我照顧是我最優先考慮的事項之一。'},
+{en:'Buying things for myself is far more emotionally rewarding.',zh:'為自己購買東西在情感上更有回報。'},
+{en:'It serves as a form of stress relief and encourages me to work harder.',zh:'它是一種減壓方式，並鼓勵我更努力工作。'},
+{en:'I used to buy things impulsively for instant gratification.',zh:'我以前習慣衝動購物以獲得即時滿足。'},
+{en:"As I've become more mature, I prefer to save for urgent needs.",zh:'隨著我變得更成熟，我更傾向於為緊急需求存錢。'},
+{en:'Wealthy people may enjoy financial freedom but still have hidden battles.',zh:'富有的人可能享有財務自由，但仍有不為人知的掙扎。'},
+{en:'One of my cousins owns several properties yet feels emotionally unfulfilled.',zh:'我的一位表親擁有幾處房產，卻仍感到情感上的不滿足。'},
+{en:'Experiences like traveling give us meaningful memories.',zh:'像旅行這樣的體驗給我們帶來有意義的回憶。'},
+{en:'Material possessions only provide short-lived pleasure.',zh:'物質財產只能提供短暫的愉悅。'},
+{en:'She once told me it gives her a deep sense of emotional satisfaction.',zh:'她曾告訴我，這給了她深深的情感滿足感。'},
+{en:'Genuinely helping others and spending on them brings her immense joy.',zh:'真誠地幫助他人並為他們花錢給她帶來巨大的快樂。'},
+{en:'I walked into an unassuming pet shop near my campus.',zh:'我走進了校園附近一家低調的寵物店。'},
+{en:'My attention was drawn to a tiny black-and-white rabbit.',zh:'我的注意力被一隻小小的黑白兔子吸引住了。'},
+{en:'Unlike the others, this little guy stood out in the cage.',zh:'與其他兔子不同，這個小傢伙在籠子裡非常顯眼。'},
+{en:'He was being bullied and literally stepped on by the others.',zh:'他正在被其他兔子欺負，甚至被踩踏。'},
+{en:'I felt compassionate and decided to bring him home.',zh:'我感到同情，決定把他帶回家。'},
+{en:"Even though he was a bargain, I've spent dozens of times his price on him.",zh:'雖然他很便宜，但我在他身上花的錢是他價格的幾十倍。'},
+{en:'Watching him grow gives me a huge sense of accomplishment.',zh:'看著他成長給了我巨大的成就感。'},
+{en:'The companionship and happiness he provides are truly priceless.',zh:'他提供的陪伴和快樂是真正無價的。'},
+{en:'Having him around is incredibly therapeutic.',zh:'有他在身邊極具療癒效果。'},
+]},
+{id:'spare_plans',name:'Spare Time & Plans',emoji:'⏰',words:[
+{w:'in my spare time',zh:'在我的空閒時間',type:'phrase',ex:'In my spare time, I enjoy reading books and listening to podcasts.',exZh:'在我的空閒時間，我喜歡閱讀書籍和聆聽播客。'},
+{w:'unwind',zh:'放鬆；舒緩',type:'v',ex:'After a long day, I unwind by watching classic movies at home.',exZh:'漫長的一天後，我藉由在家看經典電影來放鬆。'},
+{w:'kill time mindlessly',zh:'漫無目的地打發時間',type:'phrase',ex:'I used to kill time mindlessly scrolling through social media.',exZh:'我以前習慣漫無目的地刷社交媒體打發時間。'},
+{w:'manage my time effectively',zh:'有效管理時間',type:'phrase',ex:'I have to manage my time effectively to find any gaps for relaxation.',exZh:'我必須有效管理時間，才能找到任何放鬆的空檔。'},
+{w:'take a break from work',zh:'從工作中休息',type:'phrase',ex:'Young people are increasingly seeking quiet places to take a break from work.',exZh:'年輕人越來越多地尋求安靜的地方從工作中休息。'},
+{w:'absolutely crucial',zh:'絕對關鍵的',type:'phrase',ex:'Getting enough rest is absolutely crucial to staying productive in the long run.',exZh:'獲得足夠的休息對於長期保持生產力絕對關鍵。'},
+{w:'productive',zh:'有生產力的',type:'adj',ex:'Making use of fragmented time throughout the day keeps me feeling productive.',exZh:'充分利用一天中的碎片化時間讓我感到有生產力。'},
+{w:'perfect balance',zh:'完美的平衡',type:'phrase',ex:'It is all about finding a perfect balance between chasing goals and enjoying life.',exZh:'這一切都是關於在追求目標和享受生活之間找到完美的平衡。'},
+{w:'enrich myself',zh:'充實自己',type:'phrase',ex:'I prefer to enrich myself during spare time by learning something new.',exZh:'我更喜歡在空閒時間通過學習新事物來充實自己。'},
+{w:'fragmented time',zh:'碎片化時間',type:'phrase',ex:'I always make use of fragmented time to review vocabulary or listen to podcasts.',exZh:'我總是利用碎片化時間複習詞彙或聆聽播客。'},
+{w:'recharge my batteries',zh:'恢復精力',type:'phrase',ex:'I need some solitude on weekends to recharge my batteries.',exZh:'我需要在週末獨處一段時間來恢復精力。'},
+{w:'solitude',zh:'獨處',type:'n',ex:'I am a person who genuinely needs solitude to feel calm and focused.',exZh:'我是一個真正需要獨處才能感到平靜和專注的人。'},
+{w:'well-spent',zh:'花得值得的',type:'adj',ex:'These small moments of relaxation make my time feel well-spent and meaningful.',exZh:'這些小小的放鬆時刻讓我的時間感覺花得值得且有意義。'},
+{w:'make plans in advance',zh:'提前規劃',type:'phrase',ex:'I am a firm believer that making plans in advance is essential for success.',exZh:'我堅定地相信提前規劃對成功至關重要。'},
+{w:'prioritize tasks',zh:'優先處理任務',type:'phrase',ex:'Having a clear schedule helps me prioritize tasks and stay organized.',exZh:'有清晰的時間表幫助我優先處理任務並保持有條理。'},
+{w:'procrastination',zh:'拖延',type:'n',ex:'Procrastination is my biggest weakness when it comes to long-term projects.',exZh:'在長期項目方面，拖延是我最大的弱點。'},
+{w:'staying on track',zh:'保持正軌',type:'phrase',ex:'Laziness and procrastination often prevent me from staying on track.',exZh:'懶惰和拖延常常阻止我保持正軌。'},
+{w:'regroup',zh:'重整旗鼓',type:'v',ex:'When things go wrong, I take a breath, regroup, and adjust my plan.',exZh:'當事情出錯時，我深呼吸、重整旗鼓，然後調整計畫。'},
+{w:'travel itineraries',zh:'旅行行程',type:'phrase',ex:'Among all types of plans, travel itineraries are my most successful ones.',exZh:'在所有類型的計畫中，旅行行程是我最成功的。'},
+{w:'sense of accomplishment',zh:'成就感',type:'phrase',ex:'Completing every task on my list gives me a great sense of accomplishment.',exZh:'完成清單上的每項任務給了我巨大的成就感。'},
+{w:'executed',zh:'執行；實施',type:'v',ex:'When everything is executed perfectly as planned, the satisfaction is incredible.',exZh:'當一切都按計畫完美執行時，那種滿足感令人難以置信。'},
+{w:'roadmap',zh:'路線圖；規劃藍圖',type:'n',ex:'As a planner, I always have a clear roadmap for both my short and long-term goals.',exZh:'作為一個計劃者，我對短期和長期目標都有清晰的路線圖。'},
+{w:'envision',zh:'想像；設想',type:'v',ex:'I envision myself working as a digital nomad while traveling the world.',exZh:'我設想自己作為數位遊牧者在環遊世界的同時工作。'},
+{w:'digital nomad',zh:'數位遊牧者',type:'phrase',ex:'My dream is to work for a multinational company as a digital nomad.',exZh:'我的夢想是作為數位遊牧者在跨國公司工作。'},
+{w:'a tight schedule',zh:'緊湊的行程',type:'phrase',ex:'When planning, I tend to create a tight schedule to avoid wasting any time.',exZh:'在規劃時，我傾向於制定緊湊的行程以避免浪費任何時間。'},
+{w:'flexible schedule',zh:'彈性行程',type:'phrase',ex:'In practice, I prefer a flexible schedule so I do not feel pressed for time.',exZh:'在實際操作中，我更喜歡彈性行程，這樣我不會感到時間緊迫。'},
+{w:'be pressed for time',zh:'時間緊迫',type:'phrase',ex:'I always feel pressed for time during exam season.',exZh:'在考試季節，我總是感到時間緊迫。'},
+{w:'disciplined',zh:'自律的',type:'adj',ex:'Teaching children to follow a schedule helps them become more disciplined.',exZh:'教孩子遵守時間表有助於他們變得更自律。'},
+{w:'excess screen time',zh:'過多的螢幕時間',type:'phrase',ex:'Excess screen time can negatively affect children\'s social development.',exZh:'過多的螢幕時間會對兒童的社會發展產生負面影響。'},
+{w:'go according to plan',zh:'按計畫進行',type:'phrase',ex:'I get frustrated when things do not go according to plan.',exZh:'當事情不按計畫進行時，我會感到沮喪。'},
+],sentences:[
+{en:'Back then, I had plenty of time to kill time mindlessly.',zh:'那時候，我有大把時間漫無目的地打發時間。'},
+{en:'As a senior student, my schedule is much tighter now.',zh:'作為大四學生，我現在的行程緊湊得多了。'},
+{en:'I have to manage my time effectively to find any gaps for relaxation.',zh:'我必須有效管理時間，才能找到任何放鬆的空檔。'},
+{en:'Most people tend to engage in social media or outdoor activities like hiking.',zh:'大多數人傾向於使用社交媒體或從事戶外活動，例如遠足。'},
+{en:"There's a growing trend of young people seeking me-time in quiet places.",zh:'越來越多年輕人尋求在安靜的地方享有獨處時間的趨勢。'},
+{en:'They want to take a break from work and recharge.',zh:'他們想從工作中休息並恢復精力。'},
+{en:'Rest is absolutely crucial to stay productive in the long run.',zh:'從長遠來看，休息對於保持生產力絕對關鍵。'},
+{en:"It's all about finding a perfect balance between chasing goals and enjoying life.",zh:'這一切都是關於在追求目標和享受生活之間找到完美的平衡。'},
+{en:'In the past, I used to kill time by mindlessly scrolling through social media.',zh:'在過去，我習慣漫無目的地刷社交媒體打發時間。'},
+{en:"As my life became busier, I realized I shouldn't waste my time like that.",zh:'隨著生活變得更忙碌，我意識到我不應該那樣浪費時間。'},
+{en:'Now I prefer to enrich myself during my spare time.',zh:'現在我更喜歡在空閒時間充實自己。'},
+{en:'I listen to podcasts, research the stock market, or memorize English vocabulary.',zh:'我聆聽播客、研究股市或背誦英語詞彙。'},
+{en:'I usually make use of fragmented time throughout my day.',zh:'我通常充分利用一天中的碎片化時間。'},
+{en:'I listen to book-summary podcasts while doing my makeup or taking a shower.',zh:'我在化妝或淋浴時聆聽書籍摘要播客。'},
+{en:'I practice vocabulary on my way to class or meals.',zh:'我在去上課或用餐的途中練習詞彙。'},
+{en:'This makes me feel productive even during short breaks.',zh:'這讓我即使在短暫的休息中也感到有生產力。'},
+{en:'During longer breaks, I unwind by visiting cafes for afternoon tea.',zh:'在較長的休息時間，我去咖啡館喝下午茶來放鬆。'},
+{en:'I also unwind by watching classic movies at home.',zh:'我也藉由在家看經典電影來放鬆。'},
+{en:'Most of the time, I prefer to be alone.',zh:'大多數時候，我更喜歡獨處。'},
+{en:"I'm a person who needs solitude to recharge my batteries.",zh:'我是一個需要獨處來恢復精力的人。'},
+{en:'These small moments of relaxation add a touch of quality to my busy life.',zh:'這些小小的放鬆時刻為我忙碌的生活增添了一份品質。'},
+{en:'My time feels both well-spent and meaningful.',zh:'我的時間感覺既花得值得又有意義。'},
+{en:"I'm a firm believer that making plans in advance is essential for achieving goals.",zh:'我堅定地相信提前規劃對於實現目標至關重要。'},
+{en:'It helps me prioritize tasks and keep my daily schedule manageable.',zh:'它幫助我優先處理任務並保持每日行程可管理。'},
+{en:'I often struggle with laziness and procrastination.',zh:'我常常與懶惰和拖延作鬥爭。'},
+{en:'They prevent me from staying on track.',zh:'它們阻止我保持正軌。'},
+{en:'I try to manage my time effectively even when I sometimes fail.',zh:'即使有時失敗，我也嘗試有效地管理時間。'},
+{en:"When things don't go according to plan, I tend to get frustrated and feel paralysed.",zh:'當事情不按計畫進行時，我往往會感到沮喪甚至不知所措。'},
+{en:'I eventually regroup and adjust my schedule.',zh:'我最終重整旗鼓並調整我的行程。'},
+{en:'I tend to create a tight schedule to avoid wasting a single second.',zh:'我傾向於制定緊湊的行程，以避免浪費一秒鐘。'},
+{en:"In practice, I prefer a flexible schedule so I don't feel pressed for time.",zh:'在實際操作中，我更喜歡彈性行程，這樣我不會感到時間緊迫。'},
+{en:'By incorporating breaks into my schedule, I can actually stick to it more effectively.',zh:'通過在行程中加入休息時間，我實際上可以更有效地堅持執行它。'},
+{en:'Among all types of plans, travel itineraries are usually my most successful.',zh:'在所有類型的計畫中，旅行行程通常是我最成功的。'},
+{en:'I have a passion for organizing every detail, from routes to the timing of each spot.',zh:'我熱衷於組織每個細節，從路線到每個景點的時間安排。'},
+{en:'When everything is executed perfectly as planned, it gives me a great sense of satisfaction.',zh:'當一切都按計畫完美執行時，它給了我巨大的滿足感。'},
+{en:'I vividly remember arranging trips during my exchange program in France last year.',zh:'我清晰地記得去年在法國交換期間安排旅行的情景。'},
+{en:'Over six months, I managed to visit fifteen different European countries.',zh:'在六個月內，我設法訪問了十五個不同的歐洲國家。'},
+{en:'Planning the daily itineraries helped me gain a better understanding of local geography and culture.',zh:'規劃每日行程幫助我更好地了解當地的地理和文化。'},
+{en:'The process itself made me look forward to the journey even more.',zh:'這個過程本身讓我更加期待旅程。'},
+{en:'As a person who firmly believes planning is essential, I have a clear roadmap for my future.',zh:'作為一個堅定相信規劃重要性的人，我對未來有清晰的路線圖。'},
+{en:"I've divided my future plan into three main stages.",zh:'我把未來的計畫分為三個主要階段。'},
+{en:'In the short term, my priority is to finish my graduation project.',zh:'在短期內，我的首要任務是完成我的畢業專題。'},
+{en:'I also want to achieve an outstanding IELTS score to apply for my master\'s degree.',zh:'我還想取得優異的雅思成績以申請碩士學位。'},
+{en:'Following that, I plan to spend two years diving into neuroscience.',zh:'在那之後，我計劃花兩年時間深入研究神經科學。'},
+{en:"I'm looking for internships in relevant labs or companies.",zh:'我正在尋找相關實驗室或公司的實習機會。'},
+{en:"I'm preparing by improving my time management and avoiding procrastination.",zh:'我正在通過改善時間管理和避免拖延來做準備。'},
+{en:'My dream is to work for a multinational company as a digital nomad.',zh:'我的夢想是作為數位遊牧者在跨國公司工作。'},
+{en:'I envision myself traveling with my laptop and exploring the world while I work.',zh:'我設想自己帶著筆記型電腦旅行，在工作的同時探索世界。'},
+{en:"It's about balancing my career and freedom.",zh:'這是關於平衡我的職業和自由。'},
+{en:'Completing my tasks gives me a great sense of accomplishment.',zh:'完成我的任務給了我巨大的成就感。'},
+{en:"Honestly, I don't think children have a lot of responsibilities.",zh:'說實話，我不認為兒童有很多責任。'},
+{en:'So I guess they have plenty of time to explore their interests and develop useful skills.',zh:'所以我猜他們有大量時間探索興趣並培養有用的技能。'},
+{en:"Excessive screen time can have negative effects on people's social lives.",zh:'過多的螢幕時間會對人們的社交生活產生負面影響。'},
+{en:'They may become less interactive with others in person.',zh:'他們可能變得不那麼善於與他人面對面互動。'},
+{en:'My brother spent most of his time playing video games and could hardly stop.',zh:'我弟弟大部分時間都在玩電子遊戲，幾乎無法停下來。'},
+{en:'Over time, it became an addiction.',zh:'隨著時間的推移，它變成了一種上癮。'},
+{en:'Now he struggles to communicate with others effectively.',zh:'現在他很難有效地與他人溝通。'},
+]},
+{id:'vocab_bank',name:'Vocabulary Bank',emoji:'📚',words:[
+{w:'fill their lives',zh:'填滿他們的生活',type:'phrase',ex:'Pets fill their lives with joy and unconditional love every single day.',exZh:'寵物每天都用快樂和無條件的愛填滿他們的生活。'},
+{w:'only exception',zh:'唯一的例外',type:'phrase',ex:'I never eat dessert — the only exception is my grandmother\'s homemade cake.',exZh:'我從不吃甜點——唯一的例外是我祖母的自製蛋糕。'},
+{w:'creep me out',zh:'讓我毛骨悚然',type:'phrase',ex:'Those realistic robot faces really creep me out every time I see them.',exZh:'那些逼真的機器人臉每次我看到都讓我毛骨悚然。'},
+{w:'in person',zh:'親自；面對面',type:'phrase',ex:'It is much easier to resolve conflicts in person than over text.',exZh:'面對面解決衝突比用文字溝通容易得多。'},
+{w:'among all of them',zh:'在他們當中',type:'phrase',ex:'Among all of them, she was the one who stayed calm under pressure.',exZh:'在他們當中，她是在壓力下保持冷靜的那一個。'},
+{w:'left me with a lasting impression',zh:'給我留下深刻印象',type:'phrase',ex:'Her speech left me with a lasting impression that I still think about today.',exZh:'她的演講給我留下了深刻的印象，我至今仍會思考。'},
+{w:'well equipped',zh:'設備齊全的；準備充分的',type:'phrase',ex:'The new gym is well equipped with the latest machines and training tools.',exZh:'新體育館設備齊全，配備了最新的機器和訓練工具。'},
+{w:'captivated by',zh:'被...深深吸引',type:'phrase',ex:'I was completely captivated by her storytelling from the very first sentence.',exZh:'從第一句話開始，我就完全被她的講故事方式所吸引。'},
+{w:'cutting edge',zh:'最先進的；尖端的',type:'phrase',ex:'This lab is working on cutting edge technology that could change how we travel.',exZh:'這個實驗室正在研究最先進的技術，可能改變我們的出行方式。'},
+{w:'add a touch of',zh:'增添一點',type:'phrase',ex:'She added a touch of lemon to the sauce to brighten the flavour.',exZh:'她在醬汁中加入了一點檸檬，讓味道更加鮮亮。'},
+{w:"boost someone's mood",zh:'提振某人的心情',type:'phrase',ex:'A surprise coffee from a friend can really boost someone\'s mood on a tough day.',exZh:'在艱難的一天裡，朋友送來的一杯驚喜咖啡真的能提振心情。'},
+{w:'making fun out of',zh:'從...中找樂趣',type:'phrase',ex:'He has a talent for making fun out of everyday situations.',exZh:'他有一種從日常情境中找到樂趣的天賦。'},
+{w:'firm believer',zh:'堅定的信奉者',type:'phrase',ex:'She is a firm believer that consistency matters more than talent.',exZh:'她堅定相信持之以恆比天賦更重要。'},
+{w:'a means to an end',zh:'達到目的的手段',type:'phrase',ex:'For him, the part-time job was just a means to an end while he finished his degree.',exZh:'對他來說，兼職工作只是完成學業期間的一種達成目的的手段。'},
+{w:'attention drawn to',zh:'注意力被吸引到',type:'phrase',ex:'My attention was drawn to the small painting in the corner of the gallery.',exZh:'我的注意力被畫廊角落裡的那幅小畫所吸引。'},
+{w:'goes toward',zh:'用於；花費在',type:'phrase',ex:'Most of my salary goes toward rent and daily expenses.',exZh:'我大部分的薪水都用於房租和日常開銷。'},
+{w:'serves as a form of',zh:'作為一種...的形式',type:'phrase',ex:'Journaling serves as a form of therapy for many people dealing with stress.',exZh:'對許多承受壓力的人來說，寫日記是一種治療方式。'},
+{w:'passionate',zh:'充滿熱情的',type:'adj',ex:'She is passionate about teaching and never misses a chance to inspire her students.',exZh:'她對教學充滿熱忱，從不放過任何激勵學生的機會。'},
+{w:'humid',zh:'潮濕的',type:'adj',ex:'It was so humid outside that my glasses fogged up immediately.',exZh:'外面非常潮濕，我的眼鏡立刻就起霧了。'},
+{w:'scorching',zh:'灼熱的',type:'adj',ex:'We stayed indoors to avoid the scorching afternoon sun.',exZh:'我們待在室內，以避開灼熱的午後陽光。'},
+{w:'hospitality',zh:'熱情款待',type:'n',ex:'The hospitality of the local people made our trip truly unforgettable.',exZh:'當地人的熱情款待讓我們的旅程真正難以忘懷。'},
+{w:'furious',zh:'狂怒的',type:'adj',ex:'He was furious when he found out his project had been cancelled without warning.',exZh:'當他發現自己的專案在毫無預警的情況下被取消時，他勃然大怒。'},
+{w:'disrespectful',zh:'不尊重的',type:'adj',ex:'It\'s disrespectful to talk loudly on your phone during a meeting.',exZh:'在開會時大聲講電話是不尊重他人的行為。'},
+{w:'distinctive',zh:'獨特的；有特色的',type:'adj',ex:'Her distinctive laugh made her easy to spot across the room.',exZh:'她那獨特的笑聲讓她在房間裡很容易被認出。'},
+{w:'stand out',zh:'顯眼；脫穎而出',type:'v',ex:'Her red coat made her stand out in the crowd of grey winter jackets.',exZh:'她的紅色外套讓她在一片灰色冬季外套的人群中非常顯眼。'},
+{w:'identical',zh:'完全相同的',type:'adj',ex:'The two sisters wore identical outfits to the party as a joke.',exZh:'這對姐妹穿著相同的服裝去派對，只是為了開個玩笑。'},
+{w:'deliberately',zh:'故意地；刻意地',type:'adv',ex:'She deliberately arrived early to get a good seat at the front.',exZh:'她故意早到，以便在前排找到一個好位置。'},
+{w:'astonishing',zh:'令人驚嘆的',type:'adj',ex:'The magician\'s final trick was absolutely astonishing — nobody could figure it out.',exZh:'魔術師的最後一個把戲真是令人嘆為觀止——沒有人能看穿。'},
+{w:'authentic',zh:'真正的；道地的',type:'adj',ex:'This restaurant serves authentic Thai food made with imported ingredients.',exZh:'這家餐廳提供用進口食材製作的真正泰國料理。'},
+{w:'hesitation',zh:'猶豫',type:'n',ex:'After a moment of hesitation, she decided to speak up about the problem.',exZh:'猶豫片刻後，她決定站出來談論這個問題。'},
+{w:'frustrated',zh:'沮喪的；挫敗的',type:'adj',ex:'I felt frustrated after spending two hours on a problem with no solution.',exZh:'在一個沒有解決方案的問題上花了兩個小時後，我感到非常沮喪。'},
+{w:'paralysed',zh:'癱瘓的；不知所措的',type:'adj',ex:'She was paralysed with fear when she heard the strange noise downstairs.',exZh:'當她聽到樓下的奇怪聲音時，她嚇得動彈不得。'},
+{w:'effective',zh:'有效的',type:'adj',ex:'Taking short breaks is an effective way to maintain focus throughout the day.',exZh:'短暫休息是全天保持專注的有效方法。'},
+{w:'efficient',zh:'有效率的',type:'adj',ex:'She is incredibly efficient — she always finishes her work ahead of schedule.',exZh:'她非常有效率——她總是提前完成工作。'},
+{w:'productive',zh:'有生產力的',type:'adj',ex:'I feel most productive in the early morning before any distractions start.',exZh:'我在清晨、干擾開始之前感到最有效率。'},
+{w:'disciplined',zh:'自律的',type:'adj',ex:'Being disciplined about your sleep schedule can dramatically improve your energy levels.',exZh:'對睡眠時間保持自律可以顯著改善你的精力水平。'},
+{w:'unassuming',zh:'謙遜低調的',type:'adj',ex:'Despite being famous, she remains unassuming and easy to talk to.',exZh:'儘管很有名，她仍然謙遜低調，容易交談。'},
+{w:'literally',zh:'確實地；字面上地',type:'adv',ex:'I was so tired I could literally fall asleep standing up.',exZh:'我累到確實可以站著睡著。'},
+{w:'compassionate',zh:'有同情心的',type:'adj',ex:'A good nurse needs to be skilled, patient, and genuinely compassionate.',exZh:'一個好護士需要技術精湛、有耐心，並且真正富有同情心。'},
+{w:'fluffy',zh:'毛茸茸的',type:'adj',ex:'She wrapped herself in a fluffy blanket and curled up on the sofa.',exZh:'她把自己裹在毛絨絨的毯子裡，蜷縮在沙發上。'},
+{w:'impulsively',zh:'衝動地',type:'adv',ex:'He impulsively booked a flight to Tokyo without telling anyone.',exZh:'他衝動地訂了一張去東京的機票，沒有告訴任何人。'},
+{w:'tremendously',zh:'極大地；非常',type:'adv',ex:'The new policy has tremendously improved the working conditions for all staff.',exZh:'新政策極大地改善了所有員工的工作條件。'},
+{w:'remorse',zh:'悔恨；懊悔',type:'n',ex:'He felt deep remorse after realising how his words had hurt his friend.',exZh:'當他意識到自己的話傷害了朋友後，他感到深深的悔意。'},
+{w:'procrastination',zh:'拖延',type:'n',ex:'Procrastination is my biggest weakness when it comes to starting new projects.',exZh:'在開始新專案方面，拖延是我最大的弱點。'},
+{w:'satisfaction',zh:'滿足感',type:'n',ex:'There\'s a unique satisfaction that comes from finishing a task you\'ve been putting off.',exZh:'完成一項一直拖延的任務會帶來一種獨特的滿足感。'},
+{w:'accomplishment',zh:'成就感',type:'n',ex:'Crossing the finish line gave her an incredible sense of accomplishment.',exZh:'越過終點線給了她一種難以置信的成就感。'},
+{w:'destinations',zh:'目的地',type:'n',ex:'Kyoto and Osaka are two of the most popular travel destinations in Japan.',exZh:'京都和大阪是日本最受歡迎的兩個旅遊目的地。'},
+{w:'roadmap',zh:'路線圖；規劃藍圖',type:'n',ex:'The manager shared a roadmap for the project so the team knew what to expect.',exZh:'經理分享了專案的路線圖，讓團隊知道預期會發生什麼。'},
+{w:'digital nomad',zh:'數位遊牧者',type:'n',ex:'As a digital nomad, she works from a different city every few months.',exZh:'作為一名數位遊牧者，她每隔幾個月就在不同的城市工作。'},
+{w:'bargain',zh:'划算的交易；便宜貨',type:'n',ex:'I found a real bargain at the market — a beautiful scarf for only two dollars.',exZh:'我在市場上找到了一個真正的便宜貨——一條漂亮的圍巾只要兩美元。'},
+{w:'companionship',zh:'陪伴',type:'n',ex:'Many people adopt pets for the companionship they provide.',exZh:'許多人養寵物是為了它們所提供的陪伴。'},
+{w:'accessorise',zh:'搭配配件',type:'v',ex:'She knows how to accessorise a simple outfit and make it look stylish.',exZh:'她知道如何為簡單的穿搭搭配配件，讓它看起來時尚。'},
+{w:'battle',zh:'掙扎；奮鬥',type:'n',ex:'Getting enough sleep is a daily battle when you have a newborn.',exZh:'當你有了新生兒時，獲得足夠的睡眠是每天的一場奮鬥。'},
+{w:'attracts',zh:'吸引',type:'v',ex:'The new coffee shop attracts a lot of students because of its cozy atmosphere.',exZh:'這家新咖啡店因其舒適的氛圍而吸引了大量學生。'},
+{w:'convey',zh:'傳達；表達',type:'v',ex:'It\'s hard to convey how grateful I am in just a few words.',exZh:'很難用幾句話就傳達出我有多感激。'},
+{w:'symbolize',zh:'象徵',type:'v',ex:'White doves symbolize peace in many cultures around the world.',exZh:'白鴿在全球許多文化中象徵著和平。'},
+{w:'struggle',zh:'掙扎；努力',type:'v',ex:'Many students struggle with time management during exam season.',exZh:'許多學生在考試季節為時間管理而苦苦掙扎。'},
+{w:'envision',zh:'想像；設想',type:'v',ex:'Close your eyes and envision the life you want to be living in five years.',exZh:'閉上眼睛，想像你五年後想要過的生活。'},
+{w:'reckon',zh:'認為；估計',type:'v',ex:'I reckon we should leave early to avoid the traffic.',exZh:'我認為我們應該早點出發以避開交通堵塞。'},
+{w:'encourage',zh:'鼓勵',type:'v',ex:'My teacher always encouraged me to speak up, even when I was unsure.',exZh:'我的老師總是鼓勵我大聲說出來，即使我不確定的時候也是。'},
+{w:'incredibly',zh:'難以置信地；非常',type:'adv',ex:'The view from the top of the mountain was incredibly beautiful.',exZh:'從山頂看到的景色難以置信地美麗。'},
+{w:'exceptionally',zh:'特別地；格外地',type:'adv',ex:'She performed exceptionally well in the interview and got the job on the spot.',exZh:'她在面試中表現得異常出色，當場就得到了這份工作。'},
+{w:'Definitely',zh:'當然；絕對',type:'adv',ex:'You should definitely try the ramen here — it is the best in the city.',exZh:'你一定要嘗試這裡的拉麵——這是城裡最好吃的。'},
+{w:'Absolutely',zh:'完全地；絕對地',type:'adv',ex:'I absolutely love waking up early and watching the sunrise with a coffee.',exZh:'我完全愛上了早起，一邊喝咖啡一邊看日出。'},
+{w:'Not that often',zh:'不那麼頻繁',type:'phrase',ex:'I eat out, but not that often — maybe once or twice a week.',exZh:'我有外出用餐，但不太頻繁——大概一週一兩次。'},
+{w:'Fortunately',zh:'幸運地',type:'adv',ex:'Fortunately, I remembered my umbrella before the rain started.',exZh:'幸運地，在下雨之前我記起了帶傘。'},
+{w:'Meanwhile',zh:'同時；與此同時',type:'adv',ex:'I studied for my exams. Meanwhile, my roommate was watching TV the whole time.',exZh:'我在備考。與此同時，我的室友一直在看電視。'},
+{w:'whereas',zh:'然而；但是',type:'conj',ex:'I prefer working in silence, whereas my sister needs background music to focus.',exZh:'我喜歡在安靜中工作，然而我妹妹需要背景音樂才能專注。'},
+{w:'Not at all',zh:'完全不；不客氣',type:'phrase',ex:'Not at all — I was happy to help you with the project.',exZh:'完全不——我很樂意幫你完成這個專案。'},
+{w:'pursuit',zh:'追求；追尋',type:'n',ex:'The pursuit of happiness looks different for everyone.',exZh:'對每個人來說，追求幸福的樣子都不同。'},
+{w:'executed',zh:'執行；實施',type:'v',ex:'The plan was executed flawlessly and the event was a huge success.',exZh:'計畫被完美執行，活動取得了巨大成功。'},
+],sentences:[
+{en:'She was completely captivated by the documentary and watched it twice in a row.',zh:'她完全被那部紀錄片吸引，連續看了兩遍。'},
+{en:'The cutting edge research at this university attracts students from around the world.',zh:'這所大學的尖端研究吸引了來自世界各地的學生。'},
+{en:'He felt deep remorse after realising his impulsive decision had hurt the people he loved.',zh:'他意識到自己的衝動決定傷害了他愛的人後，感到深深的悔意。'},
+{en:'Fortunately, she remained calm and managed to convey her ideas clearly despite the pressure.',zh:'幸運地，她保持冷靜，儘管承受壓力，仍設法清晰地傳達了她的想法。'},
+{en:'Whereas some people find solitude recharging, others feel energised by being around people.',zh:'然而有些人覺得獨處能恢復精力，其他人則因與人相處而感到充滿活力。'},
+{en:'She struggled with procrastination for years before finally developing a disciplined routine.',zh:'她與拖延症鬥爭多年，最終才建立了自律的日常習慣。'},
+{en:'The view from the summit was absolutely astonishing — it left everyone speechless.',zh:'山頂的景色絕對令人驚嘆——讓所有人都說不出話來。'},
+{en:'Meanwhile, her sister was pursuing her passion for music while working a full-time job.',zh:'與此同時，她的姐姐在全職工作的同時追求她對音樂的熱情。'},
+{en:'Definitely try the local street food when you visit — it is an authentic experience you cannot miss.',zh:'去參觀時一定要嘗試當地的街頭食物——這是你不能錯過的真實體驗。'},
+{en:'The companionship pets provide serves as a form of emotional support that is truly priceless.',zh:'寵物提供的陪伴作為一種情感支持，是真正無價的。'},
+]},
+{id:'outer_space',name:'Outer Space',emoji:'🚀',words:[
+{w:'outer space',zh:'外太空',type:'n',ex:'Humans have always dreamed of exploring outer space and discovering new worlds.',exZh:'人類一直夢想著探索外太空並發現新世界。'},
+{w:'celestial bodies',zh:'天體',type:'n',ex:'Astronomers study celestial bodies such as stars, planets, and comets.',exZh:'天文學家研究天體，如恆星、行星和彗星。'},
+{w:'galaxy',zh:'星系',type:'n',ex:'Our solar system is just a tiny part of the Milky Way galaxy.',exZh:'我們的太陽系只是銀河系的一小部分。'},
+{w:'universe',zh:'宇宙',type:'n',ex:'Scientists believe the universe is still expanding at an incredible speed.',exZh:'科學家相信宇宙仍在以令人難以置信的速度膨脹。'},
+{w:'astronomy',zh:'天文學',type:'n',ex:'She developed a passion for astronomy after receiving her first telescope as a gift.',exZh:'在收到第一台望遠鏡作為禮物後，她對天文學產生了熱情。'},
+{w:'astronaut',zh:'太空人',type:'n',ex:'Becoming an astronaut requires years of rigorous training and exceptional physical fitness.',exZh:'成為太空人需要多年嚴格的訓練和出色的體能。'},
+{w:'satellite',zh:'衛星',type:'n',ex:'The satellite orbiting Earth sends back crucial data for weather forecasting.',exZh:'繞地球運行的衛星發送回對天氣預報至關重要的數據。'},
+{w:'constellation',zh:'星座',type:'n',ex:'On a clear night, you can identify many constellations with the naked eye.',exZh:'在晴朗的夜晚，你可以用肉眼辨認出許多星座。'},
+{w:'meteor shower',zh:'流星雨',type:'n',ex:'We drove far from the city to watch the meteor shower without light pollution.',exZh:'我們開車遠離城市，在沒有光污染的地方觀看流星雨。'},
+{w:'zero gravity',zh:'零重力',type:'n',ex:'Objects float freely in zero gravity, which makes simple tasks surprisingly difficult.',exZh:'物體在零重力中自由漂浮，這使得簡單的任務變得出人意料地困難。'},
+{w:'telescope',zh:'望遠鏡',type:'n',ex:'With a good telescope, you can see the craters on the surface of the moon.',exZh:'有了好的望遠鏡，你可以看到月球表面的隕石坑。'},
+{w:'breathtaking',zh:'令人屏息的',type:'adj',ex:'The view of Earth from space is absolutely breathtaking and impossible to forget.',exZh:'從太空看地球的景色絕對令人屏息，令人難以忘懷。'},
+{w:'fascinated by',zh:'對...著迷',type:'phrase',ex:"I've been fascinated by space since my childhood.",exZh:'我從小就對太空著迷。'},
+{w:'intrigued by',zh:'對...感到好奇',type:'phrase',ex:"I'm really intrigued by the mysteries of the universe and what lies beyond.",exZh:'我真的對宇宙的神秘和其背後的事物感到好奇。'},
+{w:'captured my imagination',zh:'捕獲我的想像力',type:'phrase',ex:'Space exploration has always captured my imagination like nothing else.',exZh:'太空探索總是像沒有其他事物一樣捕獲我的想像力。'},
+{w:'convinced',zh:'確信的',type:'adj',ex:"I'm convinced that alien life forms exist somewhere in the vast universe.",exZh:'我確信外星生命形式存在於廣闊宇宙的某處。'},
+{w:'numerous',zh:'許多的',type:'adj',ex:'There are numerous phenomena in space that modern technology still fails to explain.',exZh:'太空中有許多現象是現代技術仍無法解釋的。'},
+{w:'sustainable',zh:'可持續的',type:'adj',ex:'SpaceX is searching for sustainable energy sources that could support life on Mars.',exZh:'SpaceX正在尋找可持續的能源，以支持火星上的生命。'},
+{w:'cosmos',zh:'宇宙',type:'n',ex:'Carl Sagan once said we are all made of star stuff from the cosmos.',exZh:'卡爾·薩根曾說過，我們都是由宇宙中的星塵構成的。'},
+{w:'ambitious',zh:'有野心的',type:'adj',ex:'Elon Musk has incredibly ambitious goals of sending humans to live on Mars.',exZh:'伊隆·馬斯克有將人類送上火星居住的極具野心的目標。'},
+{w:'zodiac sign',zh:'星座',type:'n',ex:'She asked for my zodiac sign within five minutes of meeting me.',exZh:'她在見到我五分鐘內就問了我的星座。'},
+{w:'distinct',zh:'明顯的；截然不同的',type:'adj',ex:'Each planet in the solar system has distinct characteristics and compositions.',exZh:'太陽系中的每顆行星都有明顯的特徵和組成。'},
+{w:'skeptical',zh:'持懷疑態度的',type:'adj',ex:"I'm a bit skeptical about horoscopes — personality is far too complex for that.",exZh:'我對星座運勢有點持懷疑態度——個性遠比這複雜得多。'},
+{w:'horoscopes',zh:'星座運勢',type:'n',ex:'Some people check their horoscopes every morning before making any decisions.',exZh:'有些人每天早上在做任何決定之前都會查看星座運勢。'},
+{w:'carpeted with',zh:'覆蓋著',type:'phrase',ex:'The sky was carpeted with countless stars — it was the most beautiful sight I had ever seen.',exZh:'天空覆蓋著無數的星星——這是我見過的最美麗的景象。'},
+{w:'Big Dipper',zh:'北斗七星',type:'n',ex:'I could see the Big Dipper more clearly than ever before that night in Finland.',exZh:'那天晚上在芬蘭，我比以往任何時候都更清楚地看到了北斗七星。'},
+{w:'vast',zh:'廣闊的；巨大的',type:'adj',ex:'Standing under the night sky made me realise how vast the universe truly is.',exZh:'站在夜空下讓我意識到宇宙是多麼的廣闊。'},
+{w:'witness',zh:'目睹；見證',type:'v',ex:'I felt incredibly fortunate to witness the Northern Lights at such a young age.',exZh:'我感到非常幸運，能在如此年輕的時候目睹北極光。'},
+{w:'a once in a lifetime moment',zh:'千載難逢的時刻',type:'phrase',ex:'Watching the Northern Lights dance across the sky was a once in a lifetime moment.',exZh:'看著北極光在天空中舞動是一個千載難逢的時刻。'},
+{w:'precious',zh:'珍貴的',type:'adj',ex:'That night made me realise how precious life and every single moment can be.',exZh:'那天晚上讓我意識到生命和每一個時刻是多麼珍貴。'},
+{w:'invest funding in',zh:'投入資金於',type:'phrase',ex:'Many governments invest enormous funding in space research every year.',exZh:'許多政府每年在太空研究上投入大量資金。'},
+{w:'practical application',zh:'實際應用',type:'phrase',ex:'Space technology has many practical applications in our everyday lives.',exZh:'太空技術在我們的日常生活中有許多實際應用。'},
+{w:'GPS navigation',zh:'GPS導航',type:'n',ex:'GPS navigation relies entirely on satellites orbiting the Earth.',exZh:'GPS導航完全依賴繞地球運行的衛星。'},
+{w:'weather forecasting',zh:'天氣預報',type:'n',ex:'Accurate weather forecasting has become possible thanks to satellite technology.',exZh:'得益於衛星技術，準確的天氣預報成為了可能。'},
+{w:'spark',zh:'激發；引發',type:'v',ex:'Learning about astronomy can spark children\'s curiosity about science.',exZh:'學習天文學可以激發兒童對科學的好奇心。'},
+{w:'curiosity',zh:'好奇心',type:'n',ex:'Curiosity is the most powerful force that drives scientific discovery.',exZh:'好奇心是推動科學發現最強大的力量。'},
+{w:'critical thinking',zh:'批判性思維',type:'n',ex:'Studying science encourages critical thinking and problem-solving skills.',exZh:'學習科學鼓勵批判性思維和解決問題的能力。'},
+{w:'solar system',zh:'太陽系',type:'n',ex:'I studied the solar system in school and fell in love with astronomy.',exZh:'我在學校學習了太陽系，並愛上了天文學。'},
+{w:'Northern Lights',zh:'北極光',type:'n',ex:'Seeing the Northern Lights in person was the most magical experience of my life.',exZh:'親眼目睹北極光是我一生中最神奇的經歷。'},
+{w:'prevalent',zh:'普遍的；盛行的',type:'adj',ex:'Space exploration is becoming more prevalent as private companies enter the industry.',exZh:'隨著私人公司進入這個行業，太空探索變得越來越普遍。'},
+{w:'ordinary',zh:'普通的',type:'adj',ex:'Space travel may soon become affordable for ordinary people, not just billionaires.',exZh:'太空旅行可能很快就會讓普通人負擔得起，而不僅僅是億萬富翁。'},
+{w:'satellite collision',zh:'衛星碰撞',type:'n',ex:'The risk of satellite collision is growing as more objects are launched into orbit.',exZh:'隨著更多物體被發射到軌道上，衛星碰撞的風險正在增加。'},
+{w:'risks involved',zh:'涉及的風險',type:'phrase',ex:'Space travel is exciting but there are serious risks involved that cannot be ignored.',exZh:'太空旅行令人興奮，但有嚴重的涉及風險不能被忽視。'},
+{w:'mysterious',zh:'神秘的',type:'adj',ex:'Black holes remain one of the most mysterious phenomena in the universe.',exZh:'黑洞仍然是宇宙中最神秘的現象之一。'},
+{w:'surpassed',zh:'超越的',type:'adj',ex:'Modern space technology has surpassed what scientists thought possible fifty years ago.',exZh:'現代太空技術已超越了五十年前科學家認為可能的範疇。'},
+{w:'fortunate',zh:'幸運的',type:'adj',ex:'I feel fortunate to live in an era where space exploration is advancing so rapidly.',exZh:'我感到幸運，能生活在太空探索如此迅速發展的時代。'},
+{w:'reputation',zh:'聲譽',type:'n',ex:'Successful space missions can increase a country\'s international reputation significantly.',exZh:'成功的太空任務可以顯著提高一個國家的國際聲譽。'},
+{w:'living arrangements',zh:'生活安排',type:'n',ex:'Scientists are researching sustainable living arrangements for future Mars colonies.',exZh:'科學家正在研究未來火星殖民地的可持續生活安排。'},
+],sentences:[
+{en:"I've been fascinated by space since my childhood.",zh:'我從小就對太空著迷。'},
+{en:"I'm really intrigued by the mysteries of the universe.",zh:'我真的對宇宙的神秘感到好奇。'},
+{en:'Space exploration has always captured my imagination.',zh:'太空探索總是捕獲我的想像力。'},
+{en:"The night sky looks breathtaking when it's full of stars.",zh:'當夜空繁星點點時，景色令人屏息。'},
+{en:"I'm convinced that alien life forms exist.",zh:'我確信外星生命形式存在。'},
+{en:'There are numerous phenomena that modern technology fails to explain.',zh:'有許多現象是現代技術無法解釋的。'},
+{en:'One example is the construction of the pyramids and the formation of crop circles.',zh:'一個例子是金字塔的建造和麥田怪圈的形成。'},
+{en:'Modern technology is increasingly focused on outer space research.',zh:'現代技術越來越專注於外太空研究。'},
+{en:'The main goal is to seek sustainable resources from the cosmos.',zh:'主要目標是從宇宙中尋求可持續資源。'},
+{en:'This is much like the ambitious goals of Elon Musk\'s company SpaceX.',zh:'這很像伊隆·馬斯克的公司SpaceX的雄心壯志。'},
+{en:'They invest a lot of funding in researching outer space.',zh:'他們在外太空研究上投入大量資金。'},
+{en:'The main goal is to solve potential problems humans may face in the future.',zh:'主要目標是解決人類未來可能面臨的潛在問題。'},
+{en:'Research conducted in space can lead to technological innovations.',zh:'在太空進行的研究可以帶來技術創新。'},
+{en:'These scientific breakthroughs can benefit humanity significantly.',zh:'這些科學突破可以顯著造福人類。'},
+{en:'Although my zodiac sign is Scorpio, I\'m not a big believer in astrology.',zh:'雖然我的星座是天蠍座，但我並不太相信占星術。'},
+{en:'Human personality is far too complex to be categorised into only twelve distinct types.',zh:'人類個性太過複雜，無法僅被歸類為十二種不同類型。'},
+{en:"I'm a bit skeptical about horoscopes.",zh:'我對星座運勢有點持懷疑態度。'},
+{en:'I\'m a person who finds great romance in the night sky.',zh:'我是一個能在夜空中找到浪漫的人。'},
+{en:'Seeing the natural lights in total darkness is one of the most magical experiences.',zh:'在完全黑暗中看到自然光是最神奇的體驗之一。'},
+{en:'It happened last Christmas during a trip to Finland.',zh:'那是去年聖誕節在芬蘭旅行時發生的。'},
+{en:'My friends and I joined an Aurora hunting tour at midnight.',zh:'我和我的朋友們在午夜參加了一個追極光之旅。'},
+{en:'We had to find a spot with zero light pollution and clear skies.',zh:'我們必須找到一個沒有光污染和晴朗天空的地方。'},
+{en:'After a long drive through deep snow-covered forests, we arrived at a wide-open clearing.',zh:'經過長途穿越白雪覆蓋的深林後，我們到達了一片開闊的空地。'},
+{en:'The sky was carpeted with countless stars.',zh:'天空覆蓋著無數的星星。'},
+{en:'I could see the Big Dipper more clearly than ever before.',zh:'我比以往任何時候都更清楚地看到了北斗七星。'},
+{en:'Suddenly, the Northern Lights appeared — shades of grey and green dancing across the sky.',zh:'突然，北極光出現了——灰色和綠色的光影在天空中舞動。'},
+{en:'I was so moved that it literally took my breath away.',zh:'我感動得幾乎無法呼吸。'},
+{en:'I felt incredibly fortunate to witness such a natural wonder at a young age.',zh:'我感到非常幸運，能在年輕時目睹如此自然奇觀。'},
+{en:'It made me realise how vast the universe is.',zh:'它讓我意識到宇宙是多麼的廣闊。'},
+{en:'It was truly a once-in-a-lifetime moment.',zh:'這真的是一個千載難逢的時刻。'},
+{en:'And how precious life can be.',zh:'以及生命可以是多麼珍貴。'},
+{en:'Satellite technology plays a crucial role in GPS navigation and weather forecasting.',zh:'衛星技術在GPS導航和天氣預報中扮演著關鍵角色。'},
+{en:'Space technology has many practical applications in daily life.',zh:'太空技術在日常生活中有許多實際應用。'},
+{en:'Learning about astronomy can spark children\'s curiosity and encourage critical thinking.',zh:'學習天文學可以激發兒童的好奇心並鼓勵批判性思維。'},
+{en:'I only studied about the solar system, which includes Mars, Earth, and Venus.',zh:'我只學習了太陽系，其中包括火星、地球和金星。'},
+{en:'I\'m afraid of satellite collision and feel nervous about the risks involved.',zh:'我害怕衛星碰撞，並對涉及的風險感到緊張。'},
+{en:'Those mysterious topics can stimulate people\'s imagination and creativity.',zh:'那些神秘的話題可以激發人們的想像力和創造力。'},
+{en:'Some people believe going through a black hole could allow travel back to the past.',zh:'有些人相信穿越黑洞可以讓人回到過去。'},
+{en:'Others think it would be impossible to survive.',zh:'其他人認為這是不可能存活下來的。'},
+{en:'Space research is becoming more prevalent as technology advances.',zh:'隨著技術的進步，太空研究變得越來越普遍。'},
+{en:'Many countries manufacture and launch rockets, making space more accessible for ordinary people.',zh:'許多國家製造和發射火箭，使太空對普通人來說更加容易接近。'},
+{en:'Successful space missions can increase a country\'s international reputation significantly.',zh:'成功的太空任務可以顯著提高一個國家的國際聲譽。'},
+{en:'Scientists are researching sustainable living arrangements for future space colonies.',zh:'科學家正在研究未來太空殖民地的可持續生活安排。'},
+]}];
+
+function lsGet(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+let prog;try{prog=JSON.parse(lsGet('wf2_prog','{}'))}catch(e){prog={}}
+let score=parseInt(lsGet('wf2_score','0'));
+let streak=parseInt(lsGet('wf2_streak','0'));
+const today=new Date().toDateString();
+let todayDone=parseInt(lsGet('wf2_td_'+today,'0'));
+let todayCorrect=parseInt(lsGet('wf2_tc_'+today,'0'));
+let todayTotal=parseInt(lsGet('wf2_tt_'+today,'0'));
+let todayWordDone=parseInt(lsGet('wf2_twd_'+today,'0'));  // word questions done today
+let todaySentDone=parseInt(lsGet('wf2_tsd_'+today,'0'));  // sentence questions done today
+const WORD_GOAL=30;
+const SENT_GOAL=20;
+
+// Week key: Mon-Sun
+function getWeekKey(){const d=new Date();const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));return'wk_'+mon.toDateString();}
+let weekKey=getWeekKey();
+let weekNewWords=parseInt(lsGet('wf2_wnw_'+weekKey,'0'));
+let weekNewSents=parseInt(lsGet('wf2_wns_'+weekKey,'0'));
+
+// Unit accuracy: {unitId: {correct:0, total:0}}
+let unitAcc;try{unitAcc=JSON.parse(lsGet('wf2_uacc','{}'))}catch(e){unitAcc={}}
+
+function saveAll(){lsSet('wf2_prog',JSON.stringify(prog));lsSet('wf2_score',score);lsSet('wf2_streak',streak);lsSet('wf2_uacc',JSON.stringify(unitAcc));}
+function saveTd(){
+  lsSet('wf2_td_'+today,todayDone);
+  lsSet('wf2_tc_'+today,todayCorrect);
+  lsSet('wf2_tt_'+today,todayTotal);
+  lsSet('wf2_twd_'+today,todayWordDone);
+  lsSet('wf2_tsd_'+today,todaySentDone);
+  lsSet('wf2_wnw_'+weekKey,weekNewWords);
+  lsSet('wf2_wns_'+weekKey,weekNewSents);
+}
+
+function recordAnswer(ok, unitId){
+  todayTotal++;
+  if(ok) todayCorrect++;
+  if(unitId){
+    if(!unitAcc[unitId])unitAcc[unitId]={correct:0,total:0};
+    unitAcc[unitId].total++;
+    if(ok)unitAcc[unitId].correct++;
+  }
+}
+function wp(uid,w){const k=uid+'__'+w;if(!prog[k])prog[k]={mc:0,fi:0};return prog[k];}
+function sp(uid,i){const k=uid+'__s'+i;if(!prog[k])prog[k]={jig:0,typ:0};if(prog[k].c!==undefined){prog[k].jig=prog[k].c;prog[k].typ=0;delete prog[k].c;}return prog[k];}
+function isMastered(uid,w){const p=wp(uid,w);return p.mc>=2&&p.fi>=2;}
+function isSentDone(uid,i){const p=sp(uid,i);return p.jig>=2&&p.typ>=2;}
+
+function calcGoal(){
+  let rem=0;
+  UNITS.forEach(u=>{
+    u.words.forEach(w=>{const p=wp(u.id,w.w);rem+=Math.max(0,2-p.mc)+Math.max(0,2-p.fi);});
+    u.sentences.forEach((_,i)=>{const p=sp(u.id,i);rem+=Math.max(0,2-p.jig)+Math.max(0,2-p.typ);});
+  });
+  return Math.ceil(rem/7);
+}
+
+function switchTab(p,el){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  el.classList.add('on');
+  if(p==='words'){renderWB();document.getElementById('wordQuizArea').style.display='none';}
+  if(p==='sentences')initSentTab();
+  if(p==='practice'&&document.getElementById('topicListView').style.display!=='none')renderTopics();
+}
+
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');}
+function escR(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+function showPop(t){const el=document.getElementById('scorePop');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800);}
+function speak(t,d){
+  const go=()=>{
+    if(!window.speechSynthesis)return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang='en-US';u.rate=0.82;u.pitch=1.0;
+    // Pick best available voice: prefer Daniel (UK), Karen (AU), Samantha (US)
+    const voices=speechSynthesis.getVoices();
+    const preferred=['Daniel','Karen','Samantha','Google US English','Microsoft Aria'];
+    const pick=preferred.map(n=>voices.find(v=>v.name.includes(n))).find(Boolean)
+      ||voices.find(v=>v.lang==='en-US'&&v.localService)
+      ||voices.find(v=>v.lang.startsWith('en'));
+    if(pick)u.voice=pick;
+    speechSynthesis.speak(u);
+  };
+  // Wait for voices to load on first call
+  if(speechSynthesis.getVoices().length===0){
+    speechSynthesis.onvoiceschanged=()=>{ if(d)setTimeout(go,d); else go(); speechSynthesis.onvoiceschanged=null; };
+  } else { d?setTimeout(go,d):go(); }
+}
+function sound(type){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();if(type==='ok'){[523,659,784].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';const t=ctx.currentTime+i*.12;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.32);o.start(t);o.stop(t+.33);});}else{[300,220].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='square';const t=ctx.currentTime+i*.22;g.gain.setValueAtTime(.14,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.start(t);o.stop(t+.19);});}}catch(e){}}
+
+function updateHeader(){
+  document.getElementById('hScore').textContent=score;
+  document.getElementById('hStreak').textContent=streak;
+  // Accuracy
+  const accEl=document.getElementById('statAccNum');
+  if(accEl&&todayTotal>0){
+    const pct=Math.round(todayCorrect/todayTotal*100);
+    accEl.textContent=pct+'%';
+    accEl.style.color=pct>=80?'var(--accent3)':pct>=60?'var(--accent)':'var(--accent2)';
+  }
+  // Word bar
+  const wdn=document.getElementById('wordDoneNum');const wb=document.getElementById('wordBar');
+  if(wdn)wdn.textContent=todayWordDone;
+  if(wb){wb.style.width=Math.min(100,todayWordDone/WORD_GOAL*100)+'%';if(todayWordDone>=WORD_GOAL)wb.style.background='var(--accent3)';}
+  const wgs=document.getElementById('wordGoalStatus');
+  if(wgs){if(todayWordDone>=WORD_GOAL)wgs.textContent='Goal reached! 🎉';else if(todayWordDone>0)wgs.textContent=(WORD_GOAL-todayWordDone)+' to go';}
+  const wdl=document.getElementById('todayDateLabel');
+  if(wdl){const d=new Date();wdl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+  // Sent bar (sentences tab)
+  const sdn=document.getElementById('sentDoneNum');const sb=document.getElementById('sentBar');
+  if(sdn)sdn.textContent=todaySentDone;
+  if(sb){sb.style.width=Math.min(100,todaySentDone/SENT_GOAL*100)+'%';if(todaySentDone>=SENT_GOAL)sb.style.background='var(--accent3)';}
+}
+
+function renderTopics(){
+  const goal=calcGoal();
+  updateHeader();
+
+
+  // Accuracy stat
+  const accEl=document.getElementById('statAccNum');
+  if(accEl){
+    if(todayTotal>0){
+      const pct=Math.round(todayCorrect/todayTotal*100);
+      accEl.textContent=pct+'%';
+      accEl.style.color=pct>=80?'var(--accent3)':pct>=60?'var(--accent)':'var(--accent2)';
+    }else{accEl.textContent='—';}
+  }
+
+  // Count mastered words this week (approximation: total mastered across all units)
+  let totalMasteredWords=0,totalMasteredSents=0;
+  UNITS.forEach(u=>{
+    totalMasteredWords+=u.words.filter(w=>isMastered(u.id,w.w)).length;
+    totalMasteredSents+=u.sentences.filter((_,i)=>isSentDone(u.id,i)).length;
+  });
+  const nwEl=document.getElementById('statNewWords');if(nwEl)nwEl.textContent=totalMasteredWords;
+  const nsEl=document.getElementById('statNewSents');if(nsEl)nsEl.textContent=totalMasteredSents;
+
+  const grid=document.getElementById('topicGrid');
+  grid.innerHTML=UNITS.map(u=>{
+    const tw=u.words.length,mw=u.words.filter(w=>isMastered(u.id,w.w)).length;
+    const ts=u.sentences.length,ms=u.sentences.filter((_,i)=>isSentDone(u.id,i)).length;
+    const tot=tw+ts,mas=mw+ms,pct=tot?Math.round(mas/tot*100):0;
+    const r=18,circ=2*Math.PI*r,off=circ-(pct/100)*circ;
+    // Unit accuracy
+    const ua=unitAcc[u.id];
+    const uaStr=ua&&ua.total>0?Math.round(ua.correct/ua.total*100)+'% accuracy':'';
+    const uaColor=ua&&ua.total>0?(ua.correct/ua.total>=0.8?'var(--accent3)':ua.correct/ua.total>=0.6?'var(--accent)':'var(--accent2)'):'var(--text3)';
+    return `<div class="topic-card" onclick="startUnit('${u.id}')">
+      <div>
+        <div class="topic-emoji">${u.emoji}</div>
+        <div class="topic-name">${u.name}</div>
+        <div class="topic-meta">${mw}/${tw} words · ${ms}/${ts} sentences</div>
+        ${uaStr?`<div style="font-size:11px;font-weight:700;color:${uaColor};margin-top:4px">${uaStr}</div>`:''}
+      </div>
+      <div class="ring-wrap"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="${r}"/><circle class="ring-fill" cx="22" cy="22" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/></svg><div class="ring-text">${pct}%</div></div>
+    </div>`;
+  }).join('');
+}
+
+let CU=null,queue=[],CI=null,pAnswered=false,hintCnt=0,slots=[],selSlot=null,jHints=5;
+
+function startUnit(uid){
+  CU=UNITS.find(u=>u.id===uid);
+  document.getElementById('practiceUnitName').textContent=CU.name;
+  document.getElementById('topicListView').style.display='none';
+  document.getElementById('practiceView').style.display='block';
+  buildQ();nextQ();
+}
+function backToTopics(){
+  document.getElementById('topicListView').style.display='block';
+  document.getElementById('practiceView').style.display='none';
+  renderTopics();
+}
+
+function buildQ(){
+  queue=[];
+  CU.words.forEach(w=>{
+    const p=wp(CU.id,w.w);
+    for(let i=p.mc;i<2;i++)queue.push({type:'wmc',word:w});
+  });
+  CU.words.forEach(w=>{
+    const p=wp(CU.id,w.w);
+    if(p.mc>=2)for(let i=p.fi;i<2;i++)queue.push({type:'wfi',word:w});
+  });
+  CU.sentences.forEach((s,i)=>{
+    const p=sp(CU.id,i);
+    if(p.c<1)queue.push({type:'sjig',sent:s,idx:i});
+    if(p.c<2)queue.push({type:'styp',sent:s,idx:i});
+  });
+  // light shuffle within each group
+  queue.sort(()=>Math.random()-.5);
+}
+
+function nextQ(){
+  if(queue.length===0){
+    document.getElementById('practiceArea').innerHTML=`<div class="complete-card"><h2>Unit Complete! 🎉</h2><p>All words and sentences mastered.</p><button onclick="backToTopics()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Back to Units</button></div>`;
+    return;
+  }
+  CI=queue.shift();pAnswered=false;hintCnt=0;slots=[];selSlot=null;jHints=5;
+  if(CI.type==='wmc')renderWMC();
+  else if(CI.type==='wfi')renderWFI();
+  else if(CI.type==='sjig')renderSJig();
+  else renderSTyp();
+}
+
+function dots(mc,fi){
+  return[0,1,2,3].map(i=>{
+    let c='pdot';
+    if(i<2){if(i<mc)c+=' done';else if(i===mc)c+=' active';}
+    else{const j=i-2;if(j<fi)c+=' done';else if(j===fi&&mc>=2)c+=' active';}
+    return`<div class="${c}"></div>`;
+  }).join('');
+}
+
+function renderWMC(){
+  const w=CI.word,p=wp(CU.id,w.w);
+  const others=CU.words.filter(x=>x.w!==w.w).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[...others,w].sort(()=>Math.random()-.5);
+  // Use AI-generated fresh sentence; fall back to stored example
+  const baseEx = w.ex;
+  const masked=baseEx.replace(new RegExp(escR(w.w),'gi'),'<span class="blank"></span>');
+  document.getElementById('practiceArea').innerHTML=`<div class="qcard">
+    <div class="qcard-top"><span class="badge badge-mc">Multiple Choice</span><button class="speak-btn" onclick="speak('${escH(w.w)}')">🔊 Play</button></div>
+    <div class="pdots">${dots(p.mc,p.fi)}</div>
+    <div class="word-hint">${w.type}</div>
+    <div class="sent-box" id="mcSentBox"><div style="display:flex;align-items:center;gap:6px;color:var(--text3);font-size:13px"><div class="spinner" style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>Generating example…</div></div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    <div id="szh" style="display:none;font-size:12px;color:var(--text3);padding:6px 14px 10px;margin-top:-8px;line-height:1.5;font-style:italic"></div>
+    <div class="opts" id="optsEl">${opts.map(o=>`<button class="opt" onclick="chkMC(this,'${escH(o.w)}','${escH(w.w)}')" data-zh="${escH(o.zh)}">${escH(o.w)}<span class="opt-zh"></span></button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>
+    <div class="mastered-banner" id="mb">🎓 Word mastered!</div>
+    <button class="next-btn" id="nb" onclick="nextQ()">Next →</button>
+  </div>`;
+  fetchFreshEx(w);
+}
+
+
+async function fetchFreshExFI(w){
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:200,
+      messages:[{role:'user',content:'Write ONE natural English sentence (10-18 words) using the word/phrase: "'+w.w+'". The word must appear exactly as written. Then on a new line write the Traditional Chinese translation. Format:\nENGLISH: [sentence]\nCHINESE: [translation]'}]
+    })});
+    const data=await res.json();
+    const raw=(data.content?.[0]?.text||'').trim();
+    const enMatch=raw.match(/ENGLISH:\s*(.+)/);
+    const zhMatch=raw.match(/CHINESE:\s*(.+)/);
+    const ex=enMatch?enMatch[1].trim():raw.split('\n')[0].trim();
+    const zh=zhMatch?zhMatch[1].trim():'';
+    if(ex&&CI&&CI.word&&CI.word.w===w.w){
+      const b=document.getElementById('fiiSentBox');
+      if(b){b.textContent=ex.replace(new RegExp(escR(w.w),'gi'),'______');}
+      const szhEl=document.getElementById('szh');
+      if(szhEl&&zh){szhEl.textContent=zh;}
+      CI.freshEx=ex;CI.freshExZh=zh;
+    }
+  }catch(e){/* fallback: keep stored sentence */}
+}
+
+async function fetchFreshEx(w){
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:200,
+      messages:[{role:'user',content:'Write ONE natural English sentence (10-18 words) using the word/phrase: "'+w.w+'". The word must appear exactly as written. Then on a new line write the Traditional Chinese translation of that sentence. Format:\nENGLISH: [sentence]\nCHINESE: [translation]'}]
+    })});
+    const data=await res.json();
+    const raw=(data.content?.[0]?.text||'').trim();
+    const enMatch=raw.match(/ENGLISH:\s*(.+)/);
+    const zhMatch=raw.match(/CHINESE:\s*(.+)/);
+    const ex=enMatch?enMatch[1].trim():raw.split('\n')[0].trim();
+    const zh=zhMatch?zhMatch[1].trim():'';
+    if(ex&&CI&&CI.word&&CI.word.w===w.w){
+      const b=document.getElementById('mcSentBox');
+      if(b){b.innerHTML=ex.replace(new RegExp(escR(w.w),'gi'),'<span class="blank"></span>');}
+      CI.freshEx=ex;
+      CI.freshExZh=zh;
+    }
+  }catch(e){
+    const b=document.getElementById('mcSentBox');
+    if(b){b.innerHTML=w.ex.replace(new RegExp(escR(w.w),'gi'),'<span class="blank"></span>');}
+  }
+}
+
+function chkMC(btn,chosen,correct){
+  if(pAnswered)return;pAnswered=true;
+  const ok=chosen.toLowerCase()===correct.toLowerCase();
+  document.querySelectorAll('.opt').forEach(b=>{b.disabled=true;b.querySelector('.opt-zh').textContent=b.dataset.zh;});
+  ok?btn.classList.add('correct'):(btn.classList.add('wrong'),document.querySelectorAll('.opt').forEach(b=>{if(b.textContent.trim().toLowerCase().startsWith(correct.toLowerCase()))b.classList.add('correct');}));
+  // Show translation of the displayed sentence (fresh or stored)
+  const szhEl=document.getElementById('szh');
+  if(szhEl){
+    szhEl.style.display='block';
+    if(CI&&CI.freshExZh){szhEl.textContent=CI.freshExZh;}
+    else if(CI&&CI.word&&CI.word.exZh){szhEl.textContent=CI.word.exZh;}
+  }
+  const fb=document.getElementById('fb');
+  if(ok){sound('ok');speak(correct,600);fb.className='feedback ok';fb.textContent=['Correct! ✨','Perfect! 🎉','Great job!'][Math.floor(Math.random()*3)];
+    const p=wp(CU.id,correct);p.mc=Math.min(2,p.mc+1);score+=10+streak;streak++;todayDone++;todayWordDone++;recordAnswer(true,CU?.id);if(p.mc===1&&p.fi===0)weekNewWords++;saveTd();showPop('+'+(10+Math.max(0,streak-1)));updateHeader();
+    if(p.mc>=2&&p.fi>=2)document.getElementById('mb').classList.add('show');
+  }else{sound('bad');speak(correct,600);fb.className='feedback bad';fb.innerHTML=`<b style="color:var(--accent2)">${escH(correct)}</b>`;streak=0;todayDone++;saveTd();updateHeader();}
+  saveAll();document.getElementById('nb').classList.add('show');
+}
+
+function renderWFI(){
+  const w=CI.word,p=wp(CU.id,w.w);
+  const masked=w.ex.replace(new RegExp(escR(w.w),'gi'),'______');
+  document.getElementById('practiceArea').innerHTML=`<div class="qcard">
+    <div class="qcard-top"><span class="badge badge-fi">Spell it out</span><button class="speak-btn" onclick="speak('${escH(w.w)}')">🔊 Play</button></div>
+    <div class="pdots">${dots(p.mc,p.fi)}</div>
+    <div class="word-hint">${w.type} · ${escH(w.zh)}</div>
+    <div class="sent-box" id="fiiSentBox">${escH(masked)}</div>
+    <div id="szh" style="display:none;font-size:12px;color:var(--text3);padding:4px 14px 10px;margin-top:-6px;line-height:1.5;font-style:italic">${escH(w.exZh||"")}</div>
+    <div class="fi-wrap"><input class="fi-input" id="fii" placeholder="Spell the answer…" oninput="fiCh()" onkeydown="if(event.key==='Enter')chkFI()"><button class="check-btn" id="cb" onclick="chkFI()" disabled>Check</button></div>
+    <div class="hint-row"><button class="hint-btn" id="hb" onclick="wHint()">💡 Hint</button><button class="skip-btn" onclick="chkFI(true)">❌ Skip</button></div>
+    <div class="feedback" id="fb"></div>
+    <div class="mastered-banner" id="mb">🎓 Word mastered!</div>
+    <button class="next-btn" id="nb" onclick="nextQ()">Next →</button>
+  </div>`;
+  setTimeout(()=>document.getElementById('fii')?.focus(),80);
+  fetchFreshExFI(w);
+}
+function fiCh(){const v=document.getElementById('fii')?.value.trim();document.getElementById('cb').disabled=!v;}
+function wHint(){
+  const w=CI.word.w;hintCnt++;
+  const rev=w.slice(0,hintCnt),hid='_ '.repeat(w.length-hintCnt).trim();
+  const inp=document.getElementById('fii');if(inp){inp.value='';inp.placeholder=rev+(hintCnt<w.length?' '+hid:'');}
+  const hb=document.getElementById('hb');if(hb)hb.textContent=`💡 Hint (${Math.max(0,5-hintCnt)} left)`;
+  if(hintCnt>=5||hintCnt>=w.length){if(hb){hb.disabled=true;hb.style.opacity='.4';}setTimeout(()=>chkFI(true),400);}
+}
+function chkFI(skip){
+  if(pAnswered)return;pAnswered=true;
+  const inp=document.getElementById('fii');const val=skip?'':inp?.value.trim()||'';
+  if(!skip&&!val)return;
+  if(inp)inp.disabled=true;document.getElementById('cb').disabled=true;
+  const hb=document.getElementById('hb');if(hb){hb.disabled=true;hb.style.opacity='.4';}
+  const correct=CI.word.w;const norm=s=>s.toLowerCase().replace(/[^a-z0-9\s']/g,'').trim();
+  const ok=!skip&&norm(val)===norm(correct);
+  // Show translation of the displayed sentence (fresh or stored)
+  const szhEl=document.getElementById('szh');
+  if(szhEl){
+    szhEl.style.display='block';
+    if(CI&&CI.freshExZh){szhEl.textContent=CI.freshExZh;}
+    else if(CI&&CI.word&&CI.word.exZh){szhEl.textContent=CI.word.exZh;}
+  }
+  const fb=document.getElementById('fb');
+  if(ok){if(inp)inp.classList.add('correct');sound('ok');speak(correct,600);fb.className='feedback ok';fb.textContent=['Perfect! 🎉','Nailed it! ✨','Correct!'][Math.floor(Math.random()*3)];
+    const p=wp(CU.id,correct);p.fi=Math.min(2,p.fi+1);score+=10+streak;streak++;todayDone++;todayWordDone++;recordAnswer(true,CU?.id);saveTd();showPop('+'+(10+Math.max(0,streak-1)));updateHeader();
+    if(p.mc>=2&&p.fi>=2)document.getElementById('mb').classList.add('show');
+  }else{if(inp)inp.classList.add('wrong');sound('bad');speak(correct,600);fb.className='feedback bad';
+    const wpart=(!skip&&val)?`<span style="text-decoration:line-through;color:var(--accent2)">${escH(val)}</span> → `:'';
+    fb.innerHTML=wpart+`<b style="color:var(--accent2)">${escH(correct)}</b>`;streak=0;todayDone++;todayWordDone++;recordAnswer(false,CU?.id);saveTd();updateHeader();}
+  saveAll();document.getElementById('nb').classList.add('show');
+}
+
+function renderSJig(){
+  const s=CI.sent;window._cs={sent:s,idx:CI.idx};
+  const toks=s.en.match(/[\w'']+[.,;!?]?|[.,;!?]/g)||s.en.split(' ');
+  window._cs.toks=toks;
+  const sh=[...toks].sort(()=>Math.random()-.5);
+  document.getElementById('practiceArea').innerHTML=`<div class="qcard">
+    <div class="qcard-top"><span class="badge badge-sent">🧩 Arrange</span><button class="speak-btn" onclick="speak(window._cs.sent.en)">🔊 Play all</button></div>
+    <div style="font-size:14px;font-weight:600;line-height:1.6;margin-bottom:14px">${escH(s.zh)}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Tap words in the correct order:</div>
+    <div class="jigsaw-slots" id="jsSlots"><span style="color:var(--text3);font-size:13px">Tap words below ↓</span></div>
+    <div class="jigsaw-tokens" id="jsToks">${sh.map((t,i)=>`<span class="token" data-token="${escH(t)}" data-idx="${i}" onclick="jClick(this)">${escH(t)}</span>`).join('')}</div>
+    <div class="hint-row"><button class="hint-btn" id="jhb" onclick="jHint()">💡 Hint (5)</button><button class="skip-btn" onclick="jShowAns()">❌ Skip</button></div>
+    <button class="check-btn" id="cb" onclick="chkJig()" disabled style="width:100%;margin-top:10px">Check Order ✓</button>
+    <div class="feedback" id="fb"></div>
+    <div class="sent-zh-reveal" id="szh"></div>
+    <button class="next-btn" id="nb" onclick="nextQ()">Next →</button>
+  </div>`;
+}
+
+function jClick(el){
+  if(pAnswered)return;
+  const t=el.dataset.token;
+  if(el.classList.contains('placed')){el.classList.remove('placed');slots=slots.filter(s=>s.el!==el);}
+  else{el.classList.add('placed');const item={token:t,el,idx:el.dataset.idx};if(selSlot!==null&&selSlot<=slots.length){slots.splice(selSlot,0,item);selSlot=null;}else slots.push(item);}
+  renderSlots();document.getElementById('cb').disabled=slots.length<document.querySelectorAll('.token').length;
+}
+function gapClick(pos){if(pAnswered)return;selSlot=pos;renderSlots();}
+function slotRm(i){if(pAnswered)return;const r=slots.splice(i,1)[0];if(r.el)r.el.classList.remove('placed');selSlot=null;renderSlots();document.getElementById('cb').disabled=slots.length<document.querySelectorAll('.token').length;}
+function renderSlots(){
+  const el=document.getElementById('jsSlots');if(!el)return;
+  if(slots.length===0){el.innerHTML='<span style="color:var(--text3);font-size:13px">Tap words below ↓</span>';return;}
+  let h=`<span class="insert-gap ${selSlot===0?'active':''}" onclick="gapClick(0)">⬩</span>`;
+  slots.forEach((s,i)=>{h+=`<span class="slot-token" onclick="slotRm(${i})">${escH(s.token)} <span style="font-size:9px;opacity:.5">✕</span></span><span class="insert-gap ${selSlot===(i+1)?'active':''}" onclick="gapClick(${i+1})">⬩</span>`;});
+  if(selSlot!==null)h+=`<span style="font-size:11px;color:var(--purple);margin-left:4px">← tap to insert here</span>`;
+  el.innerHTML=h;
+}
+function jHint(){
+  if(pAnswered||jHints<=0)return;
+  const toks=window._cs.toks;let fw=slots.length;
+  for(let i=0;i<Math.min(slots.length,toks.length);i++){if(slots[i].token!==toks[i]){fw=i;break;}}
+  if(fw>=toks.length)return;
+  const rem=slots.splice(fw);rem.forEach(s=>{if(s.el)s.el.classList.remove('placed');});
+  const ct=toks[fw];const all=Array.from(document.querySelectorAll('.token'));
+  const el=all.find(t=>!t.classList.contains('placed')&&t.dataset.token===ct)||all.find(t=>!t.classList.contains('placed')&&t.textContent.trim()===ct);
+  if(el){el.classList.add('placed');el.style.outline='2px solid var(--purple)';setTimeout(()=>el.style.outline='',800);slots.push({token:ct,el,idx:el.dataset.idx});}
+  selSlot=null;renderSlots();document.getElementById('cb').disabled=slots.length<document.querySelectorAll('.token').length;
+  jHints--;const jhb=document.getElementById('jhb');
+  if(jHints<=0){if(jhb){jhb.disabled=true;jhb.style.opacity='.4';}setTimeout(()=>jShowAns(),500);}
+  else if(jhb)jhb.textContent=`💡 Hint (${jHints})`;
+}
+function jShowAns(){
+  if(pAnswered)return;
+  const toks=window._cs.toks;
+  const se=document.getElementById('jsSlots');if(se)se.innerHTML=toks.map(t=>`<span class="slot-token correct-token">${escH(t)}</span>`).join(' ');
+  finJig(false,true);
+}
+function chkJig(){
+  if(pAnswered)return;
+  const toks=window._cs.toks;const placed=slots.map(s=>s.token);const ok=placed.join(' ')===toks.join(' ');
+  const se=document.getElementById('jsSlots');
+  if(se)se.innerHTML=slots.map((s,i)=>`<span class="slot-token ${s.token===toks[i]?'correct-token':'wrong-token'}">${escH(s.token)}</span>`).join(' ');
+  finJig(ok,false);
+}
+function finJig(ok,skip){
+  pAnswered=true;document.getElementById('cb').disabled=true;
+  const jhb=document.getElementById('jhb');if(jhb){jhb.disabled=true;jhb.style.opacity='.4';}
+  const s=window._cs.sent;
+  const szh=document.getElementById('szh');if(szh){szh.style.display='block';szh.textContent=s.zh;}
+  const fb=document.getElementById('fb');
+  if(ok){sound('ok');speak(s.en,700);fb.className='feedback ok';fb.textContent=['Correct! 🎉','Perfect order! ✨','Spot on!'][Math.floor(Math.random()*3)];
+    const p=sp(CU.id,window._cs.idx);p.c=Math.min(2,p.c+1);score+=10+streak;streak++;todayDone++;todaySentDone++;recordAnswer(true,CU?.id);saveTd();showPop('+'+(10+Math.max(0,streak-1)));updateHeader();
+  }else{sound('bad');speak(s.en,700);fb.className='feedback bad';fb.textContent=skip?"Here's the correct sentence:":'Not quite right.';streak=0;todayDone++;saveTd();updateHeader();}
+  saveAll();document.getElementById('nb').classList.add('show');
+}
+
+function renderSTyp(){
+  const s=CI.sent;window._cs={sent:s,idx:CI.idx};
+  document.getElementById('practiceArea').innerHTML=`<div class="qcard">
+    <div class="qcard-top"><span class="badge badge-fi">✏️ Write it out</span><button class="speak-btn" onclick="speak('${escH(s.en)}')">🔊 Play</button></div>
+    <div style="font-size:15px;font-weight:600;line-height:1.6;margin-bottom:14px">${escH(s.zh)}</div>
+    <textarea class="sent-typing" id="sti" placeholder="Write the full English sentence…" oninput="stCh()"></textarea>
+    <div class="hint-row" style="margin-top:8px"><button class="hint-btn" id="shb" onclick="sentHint()">💡 Hint (first 3 words)</button><button class="skip-btn" onclick="chkSTyp(true)">❌ Skip</button></div>
+    <button class="check-btn" id="cb" onclick="chkSTyp(false)" disabled style="width:100%;margin-top:10px">Check ✓</button>
+    <div class="feedback" id="fb"></div>
+    <div class="sent-zh-reveal" id="szh"></div>
+    <button class="next-btn" id="nb" onclick="nextQ()">Next →</button>
+  </div>`;
+  setTimeout(()=>document.getElementById('sti')?.focus(),80);
+}
+function stCh(){const v=document.getElementById('sti')?.value.trim();document.getElementById('cb').disabled=!v;}
+function sentHint(){const w=window._cs.sent.en.split(' ');const inp=document.getElementById('sti');if(inp){inp.placeholder=w.slice(0,3).join(' ')+'…';inp.focus();}const b=document.getElementById('shb');if(b){b.disabled=true;b.style.opacity='.4';}}
+function chkSTyp(skip){
+  if(pAnswered)return;pAnswered=true;
+  const inp=document.getElementById('sti');const val=skip?'':inp?.value.trim()||'';
+  if(inp)inp.disabled=true;document.getElementById('cb').disabled=true;const shb=document.getElementById('shb');if(shb){shb.disabled=true;shb.style.opacity='.4';}
+  const correct=window._cs.sent.en;const norm=s=>s.toLowerCase().replace(/[^a-z\s]/g,'').replace(/\s+/g,' ').trim();const ok=!skip&&norm(val)===norm(correct);
+  const szh=document.getElementById('szh');if(szh){szh.style.display='block';szh.textContent=window._cs.sent.zh;}
+  const fb=document.getElementById('fb');
+  if(ok){if(inp)inp.classList.add('correct');sound('ok');speak(correct,700);fb.className='feedback ok';fb.textContent=['Perfect! 🎉','Nailed it! ✨','Excellent!'][Math.floor(Math.random()*3)];
+    const p=sp(CU.id,window._cs.idx);p.c=Math.min(2,p.c+1);score+=10+streak;streak++;todayDone++;todaySentDone++;recordAnswer(true,CU?.id);saveTd();showPop('+'+(10+Math.max(0,streak-1)));updateHeader();
+  }else{if(inp)inp.classList.add('wrong');sound('bad');speak(correct,700);fb.className='feedback bad';
+    const wp2=(!skip&&val)?`<span style="text-decoration:line-through;color:var(--accent2)">${escH(val)}</span><br>`:'';
+    fb.innerHTML=wp2+`<span style="color:var(--accent2)">${escH(correct)}</span>`;streak=0;todayDone++;todaySentDone++;recordAnswer(false,CU?.id);saveTd();updateHeader();}
+  saveAll();document.getElementById('nb').classList.add('show');
+}
+
+function renderWB(){
+  const sel=document.getElementById('wbSel').value;
+  const units=sel==='all'?UNITS:UNITS.filter(u=>u.id===sel);
+  document.getElementById('wordGrid').innerHTML=units.flatMap(u=>u.words.map(w=>{
+    const p=wp(u.id,w.w);const m=(p.mc>=2&&p.fi>=2)?4:p.mc>=2?2:p.mc>=1?1:0;
+    return`<div class="wcard" onclick="speak('${escH(w.w)}')"><div class="mdot m${m}"></div><div class="wcard-en">${escH(w.w)}</div><div class="wcard-zh">${escH(w.zh)}</div><div class="wcard-type">${w.type}</div></div>`;
+  })).join('');
+}
+
+
+// ── SENTENCE TAB JIGSAW ──────────────────────────────
+let stUnit=null,stQueue=[],stCI=null,stAns=false,stSlots=[],stSel=null,stHints=5;
+
+function initSentTab(){
+  // Refresh sentence progress bar
+  const sdn=document.getElementById('sentDoneNum');const sb=document.getElementById('sentBar');
+  if(sdn)sdn.textContent=todaySentDone;
+  if(sb){sb.style.width=Math.min(100,todaySentDone/SENT_GOAL*100)+'%';if(todaySentDone>=SENT_GOAL)sb.style.background='var(--accent3)';}
+  const dl=document.getElementById('sentTabDateLabel');
+  if(dl){const d=new Date();dl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+  const gs=document.getElementById('sentGoalStatus');
+  if(gs){
+    if(todaySentDone>=SENT_GOAL)gs.textContent='Goal reached! 🎉';
+    else gs.textContent=(SENT_GOAL-todaySentDone)+' to go';
+  }
+  const sel=document.getElementById('sentSel').value;
+  const units=sel==='all'?UNITS:UNITS.filter(u=>u.id===sel);
+  // Build queue of all sentences needing practice (count<2) across selected units
+  stQueue=[];
+  units.forEach(u=>{
+    u.sentences.forEach((s,i)=>{
+      const p=sp(u.id,i);
+      // Jigsaw phase: need 2 correct jigsaw
+      for(let j=p.jig;j<2;j++) stQueue.push({sent:s,idx:i,unit:u,mode:'jig'});
+      // Typing phase: only available after jig>=2, need 2 correct typing
+      if(p.jig>=2) for(let j=p.typ;j<2;j++) stQueue.push({sent:s,idx:i,unit:u,mode:'typ'});
+    });
+  });
+  stQueue.sort(()=>Math.random()-.5);
+  renderSentListArea(units);
+  nextStQ();
+}
+
+function nextStQ(){
+  if(stQueue.length===0){
+    document.getElementById('sentPracticeArea').innerHTML=`<div style="text-align:center;padding:30px 20px;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">🎉</div><div style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--accent3);margin-bottom:6px">All done!</div><div style="font-size:13px">All sentences practiced. Check back tomorrow!</div></div>`;
+    return;
+  }
+  stCI=stQueue.shift();stAns=false;stSlots=[];stSel=null;stHints=5;
+  if(stCI.mode==='typ') renderStTyp();
+  else renderStJig();
+}
+
+function renderStJig(){
+  const s=stCI.sent,u=stCI.unit;
+  const toks=s.en.match(/[\w'']+[.,;!?]?|[.,;!?]/g)||s.en.split(' ');
+  stCI.toks=toks;
+  const sh=[...toks].sort(()=>Math.random()-.5);
+  const progTxt=`${stQueue.length} remaining`;
+  document.getElementById('sentPracticeArea').innerHTML=`<div class="qcard">
+    <div class="qcard-top">
+      <span class="badge badge-sent">🧩 Arrange</span>
+      <span style="font-size:11px;color:var(--text3)">${progTxt}</span>
+    </div>
+    <div style="font-size:14px;font-weight:600;line-height:1.6;margin-bottom:14px;color:var(--text)">${escH(s.zh)}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Tap words in the correct order:</div>
+    <div class="jigsaw-slots" id="stSlots"><span style="color:var(--text3);font-size:13px">Tap words below ↓</span></div>
+    <div class="jigsaw-tokens" id="stToks">${sh.map((t,i)=>`<span class="token" data-token="${escH(t)}" data-idx="${i}" onclick="stClick(this)">${escH(t)}</span>`).join('')}</div>
+    <div class="hint-row" style="margin-bottom:10px">
+      <button class="hint-btn" id="sthb" onclick="stHint()">💡 Hint (5)</button>
+      <button class="skip-btn" onclick="stShowAns()">👁 See Answer</button>
+    </div>
+    <button class="check-btn" id="stcb" onclick="chkSt()" disabled style="width:100%">Check Order ✓</button>
+    <div class="feedback" id="stfb"></div>
+    <div class="sent-zh-reveal" id="stszh"></div>
+    <button class="next-btn" id="stnb" onclick="nextStQ()">Next Sentence →</button>
+  </div>`;
+}
+
+function stClick(el){
+  if(stAns)return;
+  const t=el.dataset.token;
+  if(el.classList.contains('placed')){el.classList.remove('placed');stSlots=stSlots.filter(s=>s.el!==el);}
+  else{el.classList.add('placed');const item={token:t,el,idx:el.dataset.idx};if(stSel!==null&&stSel<=stSlots.length){stSlots.splice(stSel,0,item);stSel=null;}else stSlots.push(item);}
+  renderStSlots();
+  document.getElementById('stcb').disabled=stSlots.length<document.querySelectorAll('#stToks .token').length;
+}
+function stGap(pos){if(stAns)return;stSel=pos;renderStSlots();}
+function stSlotRm(i){if(stAns)return;const r=stSlots.splice(i,1)[0];if(r.el)r.el.classList.remove('placed');stSel=null;renderStSlots();document.getElementById('stcb').disabled=stSlots.length<document.querySelectorAll('#stToks .token').length;}
+function renderStSlots(){
+  const el=document.getElementById('stSlots');if(!el)return;
+  if(stSlots.length===0){el.innerHTML='<span style="color:var(--text3);font-size:13px">Tap words below ↓</span>';return;}
+  let h=`<span class="insert-gap ${stSel===0?'active':''}" onclick="stGap(0)">⬩</span>`;
+  stSlots.forEach((s,i)=>{h+=`<span class="slot-token" onclick="stSlotRm(${i})">${escH(s.token)} <span style="font-size:9px;opacity:.5">✕</span></span><span class="insert-gap ${stSel===(i+1)?'active':''}" onclick="stGap(${i+1})">⬩</span>`;});
+  if(stSel!==null)h+=`<span style="font-size:11px;color:var(--purple);margin-left:4px">← tap to insert here</span>`;
+  el.innerHTML=h;
+}
+function stHint(){
+  if(stAns||stHints<=0)return;
+  const toks=stCI.toks;let fw=stSlots.length;
+  for(let i=0;i<Math.min(stSlots.length,toks.length);i++){if(stSlots[i].token!==toks[i]){fw=i;break;}}
+  if(fw>=toks.length)return;
+  const rem=stSlots.splice(fw);rem.forEach(s=>{if(s.el)s.el.classList.remove('placed');});
+  const ct=toks[fw];const all=Array.from(document.querySelectorAll('#stToks .token'));
+  const el=all.find(t=>!t.classList.contains('placed')&&t.dataset.token===ct)||all.find(t=>!t.classList.contains('placed')&&t.textContent.trim()===ct);
+  if(el){el.classList.add('placed');el.style.outline='2px solid var(--purple)';setTimeout(()=>el.style.outline='',800);stSlots.push({token:ct,el,idx:el.dataset.idx});}
+  stSel=null;renderStSlots();document.getElementById('stcb').disabled=stSlots.length<document.querySelectorAll('#stToks .token').length;
+  stHints--;const hb=document.getElementById('sthb');
+  if(stHints<=0){if(hb){hb.disabled=true;hb.style.opacity='.4';}setTimeout(()=>stShowAns(),500);}
+  else if(hb)hb.textContent=`💡 Hint (${stHints})`;
+}
+function stShowAns(){
+  if(stAns)return;
+  const toks=stCI.toks;
+  const se=document.getElementById('stSlots');if(se)se.innerHTML=toks.map(t=>`<span class="slot-token correct-token">${escH(t)}</span>`).join(' ');
+  finSt(false,true);
+}
+function chkSt(){
+  if(stAns)return;
+  const toks=stCI.toks;const placed=stSlots.map(s=>s.token);const ok=placed.join(' ')===toks.join(' ');
+  const se=document.getElementById('stSlots');if(se)se.innerHTML=stSlots.map((s,i)=>`<span class="slot-token ${s.token===toks[i]?'correct-token':'wrong-token'}">${escH(s.token)}</span>`).join(' ');
+  finSt(ok,false);
+}
+function finSt(ok,skip){
+  stAns=true;document.getElementById('stcb').disabled=true;
+  const hb=document.getElementById('sthb');if(hb){hb.disabled=true;hb.style.opacity='.4';}
+  const s=stCI.sent;
+  // Always speak full sentence regardless of correct/wrong
+  speak(s.en,500);
+  const szh=document.getElementById('stszh');if(szh){szh.style.display='block';szh.textContent=s.zh;}
+  const fb=document.getElementById('stfb');
+  if(ok){sound('ok');fb.className='feedback ok';fb.textContent=['Correct! 🎉','Perfect! ✨','Spot on!'][Math.floor(Math.random()*3)];
+    const p=sp(stCI.unit.id,stCI.idx);
+    if(stCI.mode==='typ'){p.typ=Math.min(2,p.typ+1);}else{p.jig=Math.min(2,p.jig+1);} todaySentDone++;recordAnswer(true,stCI.unit?.id);
+    // If jigsaw just reached 2, unlock typing phase
+    if(p.jig>=2&&p.typ<2){
+      // Add typing items to front of queue
+      for(let j=p.typ;j<2;j++) stQueue.unshift({sent:stCI.sent,idx:stCI.idx,unit:stCI.unit,mode:'typ'});
+    }
+  }else{sound('bad');fb.className='feedback bad'; todaySentDone++;recordAnswer(false,stCI.unit?.id);
+    if(!skip){const ca=document.createElement('div');ca.style.cssText='margin-top:6px;padding:8px 12px;background:var(--surface2);border-radius:8px;font-size:13px;color:var(--text2)';ca.textContent=s.en;fb.parentNode.insertBefore(ca,szh);}
+  }
+  saveAll();
+  // Refresh sent bar
+  const sdn2=document.getElementById('sentDoneNum');const sb2=document.getElementById('sentBar');
+  if(sdn2)sdn2.textContent=todaySentDone;
+  if(sb2){sb2.style.width=Math.min(100,todaySentDone/SENT_GOAL*100)+'%';if(todaySentDone>=SENT_GOAL)sb2.style.background='var(--accent3)';}
+  const gs2=document.getElementById('sentGoalStatus');
+  if(gs2){if(todaySentDone>=SENT_GOAL)gs2.textContent='Goal reached! 🎉';else gs2.textContent=(SENT_GOAL-todaySentDone)+' to go';}
+  renderSentListArea([stCI.unit]);
+  const nb=document.getElementById('stnb');if(nb)nb.classList.add('show');
+}
+
+function renderStTyp(){
+  const s=stCI.sent;
+  const p=sp(stCI.unit.id,stCI.idx);
+  const progTxt=stQueue.length+' remaining';
+  document.getElementById('sentPracticeArea').innerHTML=`<div class="qcard">
+    <div class="qcard-top">
+      <span class="badge" style="background:rgba(196,129,58,.12);color:var(--accent);border:1px solid rgba(196,129,58,.25)">✏️ Write it out</span>
+      <span style="font-size:11px;color:var(--text3)">${progTxt}</span>
+    </div>
+    <div style="font-size:14px;font-weight:600;line-height:1.6;margin-bottom:14px;color:var(--text)">${escH(s.zh)}</div>
+    <textarea class="sent-typing" id="stTypInput" placeholder="Write the full English sentence…" oninput="stTypCh()"></textarea>
+    <div id="stTypSzh" style="display:none;font-size:12px;color:var(--text3);padding:4px 14px 8px;margin-top:-4px;line-height:1.5;font-style:italic">${escH(s.en)}</div>
+    <div class="hint-row" style="margin-top:8px">
+      <button class="hint-btn" id="stTypHb" onclick="stTypHint()">💡 Hint (first 3 words)</button>
+      <button class="skip-btn" onclick="chkStTyp(true)">❌ Skip</button>
+    </div>
+    <button class="check-btn" id="stTypCb" onclick="chkStTyp(false)" disabled style="width:100%;margin-top:10px">Check ✓</button>
+    <div class="feedback" id="stTypFb"></div>
+    <div class="sent-zh-reveal" id="stTypZh"></div>
+    <button class="next-btn" id="stTypNb" onclick="nextStQ()">Next →</button>
+  </div>`;
+  setTimeout(()=>document.getElementById('stTypInput')?.focus(),80);
+}
+function stTypCh(){const v=document.getElementById('stTypInput')?.value.trim();document.getElementById('stTypCb').disabled=!v;}
+function stTypHint(){
+  const w=stCI.sent.en.split(' ');
+  const inp=document.getElementById('stTypInput');if(inp){inp.placeholder=w.slice(0,3).join(' ')+'…';}
+  const hb=document.getElementById('stTypHb');if(hb){hb.disabled=true;hb.style.opacity='.4';}
+}
+function chkStTyp(skip){
+  if(stAns)return;stAns=true;
+  const inp=document.getElementById('stTypInput');const val=skip?'':inp?.value.trim()||'';
+  if(inp)inp.disabled=true;document.getElementById('stTypCb').disabled=true;
+  const hb=document.getElementById('stTypHb');if(hb){hb.disabled=true;hb.style.opacity='.4';}
+  const correct=stCI.sent.en;const norm=s=>s.toLowerCase().replace(/[^a-z\s]/g,'').replace(/\s+/g,' ').trim();
+  const ok=!skip&&norm(val)===norm(correct);
+  // Always speak full sentence
+  speak(correct,500);
+  const szh=document.getElementById('stTypZh');if(szh){szh.style.display='block';szh.textContent=stCI.sent.zh;}
+  const szh2=document.getElementById('stTypSzh');if(szh2)szh2.style.display='block';
+  const fb=document.getElementById('stTypFb');
+  if(ok){if(inp)inp.classList.add('correct');sound('ok');fb.className='feedback ok';fb.textContent=['Perfect! 🎉','Nailed it! ✨','Excellent!'][Math.floor(Math.random()*3)];
+    const p=sp(stCI.unit.id,stCI.idx);p.typ=Math.min(2,p.typ+1);todaySentDone++;recordAnswer(true,stCI.unit?.id);
+  }else{if(inp)inp.classList.add('wrong');sound('bad');fb.className='feedback bad';
+    const wp=(!skip&&val)?`<span style="text-decoration:line-through;color:var(--accent2)">${escH(val)}</span><br>`:'';
+    fb.innerHTML=wp+`<span style="color:var(--accent2)">${escH(correct)}</span>`;todaySentDone++;recordAnswer(false,stCI.unit?.id);
+  }
+  saveAll();
+  const sdn3=document.getElementById('sentDoneNum');const sb3=document.getElementById('sentBar');
+  if(sdn3)sdn3.textContent=todaySentDone;
+  if(sb3){sb3.style.width=Math.min(100,todaySentDone/SENT_GOAL*100)+'%';if(todaySentDone>=SENT_GOAL)sb3.style.background='var(--accent3)';}
+  const gs3=document.getElementById('sentGoalStatus');
+  if(gs3){if(todaySentDone>=SENT_GOAL)gs3.textContent='Goal reached! 🎉';else gs3.textContent=(SENT_GOAL-todaySentDone)+' to go';}
+  renderSentListArea([stCI.unit]);
+  document.getElementById('stTypNb').classList.add('show');
+}
+
+function renderSentListArea(units){
+  const el=document.getElementById('sentListArea');if(!el)return;
+  el.innerHTML=(units||UNITS).flatMap(u=>u.sentences.map((s,i)=>{
+    const done=isSentDone(u.id,i);const p2=sp(u.id,i);
+    const prog=done?'✅ Mastered':p2.jig>=2?`Arrange ✓ · Write ${p2.typ}/2`:`Arrange ${p2.jig}/2`;
+    return`<div class="sent-item ${done?'mastered':''}"><div class="sent-item-en">${escH(s.en)}</div><div class="sent-item-zh">${escH(s.zh)}</div><div class="sent-item-meta">${u.name} · ${prog}</div></div>`;
+  })).join('');
+}
+
+// ── WORD BANK QUIZ ───────────────────────────────────
+let wqCurrent=null,wqAnswered=false,wqCorrect=0,wqTotal=0;
+
+function startWordQuiz(){
+  wqCorrect=0;wqTotal=0;
+  document.getElementById('wordQuizArea').style.display='block';
+  nextWQ();
+}
+
+function nextWQ(){
+  // Pick random word from all units
+  const all=UNITS.flatMap(u=>u.words.map(w=>({w,u})));
+  const item=all[Math.floor(Math.random()*all.length)];
+  wqCurrent=item;wqAnswered=false;
+  const w=item.w,u=item.u;
+  // 4 options: correct zh + 3 distractors
+  const others=all.filter(x=>x.w.w!==w.w).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[...others.map(x=>x.w.zh),w.zh].sort(()=>Math.random()-.5);
+  const score_txt=wqTotal>0?`${wqCorrect}/${wqTotal} correct`:'';
+  document.getElementById('wordQuizArea').innerHTML=`<div class="qcard" style="border-color:var(--purple)">
+    <div class="qcard-top">
+      <span class="badge" style="background:rgba(124,111,212,.12);color:var(--purple);border:1px solid rgba(124,111,212,.25)">🎯 Word Quiz</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--text3)">${score_txt}</span>
+        <button onclick="closeWordQuiz()" style="background:none;border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:12px;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif">✕ Close</button>
+      </div>
+    </div>
+    <div style="font-family:'Instrument Serif',serif;font-size:28px;letter-spacing:-.5px;margin-bottom:4px">${escH(w.w)}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px">${w.type} · ${u.name}</div>
+    <div class="opts" id="wqOpts">
+      ${opts.map(zh=>`<button class="opt" onclick="chkWQ(this,'${escH(zh)}','${escH(w.zh)}')">${escH(zh)}</button>`).join('')}
+    </div>
+    <div class="feedback" id="wqfb"></div>
+    <button class="next-btn" id="wqnb" onclick="nextWQ()">Next →</button>
+  </div>`;
+  speak(w.w);
+}
+
+function chkWQ(btn,chosen,correct){
+  if(wqAnswered)return;wqAnswered=true;wqTotal++;
+  const ok=chosen===correct;
+  document.querySelectorAll('#wqOpts .opt').forEach(b=>b.disabled=true);
+  if(ok){btn.classList.add('correct');wqCorrect++;sound('ok');}
+  else{btn.classList.add('wrong');document.querySelectorAll('#wqOpts .opt').forEach(b=>{if(b.textContent.trim()===correct)b.classList.add('correct');});sound('bad');}
+  const fb=document.getElementById('wqfb');
+  fb.className='feedback '+(ok?'ok':'bad');
+  fb.textContent=ok?['Correct! ✨','Right! 🎉','Yes!'][Math.floor(Math.random()*3)]:correct;
+  document.getElementById('wqnb').classList.add('show');
+}
+
+function closeWordQuiz(){
+  document.getElementById('wordQuizArea').style.display='none';
+}
+
+function renderSL(){renderSentListArea(UNITS);}
+
+
+function populateSels(){
+  ['wbSel','sentSel'].forEach(id=>{
+    const sel=document.getElementById(id);
+    UNITS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;sel.appendChild(o);});
+  });
+}
+
+populateSels();
+renderTopics();
+initSentTab();
+</script>
+</body>
+</html>
